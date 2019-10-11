@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700,900&display=swap&subset=cyrillic,cyrillic-ext');
+//@import "./fonts/stylesheet.css";
+
+// Fonts
+$font-family-sans-serif: "Roboto", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+
+$grid-gutter-width:           20px;
+$card-border-radius:          .625rem;
+//$card-border-width: 0;
+
+$primary: #0B53F9;
+$input-placeholder-color: #CFCFCF;
+$font-size-base: 1rem;
+
+
+$navbar-light-color:                rgba($primary, .5);
+$navbar-light-hover-color:          rgba($primary, .7);
+$navbar-light-active-color:         rgba($primary, .9);
+$navbar-light-disabled-color:       rgba($primary, .3);
+$navbar-light-toggler-border-color: rgba($primary, .1);
+
+$headings-line-height:        1;
+$h5-font-size:                $font-size-base * 1.125;
+
+$small-font-size:             66.6667%;
+
+//@import "~bootswatch/dist/minty/variables";
+@import '~bootstrap/scss/bootstrap';
+//@import "~bootswatch/dist/minty/bootswatch";
+@import "~bootstrap-vue/src/index";
+
+
+
+
+html,
+body {
+  min-height: 100%;
+  //min-height: 100%;
+  scroll-behavior: smooth;
+}
+#__nuxt, #__layout {
+  min-height: 100%;
+}
+
+// themes
+
+#__layout {
+  .light {
+    min-height: 100%;
+    padding-bottom: 5rem;
+    background-color: #F8F8F8;
+    header {
+      background-color: #fff;
+    }
+    p {
+      color: #464A59;
+    }
+    div {
+      &.label {
+        color: #BABCCC;
+      }
+    }
+    h1,h2,h3,h4,h5,h6 {
+      color: #464A59;
+    }
+
+    .card {
+      border-color: transparent !important;
+      &.bg-primary {
+        background-color: #3299F4 !important;
+        color: white;
+      }
+      &.bg-success {
+        background-color: #71E2B5 !important;
+        color: white;
+      }
+      &.bg-danger {
+        background-color: #F87173 !important;
+        color: white;
+      }
+      &.bg-warning {
+        background-color: #FDBB69 !important;
+        color: white;
+      }
+      &.bg-info {
+        background-color: #AC81F2 !important;
+        color: white;
+      }
+      &.bg-secondary {
+        background-color: #EFEFEF !important;
+        //color: white;
+      }
+
+    }
+  }
+
+  .dark {
+    min-height: 100%;
+    padding-bottom: 5rem;
+    color: #AEBEDE;
+    background-color: #0F1622;
+    header {
+      //background-color: #fff;
+    }
+    p {
+      color: #B8C8EA;
+    }
+    div {
+      &.label {
+        color: #B8C8EA;
+      }
+    }
+    h1,h2,h3,h4,h5,h6 {
+      color: white;
+    }
+    .card {
+      background-color: #19212F;
+      border-color: transparent !important;
+
+      &.bg-primary {
+        background-color: #3299F4 !important;
+        color: white;
+      }
+
+      &.bg-success {
+        background-color: #71E2B5 !important;
+        color: white;
+      }
+
+      &.bg-danger {
+        background-color: #F87173 !important;
+        color: white;
+      }
+
+      &.bg-warning {
+        background-color: #FDBB69 !important;
+        color: white;
+      }
+
+      &.bg-info {
+        background-color: #AC81F2 !important;
+        color: white;
+      }
+
+      &.bg-secondary {
+        background-color: #19212F !important;
+        color: white;
+      }
+    }
+    .form-control {
+      background-color: #19212F;
+      border-color: #19212F;
+    }
+
+  }
+}
+
+header {
+  .navbar-brand {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .custom-switch {
+    padding-left: 2rem;
+    margin-right: -0.75rem;
+  }
+}
+//a {
+//  transition: all .35s;
+//}
+h1,h2,h3,h4,h5,h6 {
+  &.subtitle {
+    font-weight: 600;
+  }
+}
+// number of cards per line for each breakpoint
+$cards-per-line: (
+  xs: 2,
+  sm: 2,
+  md: 2,
+  lg: 2,
+  xl: 3
+);
+
+@each $name, $breakpoint in $grid-breakpoints {
+  @media (min-width: $breakpoint) {
+    .card-deck .card {
+      flex: 0 0 calc(#{100%/map-get($cards-per-line, $name)} - #{$grid-gutter-width});
+    }
+  }
+}
+
+//custom
+
+.market {
+  .navbar {
+    padding: 0 0 1rem 0;
+  }
+  .card {
+    .card-body {
+      padding: 0.625rem;
+    }
+    h5.card-title {
+      font-size: $font-size-base * 0.875;
+    }
+  }
+}
+
+p {
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+//special
+
+.jumbotron {
+  &.banner1 {
+    background: linear-gradient(to right, #0038FD, #0038FD 10%, rgba(#0024A8, 0.63) 40%, rgba(#000316, 0) 70%), url(img/3222.png);
+    background-size: cover;
+    color: white !important;
+    //min-height: 180px;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+
+    h1 {
+      color: white !important;
+    }
+    p {
+      width: 60%;
+      color: white !important;
+    }
+  }
+}
