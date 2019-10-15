@@ -55,6 +55,7 @@ export default {
     { src: '~/plugins/filters' },
     { src: '~/plugins/market', mode: 'client' },
     { src: '~/plugins/cosmos', mode: 'client' },
+    { src: '~/plugins/identicon', mode: 'client' },
   ],
   /*
    ** Nuxt.js dev-modules

@@ -78,7 +78,8 @@
 <!--            </b-nav-item-dropdown>-->
             <b-nav-item-dropdown right>
               <template slot="button-content">
-                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}
+<!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
+                <jazzicon :address="userAddress" :diameter="20" /> {{ userName | truncate(5) }}
               </template>
               <template v-if="accounts.length">
                 <b-dropdown-item-btn v-for="(a, id) in accounts" :key="id" :active="currentId === id" @click="setCurrentUser(id)">
@@ -154,6 +155,9 @@ export default {
     ...mapGetters('user', ['currentUser']),
     userName() {
       return this.currentUser ? this.currentUser.name : '<login>'
+    },
+    userAddress() {
+      return this.currentUser ? this.currentUser.address.substring(8) : '<address>'
     },
   },
   created() {
