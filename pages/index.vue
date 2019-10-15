@@ -1,6 +1,10 @@
 <template>
   <page>
-    index page
+    <b-container>
+      <b-jumbotron>
+        <h1 class="text-center">DGaming Market Demo</h1>
+      </b-jumbotron>
+    </b-container>
   </page>
 </template>
 

@@ -42,8 +42,8 @@ import { MARKET_ALL_NFT } from '../mutation-types'
 // }
 //
 export default {
-  [MARKET_ALL_NFT](state, { nfts = [] }) {
-    state.nfts = state.nfts // this.wallets.map(prepWallet)
+  [MARKET_ALL_NFT](state, nfts = []) {
+    state.nfts = nfts // this.wallets.map(prepWallet)
       // .filter(w => {
       //   return wallets.findIndex(w1 => w1.currency === w.currency) === -1
       // })

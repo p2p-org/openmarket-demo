@@ -1,10 +1,5 @@
 <template>
-  <section class="market">
     <b-container>
-      <b-jumbotron class="banner1">
-        <h1>BlockRobots</h1>
-        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. </p>
-      </b-jumbotron>
       <b-row class="">
         <b-col md="3">
           <b-card>
@@ -51,21 +46,25 @@
               </b-nav-form>
             </b-navbar-nav>
           </b-navbar>
-          <b-card-group deck>
+          <b-card-group v-if="nfts.length" deck>
+            <!--              :title="nft.meta.name"-->
+            <!--              :image="nft.meta.image"-->
+            <!--              :price="nft.price"-->
+            <!--              :id="nft.id"-->
             <market-card
               v-for="nft in nfts"
               :key="nft.id"
-              :title="nft.meta.title"
-              :image="nft.meta.image"
-              :price="nft.price"
+              :nft="nft"
               :rate="rateETH"
-              :id="nft.id"
             ></market-card>
+<!--            {{ nfts }}-->
           </b-card-group>
+          <div v-if="nfts.length" class="overflow-auto">
+            <b-pagination-nav v-model="curPage" :link-gen="linkGen" :number-of-pages="numberOfPages" use-router></b-pagination-nav>
+          </div>
         </b-col>
       </b-row>
     </b-container>
-  </section>
 </template>
 
 <script>
@@ -75,11 +74,13 @@ import SortDropdown from './form/SortDropdown'
 import MarketCard from './element/MarketCard'
 
 export default {
-  name: 'Market',
+  name: 'MarketList',
   components: { MarketCard, SortDropdown },
   data() {
     return {
       rateETH: 123123,
+      perPage: 3,
+      curPage: null,
       cards: [],
       selected: null,
       options: ['All', 'Fixed price', 'Auction'],
@@ -120,20 +121,30 @@ export default {
   },
   computed: {
     ...mapState({
-      nfts: state => state.market.nfts
+      nfts: state => state.market.nfts,
     }),
-    // nfts1() {
-      // return this.nfts
+    nfts1() {
+      return this.nfts
       //   .sort((a,b) => {
       //
       // })
-    // }
+    },
+    numberOfPages() {
+      return this.nfts.length ? this.nfts.length / this.perPage : 1
+    }
   },
   mounted() {
-    this.getAllNft()
+    this.queryNft()
   },
   methods: {
-    ...mapActions('market', ['getAllNft']),
+    ...mapActions('market', ['getAllNft', 'queryNft']),
+    linkGen(pageNum) {
+      // return {
+      //   name: 'market',
+      //   query: { page: pageNum === 1 ? null : pageNum },
+      // }
+      return pageNum === 1 ? '?' : `?page=${pageNum}`
+    },
     changeSortTime(value) {
       this.sort.time.current = value
     },
