@@ -12,24 +12,29 @@
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore ."
   },
   "dependencies": {
+    "@cosmostation/cosmosjs": "^0.4.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/vue-fontawesome": "^0.1.7",
     "@nuxtjs/axios": "^5.3.6",
-    "bootstrap-vue": "^2.0.2",
+    "@nuxtjs/proxy": "^1.3.3",
+    "bootstrap-vue": "^2.0.4",
     "cookie-universal-nuxt": "^2.0.18",
+    "express": "^4.17.1",
+    "express-query-boolean": "^2.0.0",
     "node-sass": "^4.12.0",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.10.1",
     "nuxt-fontawesome": "^0.4.0",
-    "sass-loader": "^8.0.0"
+    "sass-loader": "^8.0.0",
+    "sharp": "^0.23.1"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^1.0.1",
     "@nuxtjs/eslint-module": "^1.0.0",
     "babel-eslint": "^10.0.1",
-    "eslint": "^6.1.0",
-    "eslint-plugin-nuxt": ">=0.4.2",
+    "eslint": "^6.5.1",
     "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-nuxt": ">=0.4.2",
     "eslint-plugin-prettier": "^3.0.1",
     "prettier": "^1.16.4"
   }

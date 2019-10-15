@@ -11,6 +11,7 @@ $card-border-radius:          .625rem;
 $primary: #0B53F9;
 $input-placeholder-color: #CFCFCF;
 $font-size-base: 1rem;
+$body-bg:                   #F8F8F8 !default;
 
 
 $navbar-light-color:                rgba($primary, .5);
@@ -48,7 +49,7 @@ body {
   .light {
     min-height: 100%;
     padding-bottom: 5rem;
-    background-color: #F8F8F8;
+    //background-color: #F8F8F8;
     header {
       background-color: #fff;
     }
@@ -203,6 +204,12 @@ $cards-per-line: (
     h5.card-title {
       font-size: $font-size-base * 0.875;
     }
+    //.card-header {
+    //  position: absolute;
+    //  //top: 0.5rem;
+    //  background: none;
+    //  border: none;
+    //}
   }
 }
 

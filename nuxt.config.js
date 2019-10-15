@@ -40,7 +40,7 @@ export default {
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: '#fff' },
+  loading: { color: '#555' },
   /*
    ** Global CSS
    */
@@ -51,8 +51,10 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    { src: '~/plugins/directives', mode: 'client' },
+    { src: '~/plugins/directives' },
+    { src: '~/plugins/filters' },
     { src: '~/plugins/market', mode: 'client' },
+    { src: '~/plugins/cosmos', mode: 'client' },
   ],
   /*
    ** Nuxt.js dev-modules
@@ -84,16 +86,20 @@ export default {
       },
     ],
   ],
-  /*
-   ** Axios module configuration
-   ** See https://axios.nuxtjs.org/options
-   */
-  axios: {},
-
   router: {
     linkExactActiveClass: 'active',
   },
-
+  serverMiddleware: [
+    // API middleware
+    '~/api',
+  ],
+  proxy: {
+    '/apiHub': {
+      pathRewrite: { '^/apiHub': '' },
+      target: 'http://localhost:1317',
+      ws: false
+    },
+  },
   /*
    ** Build configuration
    */

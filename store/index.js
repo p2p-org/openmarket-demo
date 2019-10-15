@@ -36,7 +36,7 @@ export const actions = {
       case 'dark':
         break;
       default:
-        theme = 'dark'
+        theme = 'light'
     }
     // saving token in cookie for server rendering
     this.$cookies.set(themeKeyName, theme, { path: '/' })
