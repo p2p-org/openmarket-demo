@@ -1,9 +1,15 @@
-export function setUser({ commit }, { id = null, name = null, mnemonic = null, password = null }) {
-  const address = this.$cosmos.getAddress(mnemonic)
+export function setUser(
+  { commit },
+  // eslint-disable-next-line camelcase
+  { id = null, name = null, mnemonic = null, address = null, password = null, sequence = 0, account_number = 0 }
+) {
+  if (!address && mnemonic) {
+    address = this.$cosmos.getAddress(mnemonic)
+  }
   // console.log(address, this.users[0].address)
   // const ecpairPriv = cosmos.getECPairPriv(mnemonic)
 
-  commit('setUser', { id, name, mnemonic, password, address })
+  commit('setUser', { id, name, mnemonic, password, address, sequence, account_number })
   return Promise.resolve()
 }
 

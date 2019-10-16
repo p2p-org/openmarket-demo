@@ -1,98 +1,116 @@
 <template>
-    <b-container>
-      <b-row class="">
-        <b-col md="3">
-          <b-card>
-            <b-form-group label="Rankings">
-              <b-form-checkbox-group
-                v-model="selected"
-                :options="options"
-                name="flavour-2a"
-                stacked
-              ></b-form-checkbox-group>
-            </b-form-group>
-          </b-card>
-        </b-col>
-        <b-col>
-          <b-navbar>
-            <b-navbar-nav>
-              <b-nav-form>
-<!--              <b-form-group>-->
-<!--                <b-form-radio-group-->
-<!--                  v-model="selected"-->
-<!--                  :options="options"-->
-<!--                  buttons-->
-<!--                  button-variant="outline-secondary"-->
-<!--                  name="radio-btn-outline"-->
-<!--                  size="sm"-->
-<!--                ></b-form-radio-group>-->
-<!--              </b-form-group>-->
+  <b-container>
+    <b-row class="">
+      <b-col md="3">
+        <b-card>
+          <b-form-group label="Rankings">
+            <b-form-checkbox-group v-model="selected" :options="options" name="flavour-2a" stacked />
+          </b-form-group>
+        </b-card>
+      </b-col>
+      <b-col>
+        <b-navbar>
+          <b-navbar-nav>
+            <b-nav-form>
+              <b-form-group class="mr-2">
+                <b-form-radio-group
+                  v-model="filter.market.current"
+                  :options="filter.market.options"
+                  buttons
+                  button-variant="outline-secondary"
+                  name="radio-btn-outline"
+                  size="sm"
+                />
+              </b-form-group>
 
-                <sort-dropdown :value="sort.time.current" :options="sort.time.options" @change="changeSortTime"></sort-dropdown>
-                <sort-dropdown :value="sort.price.current" :options="sort.price.options" @change="changeSortPrice"></sort-dropdown>
+              <sort-dropdown :value="sort.time.current" :options="sort.time.options" @change="changeSortTime" />
+              <sort-dropdown :value="sort.price.current" :options="sort.price.options" @change="changeSortPrice" />
 
-<!--                <b-dropdown size="sm" variant="outline-secondary">-->
-<!--                  <b-dropdown-item-button v-for="opt in sortOptsTime" :key="opt.value" @click.prevent="setSortOptTime(opt.value)">{{ opt.text }}</b-dropdown-item-button>-->
-<!--                  <template v-slot:button-content>-->
-<!--                    {{ currentSortOptTime.text }}-->
-<!--                  </template>-->
-<!--                </b-dropdown>-->
-              </b-nav-form>
-            </b-navbar-nav>
-            <b-navbar-nav class="ml-auto">
-              <b-nav-form>
-                <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-                <b-button size="sm" class="my-2 my-sm-0" type="submit" variant="primary">Search</b-button>
-              </b-nav-form>
-            </b-navbar-nav>
-          </b-navbar>
-          <b-card-group v-if="nfts.length" deck>
+<!--              <b-dropdown size="sm" variant="outline-secondary">-->
+<!--                <b-dropdown-item-button v-for="opt in sortOptsTime" :key="opt.value" @click.prevent="setSortOptTime(opt.value)">{{ opt.text }}</b-dropdown-item-button>-->
+<!--                <template v-slot:button-content>-->
+<!--                  {{ currentSortOptTime.text }}-->
+<!--                </template>-->
+<!--              </b-dropdown>-->
+            </b-nav-form>
+          </b-navbar-nav>
+          <b-navbar-nav class="ml-auto">
+            <b-nav-form>
+              <b-input-group>
+                <b-form-input id="input-nft-list" v-model="search" list="input-list" size="sm" placeholder="Search" />
+                <b-form-datalist id="input-list" :options="suggestions" />
+                <b-input-group-append>
+                  <b-button variant="outline-primary" size="sm" @click="doSearch">
+                    <fa :icon="['fas', 'search']" />
+                  </b-button>
+                </b-input-group-append>
+              </b-input-group>
+              <!--              <b-button size="sm" class="my-2 my-sm-0" type="submit" variant="primary">-->
+              <!--                Search-->
+              <!--              </b-button>-->
+            </b-nav-form>
+          </b-navbar-nav>
+        </b-navbar>
+        <b-card v-if="!nftsFiltered.length" body-class="text-center">
+          no items yet
+        </b-card>
+        <template v-else>
+          <b-card-group v-if="nftsPaged.length" deck>
             <!--              :title="nft.meta.name"-->
             <!--              :image="nft.meta.image"-->
             <!--              :price="nft.price"-->
             <!--              :id="nft.id"-->
-            <market-card
-              v-for="nft in nfts"
-              :key="nft.id"
-              :nft="nft"
-              :rate="rateETH"
-            ></market-card>
-<!--            {{ nfts }}-->
+            <market-card v-for="nft in nftsPaged" :key="nft.id" :nft="nft" :rate="rateETH" :buyer="buyer" />
+            <!--            {{ nfts }}-->
           </b-card-group>
-          <div v-if="nfts.length" class="overflow-auto">
-            <b-pagination-nav v-model="curPage" :link-gen="linkGen" :number-of-pages="numberOfPages" use-router></b-pagination-nav>
-          </div>
-        </b-col>
-      </b-row>
-    </b-container>
+
+          <b-pagination-nav v-model="currentPage" :link-gen="linkGen" :number-of-pages="numberOfPages" use-router align="center" />
+        </template>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 
 import SortDropdown from './form/SortDropdown'
-import MarketCard from './element/MarketCard'
+import MarketCard from './MarketCard'
 
 export default {
   name: 'MarketList',
   components: { MarketCard, SortDropdown },
+  props: {
+    buyer: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       rateETH: 123123,
-      perPage: 3,
-      curPage: null,
-      cards: [],
+      perPage: 6,
+      currentPage: null,
+
+      search: null,
+
       selected: null,
       options: ['All', 'Fixed price', 'Auction'],
+
       // asc - true, desc - false
       sort: {
-        __current: {
+        _current: {
           parameter: 'price',
           value: 'asc',
         },
         price: {
-          current: 'asc',
+          current: null,
+          cmpFunc: this.cmpPrice,
           options: [
+            {
+              value: null,
+              text: '- sort by price -',
+            },
             {
               value: 'asc',
               text: 'Price low to high',
@@ -104,8 +122,13 @@ export default {
           ],
         },
         time: {
-          current: 'asc',
+          current: null,
+          cmpFunc: this.cmpTime,
           options: [
+            {
+              value: null,
+              text: '- sort by novelty -',
+            },
             {
               value: 'asc',
               text: 'Newest first',
@@ -114,8 +137,31 @@ export default {
               value: 'desc',
               text: 'Oldest first',
             },
-          ]
-        }
+          ],
+        },
+      },
+      filter: {
+        _current: {
+          parameter: 'market',
+          value: null,
+        },
+        market: {
+          current: null,
+          options: [
+            {
+              value: null,
+              text: 'All',
+            },
+            {
+              value: 1,
+              text: 'Fixed price',
+            },
+            {
+              value: 2,
+              text: 'Auction',
+            },
+          ],
+        },
       },
     }
   },
@@ -123,21 +169,46 @@ export default {
     ...mapState({
       nfts: state => state.market.nfts,
     }),
-    nfts1() {
+    ...mapGetters('market', ['findNft']),
+    // sortFunc() {
+    //   return this.sort[this.sort._current.parameter].cmpFunc
+    // },
+    nftsFiltered() {
       return this.nfts
-      //   .sort((a,b) => {
-      //
-      // })
+        .filter(n => {
+          return !this.filter.market.current || n.status === this.filter.market.current
+        })
+        .sort((a, b) => {
+          return this.sort[this.sort._current.parameter].cmpFunc(a, b, this.sort._current.value === 'asc')
+          // return this.sortFunc(a[this.sort._current.parameter], b[this.sort._current.parameter], this.sort._current.value === 'asc')
+        })
+    },
+    nftsPaged() {
+      const curPage = this.currentPage || 1
+      console.log((curPage - 1) * this.perPage, curPage * this.perPage)
+      return this.nftsFiltered.slice((curPage - 1) * this.perPage, curPage * this.perPage)
     },
     numberOfPages() {
-      return this.nfts.length ? this.nfts.length / this.perPage : 1
-    }
+      return this.nftsFiltered.length ? Math.ceil(this.nftsFiltered.length / this.perPage) : 1
+    },
+    suggestions() {
+      return this.nfts.map(n => ({ text: this.nftMetaProp(n.meta, 'name').value, value: n.token_id }))
+    },
+  },
+  watch: {
+    // currentPage(p) {
+    //   this.reloadNftPage(p)
+    // }
+    numberOfPages(n) {
+      this.currentPage = null
+    },
   },
   mounted() {
-    this.queryNft()
+    // this.reloadNftPage()
+    this.queryNft({ force: true })
   },
   methods: {
-    ...mapActions('market', ['getAllNft', 'queryNft']),
+    ...mapActions('market', ['queryNft']),
     linkGen(pageNum) {
       // return {
       //   name: 'market',
@@ -145,12 +216,54 @@ export default {
       // }
       return pageNum === 1 ? '?' : `?page=${pageNum}`
     },
+    reloadNftPage(page = null) {
+      this.queryNft({
+        params: {
+          // limit: this.perPage,
+          // offset: (page || this.currentPage || 1 - 1) * this.perPage,
+        },
+      })
+    },
+    doSearch() {
+      if (this.search) {
+        const t = this.findNft(this.search)
+        if (t) {
+          this.$router.push({ name: 'market-id', params: { id: t.token_id } })
+        }
+      }
+    },
+
     changeSortTime(value) {
-      this.sort.time.current = value
+      this.updSort('time', value)
     },
     changeSortPrice(value) {
-      this.sort.price.current = value
+      this.updSort('price', value)
     },
-  }
+    updSort(parameter, value) {
+      // if (this.sort._current.parameter && this.sort[this.sort._current.parameter]) {
+      this.sort[this.sort._current.parameter].current = null
+      // }
+      this.sort._current = { parameter, value }
+      this.sort[parameter].current = value
+    },
+
+    cmpPrice(a, b, asc = true) {
+      const valA = parseInt(a.price.value || a.opening_price.value || 0)
+      const valB = parseInt(b.price.value || b.opening_price.value || 0)
+      // if (a.currency === b.currency) {
+      return asc ? valA - valB : valB - valA
+      // }
+      // return 0
+    },
+    cmpTime(a, b, asc = true) {
+      a = a.created_at
+      b = b.created_at
+      if (this.$moment.isMoment(a) && this.$moment.isMoment(b)) {
+        // If both compared fields are moment instance
+        return a.isBefore(b) ? (asc ? -1 : 1) : a.isAfter(b) ? (asc ? 1 : -1) : 0
+      }
+      return 0
+    },
+  },
 }
 </script>

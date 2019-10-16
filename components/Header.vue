@@ -9,7 +9,7 @@
         <b-navbar-toggle target="nav_collapse" />
         <b-collapse id="nav_collapse" is-nav>
           <b-navbar-nav>
-            <b-nav-item :to="{ name: 'index' }">
+            <b-nav-item :to="{ name: 'index' }" exact>
               Home
             </b-nav-item>
             <b-nav-item :to="{ name: 'market' }">
@@ -79,7 +79,10 @@
             <b-nav-item-dropdown right>
               <template slot="button-content">
 <!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
-                <jazzicon :address="userAddress" :diameter="20" /> {{ userName | truncate(5) }}
+                 <client-only>
+                <jazzicon :address="userAddress" :diameter="20" />
+                 </client-only>
+                 {{ userName | truncate(5) }}
               </template>
               <template v-if="accounts.length">
                 <b-dropdown-item-btn v-for="(a, id) in accounts" :key="id" :active="currentId === id" @click="setCurrentUser(id)">
@@ -135,9 +138,13 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
+import Jazzicon from './Jazzicon'
 
 export default {
   name: 'PageHeader',
+  components: {
+    Jazzicon,
+  },
   data() {
     return {
       theme: null,

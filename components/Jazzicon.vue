@@ -1,5 +1,5 @@
 <template>
-  <div ref="jazzicon" class="jazzicon" />
+  <div ref="jazzicon" class="jazzicon"/>
 </template>
 <script>
 import MersenneTwister from 'mersenne-twister'
@@ -24,14 +24,6 @@ export default {
       type: Number,
       default: 4,
     },
-    trimBegin: {
-      type: Number,
-      default: 2,
-    },
-    trimEnd: {
-      type: Number,
-      default: 10,
-    },
     colors: {
       type: Array,
       default: () => [
@@ -55,6 +47,7 @@ export default {
   data() {
     return {
       generator: null,
+      i: null
     }
   },
   watch: {
@@ -79,7 +72,7 @@ export default {
   },
   methods: {
     async icon() {
-      const seed = this.address ? parseInt(this.address.slice(this.trimBegin, this.trimEnd), 16) : this.seed
+      const seed = this.address ? this.calcHash(this.address) : this.seed
       this.$refs.jazzicon.innerHTML = ''
       const el = await this.generateIdenticon(this.diameter, seed)
       await this.$refs.jazzicon.append(el)
@@ -139,16 +132,20 @@ export default {
     },
     genColor(colors) {
       const idx = Math.floor(colors.length * this.generator.random())
-      return colors.splice(idx, 1)[0]
+      const color = colors.splice(idx, 1)[0]
+      return color
     },
     hueShift(colors, generator) {
       const wobble = 30
       const amount = generator.random() * 30 - wobble / 2
-      return colors.map(hex => {
+      return colors.map(function(hex) {
         const color = Color(hex)
         color.rotate(amount)
         return color.hex()
       })
+    },
+    calcHash(text) {
+      return text ? text.match(/\d/g).reduce((a, n) => a + n) : 0
     },
   },
 }

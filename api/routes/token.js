@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { LoremIpsum } from 'lorem-ipsum'
 const { join } = require('path')
 const fs = require('fs')
 const sharp = require('sharp')
@@ -21,35 +22,65 @@ const imgDir = join(__dirname, '../../static')
 
 const router = Router()
 
+const totalSupply = 123
+
 module.exports = router
 
 router.get('/token/:id', async (req, res, next) => {
   const tokenId = parseInt(req.params.id)
-  console.log(req.params)
-  const name = FIRST_NAMES[tokenId % FIRST_NAMES.length] + ' ' + LAST_NAMES[tokenId % LAST_NAMES.length]
+  // console.log(req.params)
+  const name =
+    FIRST_NAMES[tokenId % FIRST_NAMES.length] +
+    ' ' +
+    LAST_NAMES[tokenId % LAST_NAMES.length] +
+    ' ' +
+    FIRST_NAMES[(tokenId + 11) % FIRST_NAMES.length] +
+    ' ' +
+    LAST_NAMES[(tokenId + 7) % LAST_NAMES.length]
   const base = BASES[tokenId % BASES.length]
   const eyes = EYES[tokenId % EYES.length]
   const mouth = MOUTH[tokenId % MOUTH.length]
   await composeImage([`images/bases/base-${base}.png`, `images/eyes/eyes-${eyes}.png`, `images/mouths/mouth-${mouth}.png`], tokenId)
 
-  const attributes = []
-  addAttribute(attributes, 'base', BASES, tokenId)
-  addAttribute(attributes, 'eyes', EYES, tokenId)
-  addAttribute(attributes, 'mouth', MOUTH, tokenId)
-  addAttribute(attributes, 'level', INT_ATTRIBUTES, tokenId)
-  addAttribute(attributes, 'stamina', FLOAT_ATTRIBUTES, tokenId)
-  addAttribute(attributes, 'personality', STR_ATTRIBUTES, tokenId)
-  addAttribute(attributes, 'aqua_power', BOOST_ATTRIBUTES, tokenId, 'boost_number')
-  addAttribute(attributes, 'stamina_increase', PERCENT_BOOST_ATTRIBUTES, tokenId, 'boost_percentage')
-  addAttribute(attributes, 'generation', NUMBER_ATTRIBUTES, tokenId, 'number')
-
   const metadata = {
-    name,
-    description: 'Friendly Creature that enjoys long swims in the ocean.',
-    image: `${req.protocol}://${req.get('host')}/images/output/${tokenId}.png`,
-    external_url: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`,
-    attributes,
+    tokenId,
+    totalCount: totalSupply,
+    properties: [],
+    definitions: {},
   }
+  const lorem = new LoremIpsum({
+    sentencesPerParagraph: {
+      max: 5,
+      min: 3,
+    },
+    wordsPerSentence: {
+      max: 10,
+      min: 4,
+    },
+  })
+
+  addMetaProp(metadata, { trait: 'name', value: name, display: 'title' })
+  addMetaProp(metadata, { trait: 'image', value: `${req.protocol}://${req.get('host')}/images/output/${tokenId}.png`, display: 'image' })
+  addMetaProp(metadata, { trait: 'description', value: lorem.generateParagraphs(1), display: 'description' })
+  addMetaProp(metadata, { trait: 'external_url', value: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`, display: 'link' })
+  addMetaProp(metadata, { trait: 'collection', value: `AwesomeCuties`, display: 'collection' })
+
+  addMetaDef(metadata, { trait: 'base', options: BASES, mock: true, id: tokenId })
+  addMetaDef(metadata, { trait: 'eyes', options: EYES, mock: true, id: tokenId })
+  addMetaDef(metadata, { trait: 'mouth', options: MOUTH, mock: true, id: tokenId })
+  addMetaDef(metadata, { trait: 'level', options: INT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
+  addMetaDef(metadata, { trait: 'stamina', options: FLOAT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
+  addMetaDef(metadata, { trait: 'personality', options: STR_ATTRIBUTES, mock: true, id: tokenId })
+  addMetaDef(metadata, { trait: 'aqua_power', options: BOOST_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
+  addMetaDef(metadata, {
+    trait: 'stamina_increase',
+    options: PERCENT_BOOST_ATTRIBUTES,
+    mm: true,
+    mock: true,
+    id: tokenId,
+    display: 'rank',
+  })
+  addMetaDef(metadata, { trait: 'generation', options: NUMBER_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
 
   return res.status(200).send(metadata)
 })
@@ -62,16 +93,29 @@ router.get('/token/:id', async (req, res, next) => {
 //     },
 //   })
 // }
+function getMimMax(numbers) {
+  return {
+    min: Math.min(...numbers),
+    max: Math.max(...numbers),
+  }
+}
 
-function addAttribute(existing, attributeName, options, tokenId, displayType = null) {
-  const trait = {
-    trait_type: attributeName,
-    value: options[tokenId % options.length],
-  }
-  if (displayType) {
-    trait.display_type = displayType
-  }
-  existing.push(trait)
+function getMockVal(options, id) {
+  return options[id % options.length]
+}
+
+function addMetaProp(metadata, { trait, value, count = 1, order = null, display = null }) {
+  metadata.properties.push({
+    trait,
+    value,
+    display,
+    count,
+    order,
+  })
+}
+function addMetaDef(metadata, { trait, options = [], value = null, display = null, mock = false, id = null, mm = false }) {
+  metadata.definitions[trait] = mm ? getMimMax(options) : options
+  addMetaProp(metadata, { trait, value: mock ? getMockVal(options, id) : value, display })
 }
 
 async function composeImage(images, tokenId) {

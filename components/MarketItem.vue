@@ -1,28 +1,41 @@
 <template>
   <section class="market">
     <b-container>
-      <b-row>
+      <b-row v-if="nft">
         <b-col md="4">
-          <b-card :img-src="meta.image" :img-alt="meta.title" img-top class="mb-3">
+          <b-card :img-src="image" :img-alt="title" img-top class="mb-3">
             <b-card-body>
             <div class="mb-4">
-              <b>BlockRobots</b>
+              <b>{{ collection }}</b>
             </div>
-              <h5 class="mb-3"><b>{{ meta.title }}</b></h5>
-            <p>CryptoKitties is one of the world’s first games to be built on blockchain technology—the same breakthrough that makes things like Bitcoin and Ethereum possible.
-            <b-link>Read more</b-link></p>
-            <!--              <template v-slot:footer>-->
-            <!--              </template>-->
+              <h5 class="mb-3"><b>{{ title }}</b></h5>
+            <p>{{ description }}
+            <b-link :href="link">Read more</b-link></p>
+
+<!--              <template v-for="stat in stats">-->
+<!--                <h5 class="mt-3">{{ stat.trait.toUpperCase() }}</h5>-->
+<!--                &lt;!&ndash;              height="0.2rem"&ndash;&gt;-->
+<!--                <b-progress :value="stat.value" :max="stat.options.max" :min="stat.options.min" show-progress></b-progress>-->
+<!--              </template>-->
+              <template v-for="rank in ranks">
+                <h5 class="mt-3">{{ rank.trait.toUpperCase() }}</h5>
+                <!--              height="0.2rem"-->
+                <b-progress :value="rank.value" :max="rank.options.max" :min="rank.options.min" show-progress></b-progress>
+              </template>
             </b-card-body>
           </b-card>
         </b-col>
         <b-col>
-          <b-card class="mb-3 p-2">
+          <b-card v-if="nft.status === 1" class="mb-3 p-2">
             <b-row>
               <b-col md="6" class="d-flex flex-column pr-4">
-                <div class="label  mb-1">Listed for</div>
-                <h3 class="my-2">{{ priceExt.value }} {{ priceExt.currency }}</h3>
-                <h3><small class="text-muted">{{ priceEth }} ETH</small></h3>
+                <div class="label mb-1">Fixed price</div>
+                <div class="d-flex justify-content-middle align-items-center">
+                  <b-img :src="currencyImage" rounded="circle" width="33px" height="33px"></b-img>
+                  <h1 class="ml-2 my-0"><b>{{ price.value }}</b> {{ price.currency }}</h1>
+                </div>
+
+                <h3><small v-if="price.value"  class="text-muted">{{ priceEth(price.value) }} ETH</small></h3>
                 <b-btn variant="primary" class="mt-3 py-3">
                   Buy
                   <!--                    <b-spinner v-if="nft.id === processedId" small type="grow"></b-spinner>-->
@@ -31,8 +44,10 @@
               <b-col md="6" class="d-flex flex-column p-2">
                 <div class="label mb-1">Owner</div>
                 <div class="">
-                  <b-img v-bind="mainProps" rounded="circle" alt="Circle image"></b-img>
-                  <b>BRfighter </b>
+                  <client-only>
+                    <jazzicon :address="ownerAddress" :diameter="35" />
+                  </client-only>
+                  <b>{{ ownerName }}</b>
                   <b-link>34 items for sale</b-link>
                 </div>
                 <div class="label  mb-1 mt-3">Last sold</div>
@@ -119,17 +134,23 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import Jazzicon from './Jazzicon'
 
 export default {
   name: 'MarketItem',
+  components: {
+    Jazzicon,
+  },
+
   props: {
-    nft: {
-      type: Object,
+    id: {
+      type: String,
       default: null,
     },
   },
   data() {
     return {
+      rate: 123123,
       mainProps: { blank: true, blankColor: '#777', width: 50, height: 50, class: 'm1' },
       items: [
         { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -140,23 +161,91 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getTheme']),
-    meta() {
-      return this.nft.meta
+    ...mapState({
+      accounts: state => state.user.accounts,
+    }),
+    ...mapGetters('market', ['findNft']),
+    nft() {
+      return this.findNft(this.id)
     },
-    priceExt() {
-      const m = this.nft.price.match(/([\d.]+)([\w]+)/i)
-      return m ? { value: m[1], currency: m[2] } : { value: this.nft.price, currency: '' }
+
+    label1() {
+      switch (this.nft.status) {
+        case 1:
+          return 'Fixed price'
+        case 2:
+          return 'Auction'
+        default:
+          return ''
+      }
     },
-    priceEth() {
-      return (parseFloat(this.priceExt.value) / this.rate).toFixed(5)
+    propLevel() {
+      let p  = this.nftMetaProp(this.nft.meta, 'level')
+      console.log(p)
+      return this.nftMetaProp(this.nft.meta, 'level')
     },
+    stats() {
+      return this.nftMetaDisplay(this.nft.meta, 'stat', false)
+    },
+    ranks() {
+      return this.nftMetaDisplay(this.nft.meta, 'rank', false)
+
+    },
+    title() {
+      return this.nftMetaDisplay(this.nft.meta, 'title').value
+    },
+    image() {
+      return this.nftMetaDisplay(this.nft.meta, 'image').value
+    },
+    link() {
+      return this.nftMetaDisplay(this.nft.meta, 'link').value
+    },
+    description() {
+      return this.nftMetaDisplay(this.nft.meta, 'description').value
+    },
+    collection() {
+      console.log(this.propLevel)
+      return this.nftMetaDisplay(this.nft.meta, 'collection').value
+    },
+
+    price() {
+      return this.nft.price
+    },
+    openinigPrice() {
+      return this.nft.opening_price
+    },
+    status() {
+      return this.nft.status
+    },
+    owned() {
+      return this.nft.owner_address === this.buyer
+    },
+    ownerAddress() {
+      return this.nft.owner_address
+    },
+    ownerName() {
+      return this.accounts.find(a => a.address === this.nft.owner_address).name || '<unknown>'
+    },
+
+    currencyImage() {
+      switch (this.price.currency) {
+        case 'btc':
+          return '/images/currency_btc.png'
+        default:
+          return '/images/currency_atom.png'
+      }
+    },
+
   },
   mounted() {
-    console.log(this.nft)
+    this.queryNft({ forse: true, params: { tokenId: this.id } })
   },
   methods: {
+    ...mapActions('market', ['queryNft']),
 
+    priceEth(value) {
+      return (parseFloat(value) / this.rate).toFixed(5)
+    },
   }
 }
 </script>

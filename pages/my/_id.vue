@@ -1,6 +1,6 @@
 <template>
   <page>
-    <market-item :nft="nft"></market-item>
+    <market-item :id="$route.params.id"></market-item>
   </page>
 </template>
 
@@ -25,10 +25,6 @@ export default {
   data: () => ({
   }),
   computed: {
-    ...mapGetters('market', ['findNft']),
-    nft() {
-      return this.findNft(this.$route.params.id)
-    }
   },
   mounted() {
 

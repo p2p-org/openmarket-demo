@@ -53,9 +53,10 @@ export default {
   plugins: [
     { src: '~/plugins/directives' },
     { src: '~/plugins/filters' },
+    { src: '~/plugins/methods' },
     { src: '~/plugins/market', mode: 'client' },
     { src: '~/plugins/cosmos', mode: 'client' },
-    { src: '~/plugins/identicon', mode: 'client' },
+    // { src: '~/plugins/identicon', mode: 'client' },
   ],
   /*
    ** Nuxt.js dev-modules
@@ -86,9 +87,11 @@ export default {
         ],
       },
     ],
+    ['@nuxtjs/moment', { defaultLocale: 'en' }],
   ],
   router: {
     linkExactActiveClass: 'active',
+    linkActiveClass: 'active',
   },
   serverMiddleware: [
     // API middleware
