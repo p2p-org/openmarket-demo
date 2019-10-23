@@ -1,15 +1,13 @@
 export function setUser(
   { commit },
-  // eslint-disable-next-line camelcase
-  { id = null, name = null, mnemonic = null, address = null, password = null, sequence = 0, account_number = 0 }
+  { id = null, name = null, mnemonic = null, address = null, password = null, ecpairPriv = null }
 ) {
-  if (!address && mnemonic) {
+  if (mnemonic) {
     address = this.$cosmos.getAddress(mnemonic)
+    ecpairPriv = this.$cosmos.getECPairPriv(mnemonic)
   }
-  // console.log(address, this.users[0].address)
-  // const ecpairPriv = cosmos.getECPairPriv(mnemonic)
 
-  commit('setUser', { id, name, mnemonic, password, address, sequence, account_number })
+  commit('setUser', { id, name, mnemonic, password, address, ecpairPriv })
   return Promise.resolve()
 }
 
@@ -30,23 +28,30 @@ export function delUser({ commit }, id) {
 }
 
 export function loadUserInfo({ commit, state, getters, rootState }) {
+  // return new Promise((resolve, reject) => {
+  //   this.$marketApi
+  //     .getUser({ address: getters.currentUser.address })
+  //     .then(r => {
+  //       //
+  //       console.log(r)
+  //       r.forEach(i => commit('updateCurrentUser', i))
+  //       resolve(r)
+  //     })
+  //     .catch(reject)
+  // })
+
   if (getters.currentUser === null) {
-    return Promise.resolve()
+    return Promise.reject()
   }
+
   return new Promise((resolve, reject) => {
-    return Promise.all([
-      this.$axios.$get(rootState.config.apiHub + '/auth/accounts/' + getters.currentUser.address),
-      this.$axios.$get(rootState.config.apiHub + '/auth/accounts/' + getters.currentUser.address),
-    ])
-      .then(responses => {
-        console.log(responses)
-        commit('userInfo', responses[0].value || responses[0].Account.value)
-        commit('userHubInfo', responses[1].value || responses[1].Account.value)
-        resolve()
+    this.$cosmos
+      .getAccounts(getters.currentUser.address)
+      .then(data => {
+        console.log(data)
+        //       r.forEach(i => commit('updateCurrentUser', i))
+        resolve(data)
       })
-      .catch(e => {
-        console.error('loadUserInfo', e)
-        reject(e)
-      })
+      .catch(reject)
   })
 }

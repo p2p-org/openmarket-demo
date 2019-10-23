@@ -8,21 +8,14 @@
           <b-form-group id="fieldset-name" label="Name" label-for="input-name">
             <b-form-input id="input-name" v-model="form.name" trim />
           </b-form-group>
-
-          <b-form-group id="fieldset-sequence" label="Sequence" label-for="input-sequence">
-            <b-form-input id="input-sequence" v-model="form.sequence" trim />
-          </b-form-group>
-          <b-form-group id="fieldset-account-number" label="Account number" label-for="input-account-number">
-            <b-form-input id="input-account-number" v-model="form.account_number" trim />
-          </b-form-group>
           <b-form-group id="fieldset-address" label="Address" label-for="input-address">
-            <b-form-input id="input-address" v-model="form.address" trim />
+            <b-form-input id="input-address" v-model="form.address" trim readonly />
           </b-form-group>
           <b-form-group id="fieldset-address" label="Mnemonic" label-for="input-mnemonic">
             <b-form-input id="input-address" v-model="form.mnemonic" trim />
           </b-form-group>
           <b-form-group id="fieldset-password" label="Password" label-for="input-password">
-            <b-form-input id="input-password" v-model="form.password" trim />
+            <b-form-input id="input-password" v-model="form.password" trim readonly />
           </b-form-group>
           <template slot="footer">
             <b-button variant="primary" @click.prevent="doSetUser">Save</b-button>

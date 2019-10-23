@@ -15,7 +15,7 @@
             </span>
             <small v-if="price.value" class="text-muted">{{ priceEth(price.value) }} ETH</small>
           </h5>
-          <b-btn variant="danger">
+          <b-btn variant="danger" :to="{ name: 'market-id', params: { id: tokenId } }">
             Cancel sell
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -27,14 +27,14 @@
             </span>
             <small v-if="openinigPrice.value" class="text-muted">{{ priceEth(openinigPrice.value) }} ETH</small>
           </h5>
-          <b-btn variant="danger">
+          <b-btn variant="danger" :to="{ name: 'market-id', params: { id: tokenId } }">
             Cancel sell
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else>
           <div></div>
-          <b-btn variant="success">
+          <b-btn variant="success" :to="{ name: 'market-id', params: { id: tokenId } }">
             Sell item
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -49,7 +49,7 @@
             </span>
             <small v-if="price.value" class="text-muted">{{ priceEth(price.value) }} ETH</small>
           </h5>
-          <b-btn variant="primary">
+          <b-btn variant="primary" :to="{ name: 'market-id', params: { id: tokenId } }">
             Buy now
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -61,14 +61,14 @@
             </span>
             <small v-if="openinigPrice.value" class="text-muted">{{ priceEth(openinigPrice.value) }} ETH</small>
           </h5>
-          <b-btn variant="info">
+          <b-btn variant="info" :to="{ name: 'market-id', params: { id: tokenId } }">
             Place bid
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else>
           <div></div>
-          <b-btn variant="warning">
+          <b-btn variant="warning" :to="{ name: 'market-id', params: { id: tokenId } }">
             Make offer
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>

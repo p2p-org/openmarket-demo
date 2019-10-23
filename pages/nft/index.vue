@@ -1,21 +1,18 @@
 <template>
   <page>
-    <my-list :owner="currentUser.address" />
+    <nft />
   </page>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import Nft from '@/components/Nft'
 import Page from '@/components/Page'
-import MyList from '@/components/MyList'
 
 export default {
-  name: 'PageMy',
-  components: { MyList, Page },
+  name: 'PageNft',
+  components: { Page, Nft },
   data: () => ({}),
-  computed: {
-    ...mapGetters('user', ['currentUser']),
-  },
   mounted() {},
   methods: {},
 }

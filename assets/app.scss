@@ -150,7 +150,7 @@ body {
     }
     .form-control {
       background-color: #19212F;
-      border-color: #19212F;
+      border-color: #fff;
     }
 
   }
@@ -191,6 +191,36 @@ $cards-per-line: (
   }
 }
 
+
+//.form-control-xl {
+//  height: $input-height-lg;
+//  padding: $input-padding-y-lg $input-padding-x-lg;
+//  @include font-size($input-font-size-lg);
+//  line-height: $input-line-height-lg;
+//  @include border-radius($input-border-radius-lg);
+//}
+//
+//.input-group-xl > .form-control:not(textarea),
+//.input-group-xl > .custom-select {
+//  height: $input-height-xl;
+//}
+//
+//.input-group-xl > .form-control,
+//.input-group-xl > .custom-select,
+//.input-group-xl > .input-group-prepend > .input-group-text,
+//.input-group-xl > .input-group-append > .input-group-text,
+//.input-group-xl > .input-group-prepend > .btn,
+//.input-group-xl > .input-group-append > .btn {
+//  padding: $input-padding-y-xl $input-padding-x-xl;
+//  @include font-size($input-font-size-xl);
+//  line-height: $input-line-height-xl;
+//  @include border-radius($input-border-radius-xl);
+//}
+//.input-group-xl > .custom-select, {
+//  padding-right: $custom-select-padding-x + $custom-select-indicator-padding;
+//}
+
+
 //custom
 
 .market {
@@ -210,7 +240,17 @@ $cards-per-line: (
     //  background: none;
     //  border: none;
     //}
+    &.market-action {
+      .input-group > .form-control:not(:first-child), .input-group > .custom-select:not(:first-child) {
+        border-left: none;
+      }
+      .input-group-text {
+        background: none;
+      }
+
+    }
   }
+
 }
 
 p {

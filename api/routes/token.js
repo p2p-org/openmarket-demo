@@ -27,7 +27,7 @@ const totalSupply = 123
 module.exports = router
 
 router.get('/token/:id', async (req, res, next) => {
-  const tokenId = parseInt(req.params.id)
+  const tokenId = parseInt(req.params.id.replace(/\D/g, ''))
   // console.log(req.params)
   const name =
     FIRST_NAMES[tokenId % FIRST_NAMES.length] +

@@ -26,12 +26,12 @@
               <sort-dropdown :value="sort.time.current" :options="sort.time.options" @change="changeSortTime" />
               <sort-dropdown :value="sort.price.current" :options="sort.price.options" @change="changeSortPrice" />
 
-<!--              <b-dropdown size="sm" variant="outline-secondary">-->
-<!--                <b-dropdown-item-button v-for="opt in sortOptsTime" :key="opt.value" @click.prevent="setSortOptTime(opt.value)">{{ opt.text }}</b-dropdown-item-button>-->
-<!--                <template v-slot:button-content>-->
-<!--                  {{ currentSortOptTime.text }}-->
-<!--                </template>-->
-<!--              </b-dropdown>-->
+              <!--              <b-dropdown size="sm" variant="outline-secondary">-->
+              <!--                <b-dropdown-item-button v-for="opt in sortOptsTime" :key="opt.value" @click.prevent="setSortOptTime(opt.value)">{{ opt.text }}</b-dropdown-item-button>-->
+              <!--                <template v-slot:button-content>-->
+              <!--                  {{ currentSortOptTime.text }}-->
+              <!--                </template>-->
+              <!--              </b-dropdown>-->
             </b-nav-form>
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
@@ -85,10 +85,13 @@ export default {
       type: String,
       default: null,
     },
+    owner: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
-      rateETH: 123123,
       perPage: 6,
       currentPage: null,
 
@@ -105,7 +108,7 @@ export default {
         },
         price: {
           current: null,
-          cmpFunc: this.cmpPrice,
+          sortFunc: this.sortPrice,
           options: [
             {
               value: null,
@@ -123,7 +126,7 @@ export default {
         },
         time: {
           current: null,
-          cmpFunc: this.cmpTime,
+          sortFunc: this.sortTime,
           options: [
             {
               value: null,
@@ -168,24 +171,21 @@ export default {
   computed: {
     ...mapState({
       nfts: state => state.market.nfts,
+      rateETH: state => state.config.rateETH,
     }),
     ...mapGetters('market', ['findNft']),
     // sortFunc() {
     //   return this.sort[this.sort._current.parameter].cmpFunc
     // },
     nftsFiltered() {
-      return this.nfts
-        .filter(n => {
-          return !this.filter.market.current || n.status === this.filter.market.current
-        })
-        .sort((a, b) => {
-          return this.sort[this.sort._current.parameter].cmpFunc(a, b, this.sort._current.value === 'asc')
-          // return this.sortFunc(a[this.sort._current.parameter], b[this.sort._current.parameter], this.sort._current.value === 'asc')
-        })
+      const tmpNfts = this.nfts
+        .filter(n => (this.owner ? n.owner_address === this.owner : true))
+        .filter(n => !this.filter.market.current || n.status === this.filter.market.current)
+      return this.sort[this.sort._current.parameter].sortFunc(tmpNfts, this.sort._current.value === 'asc')
     },
     nftsPaged() {
       const curPage = this.currentPage || 1
-      console.log((curPage - 1) * this.perPage, curPage * this.perPage)
+      // console.log((curPage - 1) * this.perPage, curPage * this.perPage)
       return this.nftsFiltered.slice((curPage - 1) * this.perPage, curPage * this.perPage)
     },
     numberOfPages() {
@@ -196,6 +196,9 @@ export default {
     },
   },
   watch: {
+    owner(owner) {
+      this.queryNft({ force: true, params: { owner } })
+    },
     // currentPage(p) {
     //   this.reloadNftPage(p)
     // }
@@ -205,16 +208,16 @@ export default {
   },
   mounted() {
     // this.reloadNftPage()
-    this.queryNft({ force: true })
+    this.queryNft({ force: true, params: { owner: this.owner } })
   },
   methods: {
     ...mapActions('market', ['queryNft']),
     linkGen(pageNum) {
-      // return {
-      //   name: 'market',
-      //   query: { page: pageNum === 1 ? null : pageNum },
-      // }
-      return pageNum === 1 ? '?' : `?page=${pageNum}`
+      return {
+        name: 'market',
+        query: { page: pageNum === 1 ? null : pageNum, owner: this.owner },
+      }
+      // return pageNum === 1 ? '?' : `?page=${pageNum}`
     },
     reloadNftPage(page = null) {
       this.queryNft({
@@ -245,24 +248,6 @@ export default {
       // }
       this.sort._current = { parameter, value }
       this.sort[parameter].current = value
-    },
-
-    cmpPrice(a, b, asc = true) {
-      const valA = parseInt(a.price.value || a.opening_price.value || 0)
-      const valB = parseInt(b.price.value || b.opening_price.value || 0)
-      // if (a.currency === b.currency) {
-      return asc ? valA - valB : valB - valA
-      // }
-      // return 0
-    },
-    cmpTime(a, b, asc = true) {
-      a = a.created_at
-      b = b.created_at
-      if (this.$moment.isMoment(a) && this.$moment.isMoment(b)) {
-        // If both compared fields are moment instance
-        return a.isBefore(b) ? (asc ? -1 : 1) : a.isAfter(b) ? (asc ? 1 : -1) : 0
-      }
-      return 0
     },
   },
 }

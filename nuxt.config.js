@@ -35,7 +35,6 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       // { rel: 'stylesheet', href: 'http://code.highcharts.com/css/themes/dark-unica.css' }
     ],
-
   },
   /*
    ** Customize the progress-bar color
@@ -44,9 +43,7 @@ export default {
   /*
    ** Global CSS
    */
-  css: ['@/assets/app.scss',
-
-  ],
+  css: ['@/assets/app.scss'],
   /*
    ** Plugins to load before mounting the App
    */
@@ -55,7 +52,7 @@ export default {
     { src: '~/plugins/filters' },
     { src: '~/plugins/methods' },
     { src: '~/plugins/market', mode: 'client' },
-    { src: '~/plugins/cosmos', mode: 'client' },
+    { src: '~/plugins/cosmos' },
     // { src: '~/plugins/identicon', mode: 'client' },
   ],
   /*
@@ -73,6 +70,7 @@ export default {
     ['bootstrap-vue/nuxt', { css: false, bvCSS: false }],
     // Doc: https://axios.nuxtjs.org/usage
     ['@nuxtjs/axios', { baseURL: '/' }],
+    '@nuxtjs/proxy',
     'cookie-universal-nuxt',
     [
       'nuxt-fontawesome',
@@ -111,7 +109,6 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {
-    },
+    extend(config, ctx) {},
   },
 }

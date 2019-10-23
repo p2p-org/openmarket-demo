@@ -25,6 +25,7 @@ export default {
         return nfts.findIndex(n1 => n1.token_id === n.token_id) === -1
       })
       .concat(nfts.map(prepNft))
+      .sort((a, b) => (a.token_id > b.token_id ? 1 : a.token_id > b.token_id ? -1 : 0))
   },
   [MARKET_MY_NFT](state, nfts = []) {
     state.myNfts = nfts

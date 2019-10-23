@@ -50,6 +50,7 @@ export function queryNft({ state, commit, rootState }, { force = false, my = fal
       .then(nfts => {
         console.log('!!!', nfts)
         commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
+        resolve()
       })
       .catch(reject)
   })
@@ -94,28 +95,93 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
   })
 }
 
-// eslint-disable-next-line camelcase
 export function nftMint({ state, commit, rootState }, { user, token } = {}) {
-  // curl -XPUT -s http://localhost:1317/marketplace/mint --data-binary '
-  // {"base_req":{"from":"'$(mpcli keys show user1 -a)'","chain_id":"mpchain","sequence":"1","account_number":"0"},"token_name":"name","token_id":"'$(uuidgen)'","owner":"user1","name":"user1","password":"12345678","description":"desc","image":"ing","token_uri":"uri"}'
-  return new Promise((resolve, reject) => {
-    this.$axios
-      .$put(rootState.config.lcdUrl + '/marketplace/mint', {
-        base_req: { from: user.address, chain_id: rootState.config.chain_id, sequence: user.sequence, account_number: user.account_number },
-        token_name: token.name,
-        token_id: 'TOKEN_' + token.id,
-        owner: user.name,
-        name: user.name,
-        password: user.password,
-        description: token.description,
-        image: token.img,
-        token_uri: token.url,
-      })
-      .then(r => {
-        console.log(r)
-        // commit(MARKET_ALL_NFT, r)
-        resolve(r)
-      })
-      .catch(reject)
+  return this.$cosmos.getAccounts(user.address).then(data => {
+    // console.log(this.$cosmos.getECPairPriv(user.mnemonic))
+    const signMsg = this.$msgs.NewMessageMintNFT({
+      sender: user.address,
+      recipient: user.address,
+      token_id: token.id,
+      denom: 'denom_basic',
+      token_uri: token.uri || '',
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    console.log(signMsg)
+    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
+    return this.$cosmos.broadcast(signedTx)
+  })
+}
+
+export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$cosmos.getAccounts(user.address).then(data => {
+    const signMsg = this.$msgs.NewMessagePutNFTOnMarket({
+      owner: user.address,
+      beneficiary: rootGetters['user/findUserByName']('sellerBeneficiary').address,
+      token_id: token.id,
+      price: {
+        denom: 'token',
+        amount: token.price,
+      },
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    console.log(signMsg)
+    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
+    return this.$cosmos.broadcast(signedTx)
+  })
+}
+
+export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$cosmos.getAccounts(user.address).then(data => {
+    const signMsg = this.$msgs.NewMsgBuyNFT({
+      token_id: token.id,
+      buyer: user.address,
+      beneficiary: rootGetters['user/findUserByName']('buyerBeneficiary').address,
+      beneficiary_commission: rootState.config.beneficiary_commission,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    console.log(signMsg)
+    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
+    return this.$cosmos.broadcast(signedTx)
+  })
+}
+
+export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$cosmos.getAccounts(user.address).then(data => {
+    const signMsg = this.$msgs.NewMsgRemoveNFTFromMarket({
+      owner: user.address,
+      token_id: token.id,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    console.log(signMsg)
+    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
+    return this.$cosmos.broadcast(signedTx)
   })
 }

@@ -1,6 +1,6 @@
 <template>
   <page>
-    <market-item :id="$route.params.id"></market-item>
+    <market-item :nft="nft" :rate="rateETH" :buyer="currentUser.address" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
   </page>
 </template>
 
@@ -25,10 +25,30 @@ export default {
   data: () => ({
   }),
   computed: {
+    ...mapState({
+      rateETH: state => state.config.rateETH,
+    }),
+
+    ...mapGetters('user', ['currentUser']),
+    ...mapGetters('market', ['findNft']),
+    nft() {
+      return this.findNft(this.$route.params.id)
+    },
+
   },
   mounted() {
+    this.queryNft({ force: true, params: { tokenId: this.$route.params.id } })
+    console.log(this.nft)
+
   },
   methods: {
+    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed']),
+    onSellFixed() {
+
+    },
+    onCancelFixed() {
+
+    }
   },
 }
 </script>

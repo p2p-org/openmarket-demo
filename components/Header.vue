@@ -12,11 +12,14 @@
             <b-nav-item :to="{ name: 'index' }" exact>
               Home
             </b-nav-item>
-            <b-nav-item :to="{ name: 'market' }">
+            <b-nav-item :to="{ name: 'market' }" exact>
               Market
             </b-nav-item>
-            <b-nav-item :to="{ name: 'my' }">
+            <b-nav-item :to="{ name: 'market', query: { owner: currentUser.address } }" exact>
               My NFT's
+            </b-nav-item>
+            <b-nav-item :to="{ name: 'nft' }">
+              Mint
             </b-nav-item>
 
             <!--          <b-nav-item href="#" disabled>Disabled</b-nav-item>-->
@@ -84,8 +87,8 @@
                  </client-only>
                  {{ userName | truncate(5) }}
               </template>
-              <template v-if="accounts.length">
-                <b-dropdown-item-btn v-for="(a, id) in accounts" :key="id" :active="currentId === id" @click="setCurrentUser(id)">
+              <template v-if="users.length">
+                <b-dropdown-item-btn v-for="(a, id) in users" :key="id" :active="currentId === id" @click="setCurrentUser(id)">
                   <b>{{ a.name }}</b> <small>({{ a.address | collapse(8, 5) }} )</small>
 <!--                  <div class="d-flex flex-row justify-content-between">-->
 <!--                  <span><b>{{ a.name }}</b> <small>({{ a.address | collapse(8, 5) }} )</small></span>-->
@@ -155,7 +158,7 @@ export default {
   },
   computed: {
     ...mapState({
-      accounts: state => state.user.accounts,
+      users: state => state.user.users,
       currentId: state => state.user.currentId,
     }),
     ...mapGetters(['getTheme']),

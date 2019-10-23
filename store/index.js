@@ -4,7 +4,54 @@ const themeKeyName = 'theme'
 export const state = () => ({
   theme: 'dark',
   alerts: [],
-  access: false
+  access: false,
+  users: [
+    {
+      name: 'user1',
+      mnemonic:
+        'hawk above capital clock wage crew now essence typical fish pave pluck garden half isolate swarm pluck subway dignity flight bone capital scrap choose',
+    },
+    {
+      name: 'user2',
+      mnemonic:
+        'matter learn fall finish reunion result obtain fiscal picture afford arrange dignity air banana ketchup glad option cricket embrace infant album wagon wage razor',
+    },
+    {
+      name: 'sellerBeneficiary',
+      mnemonic:
+        'alert slim hard march trust goat coil gossip stay peasant book lottery enable anchor hidden calm churn planet amount concert together topple soft endorse',
+    },
+    {
+      name: 'buyerBeneficiary',
+      mnemonic:
+        'onion axis add badge give decline behave cry aim have drop wheat cat annual nerve mobile elite test effort race rebel dragon forget pony',
+    },
+    {
+      name: 'dgaming',
+      mnemonic:
+        'unfold whale pear cage stand rescue grape sentence fence document fan begin traffic across property sense list dose sock license drink poverty romance bid',
+    },
+    // {
+    //   name: 'validator1',
+    //   mnemonic:
+    //     'base figure planet hazard sail easily honey advance tuition grab across unveil random kiss fence connect disagree evil recall latin cause brisk soft lunch',
+    // },
+    {
+      name: 'alice',
+      mnemonic:
+        'actor barely wait patrol moral amateur hole clerk misery truly salad wonder artefact orchard grit check abandon drip avoid shaft dirt thought melody drip',
+    },
+    {
+      name: 'bob',
+      mnemonic:
+        'force tone wrist rice ramp inform access idea lend purse verify dial beef right spread forget novel sentence rail script pretty east exchange canoe',
+    },
+    {
+      name: 'jack',
+      mnemonic:
+        'rich decide letter cannon wet sword ill cruise lyrics churn valid shift unknown steel drum gasp ginger fury modify ship vast puppy mountain embark',
+    },
+  ],
 })
 
 export const mutations = {
@@ -25,8 +72,13 @@ export const getters = {
 
 export const actions = {
   // server pre init
-  nuxtServerInit({ commit, dispatch }, { req, app }) {
+  nuxtServerInit({ state, commit, dispatch }, { req, app }) {
+    const password = '12345678'
     dispatch('setTheme', app.$cookies.get(themeKeyName))
+    state.users.forEach((u, id) => {
+      dispatch('user/setUser', { ...u, id, password })
+    })
+    dispatch('user/setCurrentUser', 0)
   },
 
   setTheme({ commit }, theme) {
