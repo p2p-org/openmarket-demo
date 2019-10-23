@@ -3,6 +3,15 @@ import moment from 'moment'
 
 Vue.mixin({
   methods: {
+    nftMetaPropAll(meta) {
+      return meta.properties.map(p => {
+        return {
+          ...p,
+          options: meta.definitions[p.trait] || null,
+        }
+      })
+    },
+
     nftMetaProp(meta, trait) {
       return {
         ...meta.properties.find(p => p.trait === trait),

@@ -185,3 +185,25 @@ export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user
     return this.$cosmos.broadcast(signedTx)
   })
 }
+
+export function nftTransfer({ state, commit, rootState, rootGetters }, { user, token, recipient } = {}) {
+  return this.$cosmos.getAccounts(user.address).then(data => {
+    const signMsg = this.$msgs.NewMsgTransferNFT({
+      sender: user.address,
+      token_id: token.id,
+      recipient,
+      denom: 'denom_basic',
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    console.log(signMsg)
+    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
+    return this.$cosmos.broadcast(signedTx)
+  })
+}

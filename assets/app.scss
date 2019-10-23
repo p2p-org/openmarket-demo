@@ -285,3 +285,28 @@ p {
     margin-bottom: -25%;
   }
 }
+
+.stat-circle {
+  width: 75px;
+
+  circle.bg {
+    fill: none;
+    stroke: #f1f1f1;
+    stroke-width: 0.4;
+  }
+
+  circle.progress {
+    fill: none;
+    stroke: #ff3a42;
+    stroke-width: 0.8;
+    stroke-dasharray: 51;
+    stroke-dashoffset: -51;
+    stroke-linecap: round;
+  }
+
+  text {
+    font-size: 5px;
+    text-anchor: middle;
+    fill: #bbb;
+  }
+}

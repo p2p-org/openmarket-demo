@@ -5,8 +5,9 @@
         <b-col md="4">
           <b-card :img-src="image" :img-alt="title" img-top class="mb-3">
             <b-card-body>
-              <div class="mb-4">
+              <div class="mb-4 d-flex justify-content-between">
                 <b>{{ collection }}</b>
+                <span class="text-muted">#{{ nft.token_id }}</span>
               </div>
               <h5 class="mb-3">
                 <b>{{ title }}</b>
@@ -23,12 +24,12 @@
               <!--                &lt;!&ndash;              height="0.2rem"&ndash;&gt;-->
               <!--                <b-progress :value="stat.value" :max="stat.options.max" :min="stat.options.min" show-progress></b-progress>-->
               <!--              </template>-->
-              <template v-for="rank in ranks">
+              <template v-for="s in stats">
                 <h5 class="mt-3">
-                  {{ rank.trait.toUpperCase() }}
+                  {{ s.trait.toUpperCase() }}
                 </h5>
                 <!--              height="0.2rem"-->
-                <b-progress :value="rank.value" :max="rank.options.max" :min="rank.options.min" show-progress />
+                <b-progress :value="s.value" :max="s.options.max" :min="s.options.min" show-progress />
               </template>
             </b-card-body>
           </b-card>
@@ -68,7 +69,7 @@
                   <b-col md="6" class="d-flex flex-column p-2">
                     <b-btn variant="danger" size="lg" :disabled="busy" class="py-3" @click="doCancelFixed">
                       Cancel sell
-                      <b-spinner v-if="busy" small type="grow" />
+                      <b-spinner v-if="busy" type="grow" />
                     </b-btn>
 
                     <!--                    <div class="label  mb-1 mt-3">Last sold</div>-->
@@ -80,7 +81,7 @@
                 <template v-else-if="status === 2">
                   <b-btn variant="danger">
                     Cancel sell
-                    <b-spinner v-if="busy" small type="grow" />
+                    <b-spinner v-if="busy" type="grow" />
                   </b-btn>
                 </template>
                 <template v-else>
@@ -106,7 +107,7 @@
                   <b-col md="6" class="d-flex flex-column p-2">
                     <b-btn variant="primary" size="lg" :disabled="busy" class="py-3" @click="doSellFixed">
                       Sell
-                      <b-spinner v-if="busy" small type="grow" />
+                      <b-spinner v-if="busy" type="grow" />
                     </b-btn>
                   </b-col>
                 </template>
@@ -141,16 +142,16 @@
                     </div>
                   </b-col>
                   <b-col md="6" class="d-flex flex-column p-2">
-                    <b-btn variant="primary" size="lg"  :disabled="busy" class="py-3" @click="doBuyFixed">
+                    <b-btn variant="primary" size="lg" :disabled="busy" class="py-3" @click="doBuyFixed">
                       Buy
-                      <b-spinner v-if="busy" small type="grow" />
+                      <b-spinner v-if="busy" type="grow" />
                     </b-btn>
                   </b-col>
                 </template>
                 <template v-else-if="status === 2">
                   <b-btn variant="info">
                     Place bid
-                    <b-spinner v-if="busy" small type="grow" />
+                    <b-spinner v-if="busy" type="grow" />
                   </b-btn>
                 </template>
                 <template v-else>
@@ -188,57 +189,44 @@
                   <b-col md="6" class="d-flex flex-column p-2">
                     <b-btn variant="warning" size="lg" class="py-3">
                       Make offer
-                      <b-spinner v-if="busy" small type="grow" />
+                      <b-spinner v-if="busy" type="grow" />
                     </b-btn>
                   </b-col>
                 </template>
               </template>
             </b-row>
           </b-card>
+          <b-card  v-if="owned && status === 0" class="mb-3 p-2 market-action">
+            <b-row>
+              <b-col md="6" class="d-flex flex-column pr-4">
+                <div class="label mb-1">
+                  Select user
+                </div>
+                <b-form-group class="my-0">
+                  <b-form-select v-model="recipient" :options="usersList" size="lg"></b-form-select>
+                </b-form-group>
+              </b-col>
+              <b-col md="6" class="d-flex flex-column p-2">
+                <b-btn variant="info" size="lg" :disabled="busy" class="py-3" @click="doTransfer">
+                  Gift token
+                  <b-spinner v-if="busy" type="grow" />
+                </b-btn>
+              </b-col>
+            </b-row>
+          </b-card>
 
           <h5 class="subtitle mt-3">
-            Properties
+            Ranks
           </h5>
           <b-row>
-            <b-col md="6">
-              <b-card bg-variant="primary" class="mb-3 px-2">
-                <div class="title mb-5">
-                  Number of parcel to district
+            <b-col v-for="(r, i) in ranks" :key="i" md="6">
+              <b-card :bg-variant="bgVar(i)" class="mb-3 px-2">
+                <div class="title">
+                  {{ mkTitle(r.trait) }}
                 </div>
-                <div class="mt-5">
-<span class="value">10</span><span class="total">of 100</span>
-</div>
-              </b-card>
-            </b-col>
-            <b-col md="6">
-              <b-card bg-variant="success" class="mb-3 px-2">
-                <div class="title mb-5">
-                  Number of parcel to district
+                  <div class="mt-4">
+                    <span class="value">{{ r.value }}</span><span class="total"> of max {{ r.options.max }}</span>
                 </div>
-                <div class="mt-5">
-<span class="value">10</span><span class="total">of 100</span>
-</div>
-              </b-card>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col md="6">
-              <b-card bg-variant="warning" class="mb-3 px-2">
-                <div class="title mb-5">
-                  Number of parcel to district
-                </div>
-                <div class="mt-5">
-<span class="value">10</span><span class="total">of 100</span>
-</div>
-              </b-card>
-            </b-col>
-            <b-col md="6">
-              <b-card bg-variant="secondary" class="mb-3 px-2">
-                <div class="title mb-5">
-                  &nbsp;
-                </div>
-                <div class="mt-5">
-<span class="value">&nbsp;</span><span class="total" /></div>
               </b-card>
             </b-col>
           </b-row>
@@ -246,25 +234,17 @@
             Properties
           </h5>
           <b-row>
-            <b-col md="6">
-              <b-card bg-variant="danger" class="mb-3 px-2">
-                <div class="title mb-5">
-                  Number of parcel to district
+            <b-col v-for="(p, i) in props" :key="i" md="6">
+              <b-card :bg-variant="bgVar(i+1)" class="mb-3 px-2">
+                <div class="title">
+                  {{ mkTitle(p.trait) }}
                 </div>
-                <div class="mt-5">
-<span class="value">10</span><span class="total">of 100</span>
-</div>
+                <div class="mt-4">
+                  <span class="value">{{ p.value }}</span>
+                </div>
               </b-card>
             </b-col>
-            <b-col md="6">
-              <b-card bg-variant="info" class="mb-3 px-2">
-                <div class="title mb-5">
-                  &nbsp;
-                </div>
-                <div class="mt-5">
-<span class="value">&nbsp;</span><span class="total" /></div>
-              </b-card>
-            </b-col>
+
           </b-row>
           <h5 class="subtitle mt-3">
             Statistics
@@ -316,15 +296,15 @@ export default {
   },
   data() {
     return {
-      mainProps: { blank: true, blankColor: '#777', width: 50, height: 50, class: 'm1' },
       items: [
-        { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-        { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-        { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-        { age: 38, first_name: 'Jami', last_name: 'Carney' },
+        { level: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
+        { level: 21, first_name: 'Larsen', last_name: 'Shaw' },
+        { level: 89, first_name: 'Geneva', last_name: 'Wilson' },
+        { level: 38, first_name: 'Jami', last_name: 'Carney' },
       ],
       sellPrice: '1',
       offerPrice: '1',
+      recipient: null,
       currency: 'token',
       busy: false,
     }
@@ -332,6 +312,7 @@ export default {
   computed: {
     ...mapState({
       users: state => state.user.users,
+      // nfts: state => state.market.nfts,
     }),
     ...mapGetters('user', ['currentUser']),
 
@@ -350,9 +331,14 @@ export default {
       }
     },
     propLevel() {
-      const p = this.nftMetaProp(this.nft.meta, 'level')
-      console.log(p)
+      // const p = this.nftMetaProp(this.nft.meta, 'level')
+      // console.log(p)
       return this.nftMetaProp(this.nft.meta, 'level')
+    },
+    props() {
+      // const p = this.nftMetaProp(this.nft.meta, 'level')
+      // console.log(p)
+      return this.nftMetaDisplay(this.nft.meta, null, false)
     },
     stats() {
       return this.nftMetaDisplay(this.nft.meta, 'stat', false)
@@ -373,7 +359,6 @@ export default {
       return this.nftMetaDisplay(this.nft.meta, 'description').value
     },
     collection() {
-      console.log(this.propLevel)
       return this.nftMetaDisplay(this.nft.meta, 'collection').value
     },
 
@@ -404,13 +389,39 @@ export default {
           return '/images/currency_atom.png'
       }
     },
+
+    usersList() {
+      return [{ value: null, text: '- select -', disabled: true }].concat(this.users.filter(u => u.address !== this.buyer).map(u => ({ value: u.address, text: u.name })))
+    },
   },
   mounted() {
     console.log(this.nft)
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed']),
+    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed', 'nftTransfer']),
 
+    bgVar(i) {
+      switch (i % 4) {
+        case 0:
+          return 'primary'
+        case 1:
+          return 'success'
+        case 2:
+          return 'warning'
+        case 3:
+          return 'danger'
+        default:
+          return 'info'
+      }
+    },
+    mkTitle(str) {
+      str = str.toLowerCase().split('_')
+      const final = []
+      for (const word of str) {
+        final.push(word.charAt(0).toUpperCase() + word.slice(1))
+      }
+      return final.join(' ')
+    },
     priceEth(value) {
       return (parseFloat(value) / this.rate).toFixed(5)
     },
@@ -418,102 +429,125 @@ export default {
       this.$emit('sellFixed', this.price)
 
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm sell?')
-        .then(value => {
-          if (value) {
-            this.nftSellFixed({
-              user: this.currentUser,
-              token: {
-                id: this.nft.token_id,
-                price: this.sellPrice,
-              },
+      this.$bvModal.msgBoxConfirm('Confirm sell?').then(value => {
+        if (value) {
+          this.nftSellFixed({
+            user: this.currentUser,
+            token: {
+              id: this.nft.token_id,
+              price: this.sellPrice,
+            },
+          })
+            .then(r => {
+              console.log(r)
+              setTimeout(() => {
+                this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
+                  this.busy = false
+                })
+                this.$bvModal.msgBoxOk('NFT Listed for Fixed Price', { okVariant: 'success' })
+              }, 3000)
             })
-              .then(r => {
-                console.log(r)
-                setTimeout(() => {
-                  this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
-                    this.busy = false
-                  })
-                  this.$bvModal.msgBoxOk('NFT Listed for Fixed Price', { okVariant: 'success' })
-                }, 3000)
-              })
-              .catch(err => {
-                this.busy = false
-                this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
-              })
-          } else {
-            this.busy = false
-          }
-        })
-
-
-
+            .catch(err => {
+              this.busy = false
+              this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
+            })
+        } else {
+          this.busy = false
+        }
+      })
     },
     doBuyFixed() {
       // this.$emit('buyFixed')
 
       this.busy = true
 
-      this.$bvModal.msgBoxConfirm('Confirm buy?')
-        .then(value => {
-          if (value) {
-            this.nftBuyFixed({
-              user: this.currentUser,
-              token: {
-                id: this.nft.token_id,
-                price: this.sellPrice,
-              },
+      this.$bvModal.msgBoxConfirm('Confirm buy?').then(value => {
+        if (value) {
+          this.nftBuyFixed({
+            user: this.currentUser,
+            token: {
+              id: this.nft.token_id,
+              price: this.sellPrice,
+            },
+          })
+            .then(r => {
+              console.log(r)
+              // todo
+              setTimeout(() => {
+                this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
+                  this.busy = false
+                })
+                this.$bvModal.msgBoxOk('NFT sold to you', { okVariant: 'success' })
+              }, 3000)
             })
-              .then(r => {
-                console.log(r)
-                // todo
-                setTimeout(() => {
-                  this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
-                    this.busy = false
-                  })
-                  this.$bvModal.msgBoxOk('NFT sold to you', { okVariant: 'success' })
-                }, 3000)
-              })
-              .catch(err => {
-                this.busy = false
-                this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
-              })
-          } else {
-            this.busy = false
-          }
-        })
-
+            .catch(err => {
+              this.busy = false
+              this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
+            })
+        } else {
+          this.busy = false
+        }
+      })
     },
     doCancelFixed() {
       this.$emit('cancelFixed')
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm cancel sell?')
-        .then(value => {
-          if (value) {
-            this.nftCancelFixed({
-              user: this.currentUser,
-              token: {
-                id: this.nft.token_id,
-              },
+      this.$bvModal.msgBoxConfirm('Confirm cancel sell?').then(value => {
+        if (value) {
+          this.nftCancelFixed({
+            user: this.currentUser,
+            token: {
+              id: this.nft.token_id,
+            },
+          })
+            .then(r => {
+              console.log(r)
+              // todo
+              setTimeout(() => {
+                this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
+                  this.busy = false
+                })
+                this.$bvModal.msgBoxOk('NFT Unlisted', { okVariant: 'success' })
+              }, 3000)
             })
-              .then(r => {
-                console.log(r)
-                // todo
-                setTimeout(() => {
-                  this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
-                    this.busy = false
-                  })
-                  this.$bvModal.msgBoxOk('NFT Unlisted', { okVariant: 'success' })
-                }, 3000)
-              })
-              .catch(err => {
-                this.busy = false
-                this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
-              })
-          } else {
-            this.busy = false
-          }
-        })
+            .catch(err => {
+              this.busy = false
+              this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
+            })
+        } else {
+          this.busy = false
+        }
+      })
+    },
+    doTransfer() {
+      this.busy = true
+      this.$bvModal.msgBoxConfirm('Confirm transfer?').then(value => {
+        if (value) {
+          this.nftTransfer({
+            user: this.currentUser,
+            recipient: this.recipient,
+            token: {
+              id: this.nft.token_id,
+            },
+          })
+            .then(r => {
+              console.log(r)
+              // todo
+              setTimeout(() => {
+                this.queryNft({ force: true, params: { tokenId: this.nft.token_id } }).then(r => {
+                  this.busy = false
+                })
+                this.$bvModal.msgBoxOk('NFT Transfered', { okVariant: 'success' })
+              }, 3000)
+            })
+            .catch(err => {
+              this.busy = false
+              this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
+            })
+        } else {
+          this.busy = false
+        }
+      })
     },
   },
 }
