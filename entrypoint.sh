@@ -8,4 +8,4 @@ find .nuxt/ \
 #  -exec sed -i "s+%%KEYCLOAK_REALM%%+${KEYCLOAK_REALM:?}+g" '{}' \; \
 #  -exec sed -i "s+%%API_BASE_URL%%+${API_BASE_URL:?}+g" '{}' \;
 
-exec yarn start
+exec npm start

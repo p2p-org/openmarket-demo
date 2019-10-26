@@ -105,6 +105,7 @@
                 <b-dropdown-divider />
               </template>
               <template v-if="mockUsers.length">
+                <b-dropdown-item disabled>Add mock user</b-dropdown-item>
                 <b-dropdown-item-btn v-for="(a, id) in mockUsers" :key="`mock_${id}`" @click="addMockUser(id)">
                   <fa :icon="['fas', 'plus']" /> {{ a.name }}
                 </b-dropdown-item-btn>

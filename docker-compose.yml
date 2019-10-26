@@ -6,17 +6,26 @@ services:
     restart: unless-stopped
     ports:
       - 3000:3000
+    networks:
+      - dwh-tier
     environment:
       - NODE_ENV=production
       - GQL_URL=http://graphql:8080/v1/graphql
-      - REST_URL=http://merketplace:1317
+      - REST_URL=http://dwh_marketplace:1317
 
   nginx:
     image: nginx:1-alpine
     restart: unless-stopped
     ports:
       - "80:80"
+    networks:
+      - dwh-tier
     volumes:
       - ./nginx:/etc/nginx/conf.d
     depends_on:
       - nuxt
+
+networks:
+  dwh-tier:
+    external:
+      name: dwh-network
