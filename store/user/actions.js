@@ -3,8 +3,8 @@ export function setUser(
   { id = null, name = null, mnemonic = null, address = null, password = null, ecpairPriv = null }
 ) {
   if (mnemonic) {
-    address = this.$cosmos.getAddress(mnemonic)
-    ecpairPriv = this.$cosmos.getECPairPriv(mnemonic)
+    address = this.$txApi.getAddress(mnemonic)
+    ecpairPriv = this.$txApi.getECPairPriv(mnemonic)
   }
 
   commit('setUser', { id, name, mnemonic, password, address, ecpairPriv })
@@ -45,7 +45,8 @@ export function loadUserInfo({ commit, state, getters, rootState }) {
   }
 
   return new Promise((resolve, reject) => {
-    this.$cosmos
+    console
+    this.$txApi
       .getAccounts(getters.currentUser.address)
       .then(data => {
         console.log(data)

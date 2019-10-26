@@ -5,7 +5,9 @@ export function currentUser(state) {
         // account_number: state.currentUserInfo.account_number,
         // sequence_number: state.currentUserInfo.sequence_number,
       }
-    : null
+    : {
+        address: null,
+      }
 }
 
 export function findUserByName(state) {

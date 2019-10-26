@@ -15,49 +15,49 @@
             <b-nav-item :to="{ name: 'market' }" exact>
               Market
             </b-nav-item>
-            <b-nav-item :to="{ name: 'market', query: { owner: currentUser.address } }" exact>
+            <b-nav-item v-if="currentUser.address" :to="{ name: 'market', query: { owner: currentUser.address } }" exact>
               My NFT's
             </b-nav-item>
-            <b-nav-item :to="{ name: 'nft' }">
+            <b-nav-item v-if="currentUser.address" :to="{ name: 'nft' }">
               Mint
             </b-nav-item>
 
             <!--          <b-nav-item href="#" disabled>Disabled</b-nav-item>-->
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
-            <b-nav-form class="mr-5">
-              <b-form-radio
-                v-model="theme"
-                name="some-radios"
-                value="light"
-                button
-                button-variant="outline-primary"
-                size="sm"
-                @change="setTheme"
-              >
-                <fa :icon="['fas', 'sun']" />
-              </b-form-radio>
-              <!--            <b-form-checkbox v-model="theme" switch value="dark" unchecked-value="light"></b-form-checkbox>-->
-              <b-form-radio
-                v-model="theme"
-                name="some-radios"
-                value="dark"
-                button
-                button-variant="outline-primary"
-                size="sm"
-                @change="setTheme"
-              >
-                <fa :icon="['fas', 'moon']" />
-              </b-form-radio>
+<!--            <b-nav-form class="mr-5">-->
+<!--              <b-form-radio-->
+<!--                v-model="theme"-->
+<!--                name="some-radios"-->
+<!--                value="light"-->
+<!--                button-->
+<!--                button-variant="outline-primary"-->
+<!--                size="sm"-->
+<!--                @change="setTheme"-->
+<!--              >-->
+<!--                <fa :icon="['fas', 'sun']" />-->
+<!--              </b-form-radio>-->
+<!--              &lt;!&ndash;            <b-form-checkbox v-model="theme" switch value="dark" unchecked-value="light"></b-form-checkbox>&ndash;&gt;-->
+<!--              <b-form-radio-->
+<!--                v-model="theme"-->
+<!--                name="some-radios"-->
+<!--                value="dark"-->
+<!--                button-->
+<!--                button-variant="outline-primary"-->
+<!--                size="sm"-->
+<!--                @change="setTheme"-->
+<!--              >-->
+<!--                <fa :icon="['fas', 'moon']" />-->
+<!--              </b-form-radio>-->
 
-              <!--            <b-form-radio-group-->
-              <!--              id="theme-selector"-->
-              <!--              v-model="theme"-->
-              <!--              :options="themes"-->
-              <!--              buttons-->
-              <!--              name="theme-selector"-->
-              <!--            ></b-form-radio-group>-->
-            </b-nav-form>
+<!--              &lt;!&ndash;            <b-form-radio-group&ndash;&gt;-->
+<!--              &lt;!&ndash;              id="theme-selector"&ndash;&gt;-->
+<!--              &lt;!&ndash;              v-model="theme"&ndash;&gt;-->
+<!--              &lt;!&ndash;              :options="themes"&ndash;&gt;-->
+<!--              &lt;!&ndash;              buttons&ndash;&gt;-->
+<!--              &lt;!&ndash;              name="theme-selector"&ndash;&gt;-->
+<!--              &lt;!&ndash;            ></b-form-radio-group>&ndash;&gt;-->
+<!--            </b-nav-form>-->
             <b-nav-form>
               <b-form-input size="sm" class="mr-sm-2" placeholder="Search" />
               <b-button size="sm" class="my-2 my-sm-0" type="submit" variant="primary">
@@ -82,13 +82,13 @@
             <b-nav-item-dropdown right>
               <template slot="button-content">
 <!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
-                 <client-only>
+                 <client-only v-if="currentUser.address">
                 <jazzicon :address="userAddress" :diameter="20" />
                  </client-only>
-                 {{ userName | truncate(5) }}
+                 {{ userName | truncate(8) }}
               </template>
               <template v-if="users.length">
-                <b-dropdown-item-btn v-for="(a, id) in users" :key="id" :active="currentId === id" @click="setCurrentUser(id)">
+                <b-dropdown-item-btn v-for="(a, id) in users" :key="`user_${id}`" :active="currentId === id" @click="setCurrentUser(id)">
                   <b>{{ a.name }}</b> <small>({{ a.address | collapse(8, 5) }} )</small>
 <!--                  <div class="d-flex flex-row justify-content-between">-->
 <!--                  <span><b>{{ a.name }}</b> <small>({{ a.address | collapse(8, 5) }} )</small></span>-->
@@ -104,6 +104,13 @@
                 </b-dropdown-item-btn>
                 <b-dropdown-divider />
               </template>
+              <template v-if="mockUsers.length">
+                <b-dropdown-item-btn v-for="(a, id) in mockUsers" :key="`mock_${id}`" @click="addMockUser(id)">
+                  <fa :icon="['fas', 'plus']" /> {{ a.name }}
+                </b-dropdown-item-btn>
+                <b-dropdown-divider />
+              </template>
+
 <!--              <b-dropdown-item>-->
 <!--                <div class="d-flex flex-row justify-content-between">-->
 <!--                  <b-btn :to="{ name: 'user-id' }" variant="success" size="sm">-->
@@ -159,15 +166,16 @@ export default {
   computed: {
     ...mapState({
       users: state => state.user.users,
+      mockUsers: state => state.users,
       currentId: state => state.user.currentId,
     }),
     ...mapGetters(['getTheme']),
     ...mapGetters('user', ['currentUser']),
     userName() {
-      return this.currentUser ? this.currentUser.name : '<login>'
+      return this.currentUser.name || '<login>'
     },
     userAddress() {
-      return this.currentUser ? this.currentUser.address.substring(8) : '<address>'
+      return this.currentUser.address ? this.currentUser.address.substring(8) : ''
     },
   },
   created() {
@@ -179,8 +187,12 @@ export default {
   },
   methods: {
     ...mapActions(['setTheme']),
-    ...mapActions('user', ['delCurrentUser', 'setCurrentUser']),
+    ...mapActions('user', ['delCurrentUser', 'setCurrentUser', 'setUser']),
 
+    addMockUser(id) {
+      const password = '12345678'
+      this.setUser({ ...this.mockUsers[id], password })
+    },
     onActivate(target) {
       console.log('Received event: "bv::scrollspy::activate" for target ', target)
     },
