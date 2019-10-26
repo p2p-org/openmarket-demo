@@ -52,7 +52,7 @@ export default {
     { src: '~/plugins/filters' },
     { src: '~/plugins/methods' },
     { src: '~/plugins/market', mode: 'client' },
-    { src: '~/plugins/cosmos' },
+    // { src: '~/plugins/cosmos' },
     // { src: '~/plugins/identicon', mode: 'client' },
   ],
   /*
@@ -96,10 +96,15 @@ export default {
     '~/api',
   ],
   proxy: {
-    '/apiHub': {
-      pathRewrite: { '^/apiHub': '' },
-      target: 'http://localhost:1317',
-      ws: false
+    '/_lcd': {
+      pathRewrite: { '^/_lcd': '' },
+      target: process.env.REST_URL || 'http://localhost:1317',
+      ws: false,
+    },
+    '/_gql': {
+      pathRewrite: { '^/_gql': '' },
+      target: process.env.GQL_URL || 'http://localhost:8080/v1/graphql',
+      ws: true,
     },
   },
   /*

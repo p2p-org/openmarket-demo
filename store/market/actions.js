@@ -96,9 +96,9 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
 }
 
 export function nftMint({ state, commit, rootState }, { user, token } = {}) {
-  return this.$cosmos.getAccounts(user.address).then(data => {
-    // console.log(this.$cosmos.getECPairPriv(user.mnemonic))
-    const signMsg = this.$msgs.NewMessageMintNFT({
+  return this.$txApi.getAccounts(user.address).then(data => {
+    // console.log(this.$txApi.getECPairPriv(user.mnemonic))
+    const signMsg = this.$txMsgs.NewMessageMintNFT({
       sender: user.address,
       recipient: user.address,
       token_id: token.id,
@@ -114,14 +114,15 @@ export function nftMint({ state, commit, rootState }, { user, token } = {}) {
       sequence: data.result.value.sequence,
     })
     console.log(signMsg)
-    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
-    return this.$cosmos.broadcast(signedTx)
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    console.log(signedTx)
+    return this.$txApi.broadcast(signedTx)
   })
 }
 
 export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$cosmos.getAccounts(user.address).then(data => {
-    const signMsg = this.$msgs.NewMessagePutNFTOnMarket({
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMessagePutNFTOnMarket({
       owner: user.address,
       beneficiary: rootGetters['user/findUserByName']('sellerBeneficiary').address,
       token_id: token.id,
@@ -139,14 +140,14 @@ export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, 
       sequence: data.result.value.sequence,
     })
     console.log(signMsg)
-    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
-    return this.$cosmos.broadcast(signedTx)
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx)
   })
 }
 
 export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$cosmos.getAccounts(user.address).then(data => {
-    const signMsg = this.$msgs.NewMsgBuyNFT({
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgBuyNFT({
       token_id: token.id,
       buyer: user.address,
       beneficiary: rootGetters['user/findUserByName']('buyerBeneficiary').address,
@@ -161,14 +162,14 @@ export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, t
       sequence: data.result.value.sequence,
     })
     console.log(signMsg)
-    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
-    return this.$cosmos.broadcast(signedTx)
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx)
   })
 }
 
 export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$cosmos.getAccounts(user.address).then(data => {
-    const signMsg = this.$msgs.NewMsgRemoveNFTFromMarket({
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgRemoveNFTFromMarket({
       owner: user.address,
       token_id: token.id,
 
@@ -181,14 +182,14 @@ export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user
       sequence: data.result.value.sequence,
     })
     console.log(signMsg)
-    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
-    return this.$cosmos.broadcast(signedTx)
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx)
   })
 }
 
 export function nftTransfer({ state, commit, rootState, rootGetters }, { user, token, recipient } = {}) {
-  return this.$cosmos.getAccounts(user.address).then(data => {
-    const signMsg = this.$msgs.NewMsgTransferNFT({
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgTransferNFT({
       sender: user.address,
       token_id: token.id,
       recipient,
@@ -203,7 +204,7 @@ export function nftTransfer({ state, commit, rootState, rootGetters }, { user, t
       sequence: data.result.value.sequence,
     })
     console.log(signMsg)
-    const signedTx = this.$cosmos.sign({ json: signMsg }, Buffer.from(user.ecpairPriv))
-    return this.$cosmos.broadcast(signedTx)
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx)
   })
 }

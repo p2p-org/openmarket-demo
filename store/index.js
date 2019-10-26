@@ -1,4 +1,4 @@
-import { THEME } from './mutation-types'
+import { CONFIG_URLS, THEME } from './mutation-types'
 
 const themeKeyName = 'theme'
 export const state = () => ({
@@ -73,8 +73,22 @@ export const getters = {
 export const actions = {
   // server pre init
   nuxtServerInit({ state, commit, dispatch }, { req, app }) {
-    const password = '12345678'
     dispatch('setTheme', app.$cookies.get(themeKeyName))
+
+    // if (process.env.GQL_WS_URL) {
+    //   commit(`config/${CONFIG_URLS}`, {
+    //     gqlWsUrl: process.env.GQL_WS_URL,
+    // })
+    // }
+    // if (process.env.GQL_HTTP_URL) {
+    //   commit(`config/${CONFIG_URLS}`, {
+    //     gqlHttpUrl: process.env.GQL_HTTP_URL,
+    //   })
+    // }
+  },
+
+  initUsers({ state, dispatch }) {
+    const password = '12345678'
     state.users.forEach((u, id) => {
       dispatch('user/setUser', { ...u, id, password })
     })
