@@ -20,79 +20,104 @@ const NUMBER_ATTRIBUTES = [1, 2, 1, 1]
 
 const imgDir = join(__dirname, '../../static')
 
-const router = Router()
-
 const totalSupply = 123
 
-module.exports = router
+module.exports = tokenApi
 
-router.get('/token/:id', async (req, res, next) => {
-  const tokenId = parseInt(req.params.id.replace(/\D/g, ''))
-  // console.log(req.params)
-  const name =
-    FIRST_NAMES[tokenId % FIRST_NAMES.length] +
-    ' ' +
-    LAST_NAMES[tokenId % LAST_NAMES.length] +
-    ' ' +
-    FIRST_NAMES[(tokenId + 11) % FIRST_NAMES.length] +
-    ' ' +
-    LAST_NAMES[(tokenId + 7) % LAST_NAMES.length]
-  const base = BASES[tokenId % BASES.length]
-  const eyes = EYES[tokenId % EYES.length]
-  const mouth = MOUTH[tokenId % MOUTH.length]
-  await composeImage([`images/bases/base-${base}.png`, `images/eyes/eyes-${eyes}.png`, `images/mouths/mouth-${mouth}.png`], tokenId)
+function tokenApi(db) {
+  const router = Router()
+  router.get('/token/:id', async (req, res, next) => {
+    const tokenId = parseInt(req.params.id.replace(/\D/g, ''))
+    const item = db.show('nfts', tokenId)
+    // if (item) {
+    if (item && item.meta) {
+      return res.status(200).send(item.meta)
+    }
+    // console.log(req.params)
+    const name =
+      FIRST_NAMES[tokenId % FIRST_NAMES.length] +
+      ' ' +
+      LAST_NAMES[tokenId % LAST_NAMES.length] +
+      ' ' +
+      FIRST_NAMES[(tokenId + 11) % FIRST_NAMES.length] +
+      ' ' +
+      LAST_NAMES[(tokenId + 7) % LAST_NAMES.length]
+    const base = BASES[tokenId % BASES.length]
+    const eyes = EYES[tokenId % EYES.length]
+    const mouth = MOUTH[tokenId % MOUTH.length]
+    await composeImage([`images/bases/base-${ base }.png`, `images/eyes/eyes-${ eyes }.png`, `images/mouths/mouth-${ mouth }.png`], tokenId)
 
-  const metadata = {
-    tokenId,
-    totalCount: totalSupply,
-    properties: [],
-    definitions: {},
-  }
-  const lorem = new LoremIpsum({
-    sentencesPerParagraph: {
-      max: 5,
-      min: 3,
-    },
-    wordsPerSentence: {
-      max: 10,
-      min: 4,
-    },
+    const metadata = {
+      tokenId,
+      totalCount: totalSupply,
+      properties: [],
+      definitions: {},
+    }
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 5,
+        min: 3,
+      },
+      wordsPerSentence: {
+        max: 10,
+        min: 4,
+      },
+    })
+
+    addMetaProp(metadata, { trait: 'name', value: name, display: 'title' })
+    addMetaProp(metadata, {
+      trait: 'image',
+      value: `${ req.protocol }://${ req.get('host') }/images/output/${ tokenId }.png`,
+      display: 'image'
+    })
+    addMetaProp(metadata, { trait: 'description', value: lorem.generateParagraphs(1), display: 'description' })
+    addMetaProp(metadata, {
+      trait: 'external_url',
+      value: `${ req.protocol }://${ req.get('host') }/api/token/${ tokenId }`,
+      display: 'link'
+    })
+    addMetaProp(metadata, { trait: 'collection', value: `AwesomeCuties`, display: 'collection' })
+
+    addMetaDef(metadata, { trait: 'base', options: BASES, mock: true, id: tokenId })
+    addMetaDef(metadata, { trait: 'eyes', options: EYES, mock: true, id: tokenId })
+    addMetaDef(metadata, { trait: 'mouth', options: MOUTH, mock: true, id: tokenId })
+    addMetaDef(metadata, { trait: 'level', options: INT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
+    addMetaDef(metadata, { trait: 'stamina', options: FLOAT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
+    addMetaDef(metadata, { trait: 'personality', options: STR_ATTRIBUTES, mock: true, id: tokenId })
+    addMetaDef(metadata, { trait: 'aqua_power', options: BOOST_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
+    addMetaDef(metadata, {
+      trait: 'stamina_increase',
+      options: PERCENT_BOOST_ATTRIBUTES,
+      mm: true,
+      mock: true,
+      id: tokenId,
+      display: 'rank',
+    })
+    addMetaDef(metadata, { trait: 'generation', options: NUMBER_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
+
+
+    // const metadata = {
+    //   name,
+    //   description: 'Friendly OpenSea Creature that enjoys long swims in the ocean.',
+    //   image: `${req.protocol}://${req.get('host')}/images/output/${tokenId}.png`,
+    //   external_url: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`,
+    //   attributes,
+    // }
+    if (item) {
+      item.meta = metadata
+      db.update('nfts', tokenId, item)
+    } else {
+      db.store('nfts', { id: tokenId, meta: metadata })
+    }
+
+    return res.status(200).send(metadata)
+    // } else {
+    //   return notFound(res)
+    // }
   })
+  return router
+}
 
-  addMetaProp(metadata, { trait: 'name', value: name, display: 'title' })
-  addMetaProp(metadata, { trait: 'image', value: `${req.protocol}://${req.get('host')}/images/output/${tokenId}.png`, display: 'image' })
-  addMetaProp(metadata, { trait: 'description', value: lorem.generateParagraphs(1), display: 'description' })
-  addMetaProp(metadata, { trait: 'external_url', value: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`, display: 'link' })
-  addMetaProp(metadata, { trait: 'collection', value: `AwesomeCuties`, display: 'collection' })
-
-  addMetaDef(metadata, { trait: 'base', options: BASES, mock: true, id: tokenId })
-  addMetaDef(metadata, { trait: 'eyes', options: EYES, mock: true, id: tokenId })
-  addMetaDef(metadata, { trait: 'mouth', options: MOUTH, mock: true, id: tokenId })
-  addMetaDef(metadata, { trait: 'level', options: INT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
-  addMetaDef(metadata, { trait: 'stamina', options: FLOAT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
-  addMetaDef(metadata, { trait: 'personality', options: STR_ATTRIBUTES, mock: true, id: tokenId })
-  addMetaDef(metadata, { trait: 'aqua_power', options: BOOST_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
-  addMetaDef(metadata, {
-    trait: 'stamina_increase',
-    options: PERCENT_BOOST_ATTRIBUTES,
-    mm: true,
-    mock: true,
-    id: tokenId,
-    display: 'rank',
-  })
-  addMetaDef(metadata, { trait: 'generation', options: NUMBER_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
-
-  return res.status(200).send(metadata)
-})
-
-// function notFound(res) {
-//   res.status(404).send({
-//     error: {
-//       code: 'ERROR_NOT_FOUND',
-//       message: 'Not found',
-//     },
-//   })
-// }
 function getMimMax(numbers) {
   return {
     min: Math.min(...numbers),
@@ -127,4 +152,13 @@ async function composeImage(images, tokenId) {
     console.log(composite)
   }
   return `/images/output/${tokenId}.png`
+}
+
+function notFound(res) {
+  res.status(404).send({
+    error: {
+      code: 'ERROR_NOT_FOUND',
+      message: 'Not found',
+    },
+  })
 }

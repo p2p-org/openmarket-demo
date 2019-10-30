@@ -31,5 +31,9 @@ Vue.mixin({
     truncate(s, l = 45) {
       return s && s.length > l ? s.substring(0, l) + '…' : s
     },
+    priceEth(v, r = 1, d = 5) {
+      v = parseFloat(v) || 0
+      return `${(v / r).toFixed(d)} ETH`
+    },
   },
 })

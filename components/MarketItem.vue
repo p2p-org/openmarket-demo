@@ -36,47 +36,38 @@
         </b-col>
         <b-col>
           <b-card class="mb-3 p-2 market-action">
-            <b-row>
+<!--            <b-row>-->
               <template v-if="owned">
                 <template v-if="status === 1">
-                  <b-col md="6" class="d-flex flex-column pr-4">
-                    <div class="label mb-1">
-                      Fixed price
-                    </div>
-                    <div class="d-flex justify-content-middle align-items-center">
-                      <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-                      <h1 class="ml-2 my-0">
-                        <b>{{ price.value }}</b> {{ price.currency }}
-                      </h1>
-                    </div>
-                    <h3>
-                      <small v-if="price.value" class="text-muted">{{ priceEth(price.value) }} ETH</small>
-                    </h3>
+<!--                  <b-row>-->
+<!--                  <b-col md="6" class="d-flex flex-column pr-4">-->
+<!--                    <div class="label mb-1">-->
+<!--                      Fixed price-->
+<!--                    </div>-->
+<!--                    <div class="d-flex justify-content-middle align-items-center">-->
+<!--                      <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--                      <h1 class="ml-2 my-0">-->
+<!--                        <b>{{ price.value }}</b> {{ price.currency }}-->
+<!--                      </h1>-->
+<!--                    </div>-->
+<!--                    <h4 class="mt-1">-->
+<!--                      <small class="text-muted">{{ priceEth(price.value) }} ETH</small>-->
+<!--                    </h4>-->
 
-                    <div class="label my-1">
-                      Owner
-                    </div>
-                    <div class="">
-                      <client-only>
-                        <jazzicon :address="ownerAddress" :diameter="35" />
-                      </client-only>
-                      <b>{{ ownerName }}</b>
-                      <b-link :to="{ name: 'market', query: { owner: ownerAddress } }">
-                        show items
-                      </b-link>
-                    </div>
-                  </b-col>
-                  <b-col md="6" class="d-flex flex-column p-2">
-                    <b-btn variant="danger" size="lg" :disabled="busy" class="py-3" @click="doCancelFixed">
-                      Cancel sell
-                      <b-spinner v-if="busy" type="grow" />
-                    </b-btn>
+<!--                  </b-col>-->
+<!--                  <b-col md="6" class="d-flex flex-column p-2">-->
+<!--                    <b-btn variant="danger" size="lg" :disabled="busy" class="py-3" @click="doCancelFixed">-->
+<!--                      Cancel sell-->
+<!--                      <b-spinner v-if="busy" type="grow" />-->
+<!--                    </b-btn>-->
 
-                    <!--                    <div class="label  mb-1 mt-3">Last sold</div>-->
-                    <!--                    <div class="">-->
-                    <!--                      24 jul 2019 for <b>1804 USD</b>-->
-                    <!--                    </div>-->
-                  </b-col>
+<!--                    &lt;!&ndash;                    <div class="label  mb-1 mt-3">Last sold</div>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                    <div class="">&ndash;&gt;-->
+<!--                    &lt;!&ndash;                      24 jul 2019 for <b>1804 USD</b>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--                  </b-col>-->
+<!--                  </b-row>-->
+                  <form-item-cancel-sell :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" @submit="doCancelFixed" />
                 </template>
                 <template v-else-if="status === 2">
                   <b-btn variant="danger">
@@ -85,68 +76,13 @@
                   </b-btn>
                 </template>
                 <template v-else>
-                  <!--              my item, not selling yet-->
-                  <b-col md="6" class="d-flex flex-column pr-4">
-                    <div class="label mb-1">
-                      Enter fixed price
-                    </div>
-                    <b-form-group class="my-0">
-                      <b-input-group size="lg">
-                        <template v-slot:prepend>
-                          <b-input-group-text>
-                            <b-img :src="currencyImage" rounded="circle" width="30px" height="30px" />
-                          </b-input-group-text>
-                        </template>
-                        <b-form-input v-model="sellPrice" />
-                      </b-input-group>
-                    </b-form-group>
-                    <h3>
-                      <small v-if="sellPrice" class="text-muted">{{ priceEth(sellPrice) }} ETH</small>
-                    </h3>
-                  </b-col>
-                  <b-col md="6" class="d-flex flex-column p-2">
-                    <b-btn variant="primary" size="lg" :disabled="busy" class="py-3" @click="doSellFixed">
-                      Sell
-                      <b-spinner v-if="busy" type="grow" />
-                    </b-btn>
-                  </b-col>
+                  <form-item-sell :currency-image="currencyImage" :busy="busy" :rate="rate"  @submit="doSellFixed" />
                 </template>
               </template>
               <template v-else>
                 <template v-if="status === 1">
-                  <b-col md="6" class="d-flex flex-column pr-4">
-                    <div class="label mb-1">
-                      Fixed price
-                    </div>
-                    <div class="d-flex justify-content-middle align-items-center">
-                      <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-                      <h1 class="ml-2 my-0">
-                        <b>{{ price.value }}</b> {{ price.currency }}
-                      </h1>
-                    </div>
-                    <h3>
-                      <small v-if="price.value" class="text-muted">{{ priceEth(price.value) }} ETH</small>
-                    </h3>
-
-                    <div class="label my-1">
-                      Owner
-                    </div>
-                    <div class="">
-                      <client-only>
-                        <jazzicon :address="ownerAddress" :diameter="35" />
-                      </client-only>
-                      <b>{{ ownerName }}</b>
-                      <b-link :to="{ name: 'market', query: { owner: ownerAddress } }">
-                        show items
-                      </b-link>
-                    </div>
-                  </b-col>
-                  <b-col md="6" class="d-flex flex-column p-2">
-                    <b-btn variant="primary" size="lg" :disabled="busy" class="py-3" @click="doBuyFixed">
-                      Buy
-                      <b-spinner v-if="busy" type="grow" />
-                    </b-btn>
-                  </b-col>
+                  <form-item-buy :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" @submit="doBuyFixed" />
+                  <form-item-owner :owner="owner"></form-item-owner>
                 </template>
                 <template v-else-if="status === 2">
                   <b-btn variant="info">
@@ -155,55 +91,18 @@
                   </b-btn>
                 </template>
                 <template v-else>
-                  <b-col md="6" class="d-flex flex-column pr-4">
-                    <div class="label mb-1">
-                      Enter offer price
-                    </div>
-                    <b-form-group class="my-0">
-                      <b-input-group size="lg">
-                        <template v-slot:prepend>
-                          <b-input-group-text>
-                            <b-img :src="currencyImage" rounded="circle" width="30px" height="30px" />
-                          </b-input-group-text>
-                        </template>
-                        <b-form-input v-model="offerPrice" />
-                      </b-input-group>
-                    </b-form-group>
-                    <h3>
-                      <small v-if="offerPrice" class="text-muted">{{ priceEth(offerPrice) }} ETH</small>
-                    </h3>
-
-                    <div class="label my-1">
-                      Owner
-                    </div>
-                    <div class="">
-                      <client-only>
-                        <jazzicon :address="ownerAddress" :diameter="35" />
-                      </client-only>
-                      <b>{{ ownerName }}</b>
-                      <b-link :to="{ name: 'market', query: { owner: ownerAddress } }">
-                        show items
-                      </b-link>
-                    </div>
-                  </b-col>
-                  <b-col md="6" class="d-flex flex-column p-2">
-                    <b-btn variant="warning" size="lg" class="py-3">
-                      Make offer
-                      <b-spinner v-if="busy" type="grow" />
-                    </b-btn>
-                  </b-col>
+                  <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy"></form-item-offer>
+                  <form-item-owner :owner="owner"></form-item-owner>
                 </template>
               </template>
-            </b-row>
+<!--            </b-row>-->
           </b-card>
-          <b-card  v-if="owned && status === 0" class="mb-3 p-2 market-action">
+          <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">
             <b-row>
               <b-col md="6" class="d-flex flex-column pr-4">
-                <div class="label mb-1">
-                  Select user
-                </div>
-                <b-form-group class="my-0">
-                  <b-form-select v-model="recipient" :options="usersList" size="lg"></b-form-select>
+                <b-form-group class="my-0" label="Enter recipient address" label-class="pb-0">
+                  <!--                  <b-form-select v-model="recipient" :options="usersList" size="lg"></b-form-select>-->
+                  <b-form-input v-model="recipient" size="lg" />
                 </b-form-group>
               </b-col>
               <b-col md="6" class="d-flex flex-column p-2">
@@ -224,8 +123,9 @@
                 <div class="title">
                   {{ mkTitle(r.trait) }}
                 </div>
-                  <div class="mt-4">
-                    <span class="value">{{ r.value }}</span><span class="total"> of max {{ r.options.max }}</span>
+                <div class="mt-4">
+                  <span class="value">{{ r.value }}</span
+                  ><span class="total"> of max {{ r.options.max }}</span>
                 </div>
               </b-card>
             </b-col>
@@ -235,7 +135,7 @@
           </h5>
           <b-row>
             <b-col v-for="(p, i) in props" :key="i" md="6">
-              <b-card :bg-variant="bgVar(i+1)" class="mb-3 px-2">
+              <b-card :bg-variant="bgVar(i + 1)" class="mb-3 px-2">
                 <div class="title">
                   {{ mkTitle(p.trait) }}
                 </div>
@@ -244,10 +144,9 @@
                 </div>
               </b-card>
             </b-col>
-
           </b-row>
           <h5 class="subtitle mt-3">
-            Statistics
+            Sell history
           </h5>
           <b-row>
             <b-col>
@@ -264,12 +163,20 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import Jazzicon from './Jazzicon'
+import FormItemOffer from './form/ItemOffer'
+import FormItemSell from './form/ItemSell'
+import FormItemOwner from './form/ItemOwner'
+import FormItemCancelSell from './form/ItemCancelSell'
+import FormItemBuy from './form/ItemBuy'
 
 export default {
   name: 'MarketItem',
   components: {
-    Jazzicon,
+    FormItemBuy,
+    FormItemCancelSell,
+    FormItemOwner,
+    FormItemSell,
+    FormItemOffer,
   },
 
   props: {
@@ -289,24 +196,26 @@ export default {
     //   type: Boolean,
     //   default: false,
     // },
-    buyer: {
-      type: String,
-      default: null,
-    },
+    // buyer: {
+    //   type: String,
+    //   default: null,
+    // },
   },
   data() {
     return {
       items: [
-        { level: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-        { level: 21, first_name: 'Larsen', last_name: 'Shaw' },
-        { level: 89, first_name: 'Geneva', last_name: 'Wilson' },
-        { level: 38, first_name: 'Jami', last_name: 'Carney' },
+        { date: '2019-09-01', user: 'user1', price: '10token' },
+        { date: '2019-09-02', user: 'user2', price: '20token' },
+        { date: '2019-09-03', user: 'user3', price: '30token' },
+        { date: '2019-09-04', user: 'user4', price: '40token' },
+        { date: '2019-09-05', user: 'user5', price: '50token' },
       ],
       sellPrice: '1',
       offerPrice: '1',
       recipient: null,
       currency: 'token',
       busy: false,
+      owner: null,
     }
   },
   computed: {
@@ -372,15 +281,8 @@ export default {
       return this.nft.status
     },
     owned() {
-      return this.nft.owner_address === this.buyer
+      return this.nft.owner.address === this.buyer
     },
-    ownerAddress() {
-      return this.nft.owner_address
-    },
-    ownerName() {
-      return this.users.find(a => a.address === this.nft.owner_address).name || '<unknown>'
-    },
-
     currencyImage() {
       switch (this.currency) {
         case 'btc':
@@ -391,14 +293,34 @@ export default {
     },
 
     usersList() {
-      return [{ value: null, text: '- select -', disabled: true }].concat(this.users.filter(u => u.address !== this.buyer).map(u => ({ value: u.address, text: u.name })))
+      return [{ value: null, text: '- select -', disabled: true }].concat(
+        this.users.filter(u => u.address !== this.buyer).map(u => ({ value: u.address, text: u.name }))
+      )
+    },
+    buyer() {
+      return this.currentUser ? this.currentUser.address : null
+    },
+  },
+  watch: {
+    nft(nft) {
+      if (nft) {
+        this.queryUser({ address: nft.owner.address }).then(user => {
+          this.owner = user
+        })
+      }
     },
   },
   mounted() {
     console.log(this.nft)
+    if (this.nft) {
+      this.queryUser({ address: this.nft.owner.address }).then(user => {
+        this.owner = user
+      })
+    }
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed', 'nftTransfer']),
+    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed', 'nftTransfer', 'queryUser']),
+    ...mapActions('user', ['updCurrentUserBalance']),
 
     bgVar(i) {
       switch (i % 4) {
@@ -423,11 +345,10 @@ export default {
       return final.join(' ')
     },
     priceEth(value) {
-      return (parseFloat(value) / this.rate).toFixed(5)
+      const v = parseFloat(value)
+      return v ? (v / this.rate).toFixed(5) : '0.00000'
     },
-    doSellFixed() {
-      this.$emit('sellFixed', this.price)
-
+    doSellFixed({ price }) {
       this.busy = true
       this.$bvModal.msgBoxConfirm('Confirm sell?').then(value => {
         if (value) {
@@ -435,7 +356,7 @@ export default {
             user: this.currentUser,
             token: {
               id: this.nft.token_id,
-              price: this.sellPrice,
+              price,
             },
           })
             .then(r => {
@@ -448,6 +369,7 @@ export default {
               }, 3000)
             })
             .catch(err => {
+              console.log('ASDASDAD', err)
               this.busy = false
               this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
             })
@@ -478,6 +400,7 @@ export default {
                   this.busy = false
                 })
                 this.$bvModal.msgBoxOk('NFT sold to you', { okVariant: 'success' })
+                this.updCurrentUserBalance()
               }, 3000)
             })
             .catch(err => {

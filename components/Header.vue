@@ -15,10 +15,10 @@
             <b-nav-item :to="{ name: 'market' }" exact>
               Market
             </b-nav-item>
-            <b-nav-item v-if="currentUser.address" :to="{ name: 'market', query: { owner: currentUser.address } }" exact>
+            <b-nav-item v-if="currentUser" :to="{ name: 'market', query: { owner: currentUser.address } }" exact>
               My NFT's
             </b-nav-item>
-            <b-nav-item v-if="currentUser.address" :to="{ name: 'nft' }">
+            <b-nav-item v-if="currentUser" :to="{ name: 'nft' }">
               Mint
             </b-nav-item>
 
@@ -82,10 +82,10 @@
             <b-nav-item-dropdown right>
               <template slot="button-content">
 <!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
-                 <client-only v-if="currentUser.address">
+                 <client-only v-if="currentUser">
                 <jazzicon :address="userAddress" :diameter="20" />
                  </client-only>
-                 {{ userName | truncate(8) }}
+                 {{ userName | truncate(8) }} <small>{{ userBalance }}</small>
               </template>
               <template v-if="users.length">
                 <b-dropdown-item-btn v-for="(a, id) in users" :key="`user_${id}`" :active="currentId === id" @click="setCurrentUser(id)">
@@ -173,43 +173,64 @@ export default {
     ...mapGetters(['getTheme']),
     ...mapGetters('user', ['currentUser']),
     userName() {
-      return this.currentUser.name || '<login>'
+      return this.currentUser ? this.currentUser.name : '<login>'
     },
     userAddress() {
-      return this.currentUser.address ? this.currentUser.address.substring(8) : ''
+      return this.currentUser ? this.currentUser.address.substring(8) : ''
+    },
+    userBalance() {
+      const denom = 'token'
+      let val = 0
+      if (this.currentUser && this.currentUser.coins && this.currentUser.coins.length) {
+        val = this.currentUser.coins.find(x => x.denom === denom)
+        val = val ? val.amount : 0
+      }
+      return `${val} ${denom}`
     },
   },
-  created() {
-    // this.$root.$on('bv::scrollspy::activate', this.onActivate)
+  // created() {
+  //   // this.$root.$on('bv::scrollspy::activate', this.onActivate)
+  //
+  // },
+  watch: {
+    currentUser(to, from) {
+      if (to) {
+        if (!from || from.address !== to.address) {
+          this.$nextTick(() => {
+            this.updCurrentUserBalance()
+          })
+        }
+      }
+    },
   },
-
   mounted() {
     this.theme = this.getTheme
+    this.loadLocalUsers()
   },
   methods: {
     ...mapActions(['setTheme']),
-    ...mapActions('user', ['delCurrentUser', 'setCurrentUser', 'setUser']),
+    ...mapActions('user', ['delCurrentUser', 'setCurrentUser', 'setUser', 'loadLocalUsers', 'updCurrentUserBalance']),
 
     addMockUser(id) {
       const password = '12345678'
       this.setUser({ ...this.mockUsers[id], password })
     },
-    onActivate(target) {
-      console.log('Received event: "bv::scrollspy::activate" for target ', target)
-    },
-
-    handleScroll(evt, el, arg) {
-      const h = 150
-      const c = 'navbar-unshrink'
-      if (window.scrollY > h) {
-        if (el.classList.contains(c)) {
-          el.classList.remove(c)
-        }
-      } else if (!el.classList.contains(c)) {
-        el.classList.add(c)
-      }
-      return window.scrollY > h * 2
-    },
+    // onActivate(target) {
+    //   console.log('Received event: "bv::scrollspy::activate" for target ', target)
+    // },
+    //
+    // handleScroll(evt, el, arg) {
+    //   const h = 150
+    //   const c = 'navbar-unshrink'
+    //   if (window.scrollY > h) {
+    //     if (el.classList.contains(c)) {
+    //       el.classList.remove(c)
+    //     }
+    //   } else if (!el.classList.contains(c)) {
+    //     el.classList.add(c)
+    //   }
+    //   return window.scrollY > h * 2
+    // },
   },
 }
 </script>

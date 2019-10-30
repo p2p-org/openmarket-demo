@@ -7,11 +7,17 @@ app.use(express.json())
 app.use(boolParser())
 app.use(express.urlencoded({ extended: false }))
 
+const DB = require('./db')
+const db = new DB()
+
 // Require API routes
 const tokenApi = require('./routes/token')
+const dbApi = require('./db-api')
 
 // Import API Routes
-app.use(tokenApi)
+// app.use(tokenApi)
+app.use(tokenApi(db))
+app.use(dbApi(db, '/db'))
 
 // // 404 - Route not found
 app.use(function(req, res, next) {

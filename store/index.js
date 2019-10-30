@@ -17,16 +17,6 @@ export const state = () => ({
         'matter learn fall finish reunion result obtain fiscal picture afford arrange dignity air banana ketchup glad option cricket embrace infant album wagon wage razor',
     },
     {
-      name: 'sellerBeneficiary',
-      mnemonic:
-        'alert slim hard march trust goat coil gossip stay peasant book lottery enable anchor hidden calm churn planet amount concert together topple soft endorse',
-    },
-    {
-      name: 'buyerBeneficiary',
-      mnemonic:
-        'onion axis add badge give decline behave cry aim have drop wheat cat annual nerve mobile elite test effort race rebel dragon forget pony',
-    },
-    {
       name: 'dgaming',
       mnemonic:
         'unfold whale pear cage stand rescue grape sentence fence document fan begin traffic across property sense list dose sock license drink poverty romance bid',
@@ -52,6 +42,18 @@ export const state = () => ({
     //     'rich decide letter cannon wet sword ill cruise lyrics churn valid shift unknown steel drum gasp ginger fury modify ship vast puppy mountain embark',
     // },
   ],
+  sysUsers: [
+    {
+      name: 'sellerBeneficiary',
+      mnemonic:
+        'alert slim hard march trust goat coil gossip stay peasant book lottery enable anchor hidden calm churn planet amount concert together topple soft endorse',
+    },
+    {
+      name: 'buyerBeneficiary',
+      mnemonic:
+        'onion axis add badge give decline behave cry aim have drop wheat cat annual nerve mobile elite test effort race rebel dragon forget pony',
+    },
+  ]
 })
 
 export const mutations = {
@@ -88,11 +90,21 @@ export const actions = {
   },
 
   initUsers({ state, dispatch }) {
-    const password = '12345678'
-    state.users.forEach((u, id) => {
-      dispatch('user/setUser', { ...u, id, password })
+    // const password = '12345678'
+    // state.users.forEach((u, id) => {
+    //   dispatch('user/setUser', { ...u, id, password })
+    // })
+    // dispatch('user/setCurrentUser', 0)
+    state.sysUsers.forEach((u, id) => {
+      dispatch('user/setSysUser', { ...u, id })
     })
-    dispatch('user/setCurrentUser', 0)
+    if (typeof Storage !== 'undefined') {
+      // Code for localStorage
+      const users = JSON.parse(localStorage.getItem('users'))
+      console.log(users)
+    } else {
+      // No web storage Support.
+    }
   },
 
   setTheme({ commit }, theme) {

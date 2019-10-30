@@ -1,6 +1,6 @@
 <template>
   <page>
-    <market-item :nft="nft" :rate="rateETH" :buyer="currentUser.address" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
+    <market-item :nft="nft" :rate="rateETH" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
   </page>
 </template>
 

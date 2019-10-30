@@ -1,8 +1,5 @@
 export default () => ({
   users: [],
+  sysUsers: [],
   currentId: 0,
-  currentUserInfo: {
-    account_number: 0,
-    sequence_number: 0,
-  },
 })

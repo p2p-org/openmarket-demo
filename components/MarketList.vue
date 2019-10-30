@@ -81,10 +81,10 @@ export default {
   name: 'MarketList',
   components: { MarketCard, SortDropdown },
   props: {
-    buyer: {
-      type: String,
-      default: null,
-    },
+    // buyer: {
+    //   type: String,
+    //   default: null,
+    // },
     owner: {
       type: String,
       default: null,
@@ -174,12 +174,13 @@ export default {
       rateETH: state => state.config.rateETH,
     }),
     ...mapGetters('market', ['findNft']),
+    ...mapGetters('user', ['currentUser']),
     // sortFunc() {
     //   return this.sort[this.sort._current.parameter].cmpFunc
     // },
     nftsFiltered() {
       const tmpNfts = this.nfts
-        .filter(n => (this.owner ? n.owner_address === this.owner : true))
+        .filter(n => (this.owner ? n.owner.address === this.owner : true))
         .filter(n => !this.filter.market.current || n.status === this.filter.market.current)
       return this.sort[this.sort._current.parameter].sortFunc(tmpNfts, this.sort._current.value === 'asc')
     },
@@ -193,6 +194,9 @@ export default {
     },
     suggestions() {
       return this.nfts.map(n => ({ text: this.nftMetaProp(n.meta, 'name').value, value: n.token_id }))
+    },
+    buyer() {
+      return this.currentUser ? this.currentUser.address : null
     },
   },
   watch: {

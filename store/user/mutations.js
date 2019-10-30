@@ -8,6 +8,13 @@ export default {
       state.users.push({ name, address, password, mnemonic, ecpairPriv })
     }
   },
+  setSysUser(state, { id = null, mnemonic = null, name = null, address = null, ecpairPriv = null }) {
+    if (id !== null && id < state.users.length) {
+      state.sysUsers.splice(id, 1, { name, address, mnemonic, ecpairPriv })
+    } else {
+      state.sysUsers.push({ name, address, mnemonic, ecpairPriv })
+    }
+  },
   setCurrentUser(state, id = 0) {
     if (id < state.users.length) {
       state.currentId = id
