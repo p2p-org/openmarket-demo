@@ -11,7 +11,7 @@
       </b-jumbotron>
     </b-container>
     <section class="market">
-      <market-list :buyer="currentUser.address" :owner="owner"/>
+      <market-list :owner="owner" />
     </section>
   </page>
 </template>
@@ -29,6 +29,15 @@ export default {
     ...mapGetters('user', ['currentUser']),
     owner() {
       return this.$route.query.owner || null
+    },
+  },
+  watch: {
+    currentUser(to, from) {
+      if (to && from) {
+        if (this.owner === from.address) {
+          this.$router.push({ name: this.$route.name, query: { owner: to.address } })
+        }
+      }
     },
   },
   mounted() {},

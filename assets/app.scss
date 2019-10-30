@@ -25,6 +25,8 @@ $h5-font-size:                $font-size-base * 1.125;
 
 $small-font-size:             66.6667%;
 
+$text-muted: #7c7c7c;
+
 //@import "~bootswatch/dist/minty/variables";
 @import '~bootstrap/scss/bootstrap';
 //@import "~bootswatch/dist/minty/bootswatch";
@@ -63,6 +65,10 @@ body {
     }
     h1,h2,h3,h4,h5,h6 {
       color: #464A59;
+    }
+
+    legend {
+      color: #BABCCC;
     }
 
     .card {
@@ -228,6 +234,7 @@ $cards-per-line: (
     padding: 0 0 1rem 0;
   }
   .card {
+    cursor: pointer;
     .card-body {
       padding: 0.625rem;
     }

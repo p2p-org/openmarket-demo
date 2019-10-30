@@ -74,6 +74,21 @@ export function queryNft({ state, commit, rootState }, { force = false, my = fal
 //   })
 // }
 
+export function queryUser({ commit, state, getters }, { address }) {
+  return new Promise((resolve, reject) => {
+    this.$marketApi
+      .getUser({ address })
+      .then(users => {
+        // console.log(users)
+        if (users.length) {
+          resolve(users.pop())
+        }
+        reject()
+      })
+      .catch(reject)
+  })
+}
+
 export function getOneNft({ state, commit, rootState }, { force = false, id = null, mock = false } = {}) {
   // if (mock) {
   //   return Promise.all(state.nfts1.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))))
@@ -122,9 +137,10 @@ export function nftMint({ state, commit, rootState }, { user, token } = {}) {
 
 export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
   return this.$txApi.getAccounts(user.address).then(data => {
+    console.log('user', data)
     const signMsg = this.$txMsgs.NewMessagePutNFTOnMarket({
       owner: user.address,
-      beneficiary: rootGetters['user/findUserByName']('sellerBeneficiary').address,
+      beneficiary: rootGetters['user/findSysUserByName']('sellerBeneficiary').address,
       token_id: token.id,
       price: {
         denom: 'token',
@@ -139,8 +155,9 @@ export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, 
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    console.log(signMsg)
+    console.log('!!!!!', signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    console.log(signedTx)
     return this.$txApi.broadcast(signedTx)
   })
 }
@@ -150,7 +167,7 @@ export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, t
     const signMsg = this.$txMsgs.NewMsgBuyNFT({
       token_id: token.id,
       buyer: user.address,
-      beneficiary: rootGetters['user/findUserByName']('buyerBeneficiary').address,
+      beneficiary: rootGetters['user/findSysUserByName']('buyerBeneficiary').address,
       beneficiary_commission: rootState.config.beneficiary_commission,
 
       // this part is necessary

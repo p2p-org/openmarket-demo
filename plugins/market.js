@@ -1,12 +1,12 @@
 import { DGMarketAPI, DGTxAPI, DGTxMsgs } from 'dgaming-market-sdk'
 
-const build_path = (...args) => {
+const buildPath = (...args) => {
   return args
     .map((part, i) => {
       if (i === 0) {
-        return part.trim().replace(/[\/]*$/g, '')
+        return part.trim().replace(/[/]*$/g, '')
       } else {
-        return part.trim().replace(/(^[\/]*|[\/]*$)/g, '')
+        return part.trim().replace(/(^[/]*|[/]*$)/g, '')
       }
     })
     .filter(x => x.length)
@@ -30,7 +30,7 @@ export default ({ store, req }, inject) => {
   inject(
     'marketApi',
     new DGMarketAPI({
-      gqlHttpUrl: build_path(`${proto}//${host}`, store.state.config.urls.gql),
+      gqlHttpUrl: buildPath(`${proto}//${host}`, store.state.config.urls.gql),
       // gqlWsUrl: build_path(`${proto === 'https:' ? 'wss' : 'ws'}://${host}`, store.state.config.urls.gql),
       fetchPolicy: 'no-cache',
     })
@@ -38,7 +38,7 @@ export default ({ store, req }, inject) => {
   inject(
     'txApi',
     new DGTxAPI({
-      lcdUrl: build_path(`${proto}//${host}`, store.state.config.urls.lcd),
+      lcdUrl: buildPath(`${proto}//${host}`, store.state.config.urls.lcd),
       chainId: store.state.config.chainId,
     })
   )

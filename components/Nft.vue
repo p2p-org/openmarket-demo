@@ -6,7 +6,16 @@
           <b-card>
             <b-form v-if="show" @submit.prevent="onSubmit" @reset.prevent="onReset">
               <b-form-group id="input-group-1" label="Token ID:" label-for="input-1">
-                <b-form-input id="input-1" v-model="form.tokenId" type="text" required placeholder="Enter token ID" />
+                <b-form-input id="input-1" v-model="form.tokenId" type="text" required placeholder="Enter token ID" disabled/>
+              </b-form-group>
+              <b-form-group id="input-group-1" label="Token Name:" label-for="input-2" description="Can be left blank">
+                <b-form-input id="input-1" v-model="form.name" type="text" required placeholder="Enter token name"/>
+              </b-form-group>
+              <b-form-group id="input-group-1" label="Token description:" label-for="input-3"  description="Can be left blank">
+                <b-form-textarea id="input-1" v-model="form.description" required placeholder="Enter token description"/>
+              </b-form-group>
+              <b-form-group id="input-group-1" label="Token Image URL:" label-for="input-4" description="Can be left blank">
+                <b-form-input id="input-1" v-model="form.url" type="text" required placeholder="Enter token image URL"/>
               </b-form-group>
 
               <b-button type="submit" variant="primary" :disabled="busy">
@@ -23,6 +32,7 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { Nft, Token } from '~/models'
 
 export default {
   name: 'Nft',
