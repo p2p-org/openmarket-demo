@@ -17,11 +17,11 @@ export default ({ store, req }, inject) => {
   let proto
   if (process.server) {
     host = req.headers.host
-    console.log('srv', host)
+    // console.log('srv', host)
   } else {
     host = window.location.host
     proto = window.location.protocol
-    console.log('cli', window.location)
+    // console.log('cli', window.location)
   }
 
 

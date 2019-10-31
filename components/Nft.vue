@@ -4,18 +4,18 @@
       <b-row class="">
         <b-col>
           <b-card>
-            <b-form v-if="show" @submit.prevent="onSubmit" @reset.prevent="onReset">
+            <b-form v-if="show" novalidate @submit.prevent="onSubmit" @reset.prevent="onReset">
               <b-form-group id="input-group-1" label="Token ID:" label-for="input-1">
-                <b-form-input id="input-1" v-model="form.tokenId" type="text" required placeholder="Enter token ID" disabled/>
+                <b-form-input id="input-1" v-model="form.tokenId" type="text" required placeholder="Enter token ID" disabled />
               </b-form-group>
               <b-form-group id="input-group-1" label="Token Name:" label-for="input-2" description="Can be left blank">
-                <b-form-input id="input-1" v-model="form.name" type="text" required placeholder="Enter token name"/>
+                <b-form-input id="input-1" v-model="form.name" type="text" required trim placeholder="Enter token name" />
               </b-form-group>
-              <b-form-group id="input-group-1" label="Token description:" label-for="input-3"  description="Can be left blank">
-                <b-form-textarea id="input-1" v-model="form.description" required placeholder="Enter token description"/>
+              <b-form-group id="input-group-1" label="Token description:" label-for="input-3" description="Can be left blank">
+                <b-form-textarea id="input-1" v-model="form.description" required trim placeholder="Enter token description" />
               </b-form-group>
               <b-form-group id="input-group-1" label="Token Image URL:" label-for="input-4" description="Can be left blank">
-                <b-form-input id="input-1" v-model="form.url" type="text" required placeholder="Enter token image URL"/>
+                <b-form-input id="input-1" v-model="form.image" type="text" required trim placeholder="Enter token image URL" />
               </b-form-group>
 
               <b-button type="submit" variant="primary" :disabled="busy">
@@ -32,7 +32,7 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import { Nft, Token } from '~/models'
+import { Nft } from '~/models'
 
 export default {
   name: 'Nft',
@@ -48,6 +48,7 @@ export default {
       form: {},
       show: true,
       busy: false,
+      prefix: 'TOKEN_',
     }
   },
   computed: {
@@ -60,7 +61,7 @@ export default {
         const i = parseInt(n.token_id.replace(/\D/g, ''))
         return i > a ? i : a
       }, 0)
-      return `TOKEN_${id + 1}`
+      return id + 1
     },
   },
   // watch: {
@@ -70,41 +71,66 @@ export default {
   // },
   mounted() {
     this.updNextTokenId()
+    Nft.params({ t: Date.now() })
+      .get()
+      .then(nfts => {
+        console.log('12312312', nfts)
+      })
   },
   methods: {
     ...mapActions('market', ['queryNft', 'nftMint']),
     ...mapActions('user', ['loadUserInfo']),
     updNextTokenId() {
       this.queryNft({ force: true }).then(() => {
-        this.form = { tokenId: this.nextId }
+        this.form = { tokenId: this.prefix + this.nextId }
       })
     },
     onSubmit() {
       this.busy = true
-      this.nftMint({
-        user: this.currentUser,
-        token: {
-          id: this.nextId,
-          // description: '',
-          // image: '',
-          uri: '/api/token/' + this.nextId,
-        },
-      }).then(r => {
-        console.log(r)
-      })
+      const id = this.nextId
+      const tokenId = this.prefix + id
+      const meta = {}
+      if (this.form.name) {
+        this.nftAddMetaProp(meta, { trait: 'name', value: this.form.name, display: 'title' })
+      }
+      if (this.form.image) {
+        this.nftAddMetaProp(meta, { trait: 'image', value: this.form.image, display: 'image' })
+      }
+      if (this.form.description) {
+        this.nftAddMetaProp(meta, { trait: 'description', value: this.form.description, display: 'description' })
+      }
 
-      // todo
-      setTimeout(() => {
-        this.updNextTokenId()
-        this.$bvModal
-          .msgBoxOk('NFT Minted')
-          .then(value => {
-            this.busy = false
+      // let a = new Nft({ ...this.form, id })
+      // console.log('NN', a)
+
+      // save to db
+      new Nft({ id, meta })
+        .save()
+        .then(m =>
+          this.nftMint({
+            user: this.currentUser,
+            token: {
+              id: tokenId,
+              // description: '',
+              // image: '',
+              uri: '/api/token/' + tokenId,
+            },
           })
-          .catch(err => {
-            // An error occurred
-          })
-      }, 2000)
+        )
+        .then(r => {
+          console.log(r)
+          // todo
+          setTimeout(() => {
+            this.updNextTokenId()
+            this.$bvModal
+              .msgBoxOk('NFT Minted')
+              .then(value => {
+                this.busy = false
+                this.$router.push({ name: 'market-item', params: { item: tokenId } })
+              })
+          }, 2000)
+        })
+        .catch(this.handleErr)
     },
     onReset(evt) {
       // Reset our form values
@@ -114,6 +140,10 @@ export default {
       this.$nextTick(() => {
         this.show = true
       })
+    },
+    handleErr(e) {
+      this.busy = false
+      this.$bvModal.msgBoxOk(e.message, { title: 'Error', okVariant: 'danger' })
     },
   },
 }

@@ -70,6 +70,10 @@ class DB {
     }
     return data
   }
+  count(key) {
+    // Get the last id.
+    return this.D.get(`${key}.data`).value().length
+  }
 }
 
 module.exports = DB

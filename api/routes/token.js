@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { LoremIpsum } from 'lorem-ipsum'
+
 const { join } = require('path')
 const fs = require('fs')
 const sharp = require('sharp')
@@ -28,73 +29,106 @@ function tokenApi(db) {
   const router = Router()
   router.get('/token/:id', async (req, res, next) => {
     const tokenId = parseInt(req.params.id.replace(/\D/g, ''))
-    const item = db.show('nfts', tokenId)
-    // if (item) {
-    if (item && item.meta) {
-      return res.status(200).send(item.meta)
+    let item = db.show('nfts', tokenId)
+    // let properties = []
+    if (item) {
+      if (item.meta) {
+        // считаем что токен нормально записан в бд
+        if (item && item.meta && item.meta.definitions) {
+          return res.status(200).send({ ...item.meta, totalCount: db.count('nfts') })
+        } else {
+          item.meta.definitions = {}
+        }
+        if (item && item.meta && !item.meta.properties) {
+          item.meta.properties = []
+        }
+      } else {
+        item.meta = {
+          tokenId,
+          properties: [],
+          definitions: {},
+        }
+      }
+    } else {
+      item = {
+        // id: tokenId,
+        meta: {
+          tokenId,
+          properties: [],
+          definitions: {},
+        },
+      }
     }
     // console.log(req.params)
-    const name =
-      FIRST_NAMES[tokenId % FIRST_NAMES.length] +
-      ' ' +
-      LAST_NAMES[tokenId % LAST_NAMES.length] +
-      ' ' +
-      FIRST_NAMES[(tokenId + 11) % FIRST_NAMES.length] +
-      ' ' +
-      LAST_NAMES[(tokenId + 7) % LAST_NAMES.length]
+
     const base = BASES[tokenId % BASES.length]
     const eyes = EYES[tokenId % EYES.length]
     const mouth = MOUTH[tokenId % MOUTH.length]
-    await composeImage([`images/bases/base-${ base }.png`, `images/eyes/eyes-${ eyes }.png`, `images/mouths/mouth-${ mouth }.png`], tokenId)
 
-    const metadata = {
-      tokenId,
-      totalCount: totalSupply,
-      properties: [],
-      definitions: {},
+    if (!propHasTrait(item.meta, 'name')) {
+      const name =
+        FIRST_NAMES[tokenId % FIRST_NAMES.length] +
+        ' ' +
+        LAST_NAMES[tokenId % LAST_NAMES.length] +
+        ' ' +
+        FIRST_NAMES[(tokenId + 11) % FIRST_NAMES.length] +
+        ' ' +
+        LAST_NAMES[(tokenId + 7) % LAST_NAMES.length]
+      addMetaProp(item.meta, { trait: 'name', value: name, display: 'title' })
     }
-    const lorem = new LoremIpsum({
-      sentencesPerParagraph: {
-        max: 5,
-        min: 3,
+    if (!propHasTrait(item.meta, 'image')) {
+      await composeImage([`images/bases/base-${base}.png`, `images/eyes/eyes-${eyes}.png`, `images/mouths/mouth-${mouth}.png`], tokenId)
+      addMetaProp(item.meta, {
+        trait: 'image',
+        value: `${req.protocol}://${req.get('host')}/images/output/${tokenId}.png`,
+        display: 'image',
+      })
+    }
+    if (!propHasTrait(item.meta, 'description')) {
+      const lorem = new LoremIpsum({
+        sentencesPerParagraph: {
+          max: 5,
+          min: 3,
+        },
+        wordsPerSentence: {
+          max: 10,
+          min: 4,
+        },
+      })
+      addMetaProp(item.meta, { trait: 'description', value: lorem.generateParagraphs(1), display: 'description' })
+    }
+
+    addMetaProp(
+      item.meta,
+      {
+        trait: 'external_url',
+        value: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`,
+        display: 'link',
       },
-      wordsPerSentence: {
-        max: 10,
-        min: 4,
+      true
+    )
+    addMetaProp(item.meta, { trait: 'collection', value: `AwesomeCuties`, display: 'collection' }, true)
+
+    addMetaDef(item.meta, { trait: 'base', options: BASES, mock: true, id: tokenId }, true)
+    addMetaDef(item.meta, { trait: 'eyes', options: EYES, mock: true, id: tokenId }, true)
+    addMetaDef(item.meta, { trait: 'mouth', options: MOUTH, mock: true, id: tokenId }, true)
+    addMetaDef(item.meta, { trait: 'level', options: INT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' }, true)
+    addMetaDef(item.meta, { trait: 'stamina', options: FLOAT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' }, true)
+    addMetaDef(item.meta, { trait: 'personality', options: STR_ATTRIBUTES, mock: true, id: tokenId }, true)
+    addMetaDef(item.meta, { trait: 'aqua_power', options: BOOST_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' }, true)
+    addMetaDef(
+      item.meta,
+      {
+        trait: 'stamina_increase',
+        options: PERCENT_BOOST_ATTRIBUTES,
+        mm: true,
+        mock: true,
+        id: tokenId,
+        display: 'rank',
       },
-    })
-
-    addMetaProp(metadata, { trait: 'name', value: name, display: 'title' })
-    addMetaProp(metadata, {
-      trait: 'image',
-      value: `${ req.protocol }://${ req.get('host') }/images/output/${ tokenId }.png`,
-      display: 'image'
-    })
-    addMetaProp(metadata, { trait: 'description', value: lorem.generateParagraphs(1), display: 'description' })
-    addMetaProp(metadata, {
-      trait: 'external_url',
-      value: `${ req.protocol }://${ req.get('host') }/api/token/${ tokenId }`,
-      display: 'link'
-    })
-    addMetaProp(metadata, { trait: 'collection', value: `AwesomeCuties`, display: 'collection' })
-
-    addMetaDef(metadata, { trait: 'base', options: BASES, mock: true, id: tokenId })
-    addMetaDef(metadata, { trait: 'eyes', options: EYES, mock: true, id: tokenId })
-    addMetaDef(metadata, { trait: 'mouth', options: MOUTH, mock: true, id: tokenId })
-    addMetaDef(metadata, { trait: 'level', options: INT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
-    addMetaDef(metadata, { trait: 'stamina', options: FLOAT_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
-    addMetaDef(metadata, { trait: 'personality', options: STR_ATTRIBUTES, mock: true, id: tokenId })
-    addMetaDef(metadata, { trait: 'aqua_power', options: BOOST_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'rank' })
-    addMetaDef(metadata, {
-      trait: 'stamina_increase',
-      options: PERCENT_BOOST_ATTRIBUTES,
-      mm: true,
-      mock: true,
-      id: tokenId,
-      display: 'rank',
-    })
-    addMetaDef(metadata, { trait: 'generation', options: NUMBER_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' })
-
+      true
+    )
+    addMetaDef(item.meta, { trait: 'generation', options: NUMBER_ATTRIBUTES, mm: true, mock: true, id: tokenId, display: 'stat' }, true)
 
     // const metadata = {
     //   name,
@@ -103,19 +137,22 @@ function tokenApi(db) {
     //   external_url: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`,
     //   attributes,
     // }
-    if (item) {
-      item.meta = metadata
+    if (item.id) {
       db.update('nfts', tokenId, item)
     } else {
-      db.store('nfts', { id: tokenId, meta: metadata })
+      item.id = tokenId
+      db.store('nfts', item)
     }
-
-    return res.status(200).send(metadata)
+    return res.status(200).send({ ...item.meta, totalCount: db.count('nfts') })
     // } else {
     //   return notFound(res)
     // }
   })
   return router
+}
+
+function propHasTrait(meta, trait) {
+  return meta.properties.findIndex(p => p.trait === trait) !== -1
 }
 
 function getMimMax(numbers) {
@@ -129,18 +166,36 @@ function getMockVal(options, id) {
   return options[id % options.length]
 }
 
-function addMetaProp(metadata, { trait, value, count = 1, order = null, display = null }) {
-  metadata.properties.push({
-    trait,
-    value,
-    display,
-    count,
-    order,
-  })
+function addMetaProp(metadata, { trait, value, count = 1, order = null, display = null }, overwrite = false) {
+  const idx = metadata.properties.findIndex(p => p.trait === trait)
+  if (idx !== -1) {
+    if (overwrite) {
+      metadata.properties.splice(idx, 1, {
+        trait,
+        value,
+        display,
+        count,
+        order,
+      })
+    }
+  } else {
+    metadata.properties.push({
+      trait,
+      value,
+      display,
+      count,
+      order,
+    })
+  }
 }
-function addMetaDef(metadata, { trait, options = [], value = null, display = null, mock = false, id = null, mm = false }) {
+
+function addMetaDef(
+  metadata,
+  { trait, options = [], value = null, display = null, mock = false, id = null, mm = false },
+  overwrite = false
+) {
   metadata.definitions[trait] = mm ? getMimMax(options) : options
-  addMetaProp(metadata, { trait, value: mock ? getMockVal(options, id) : value, display })
+  addMetaProp(metadata, { trait, value: mock ? getMockVal(options, id) : value, display }, overwrite)
 }
 
 async function composeImage(images, tokenId) {
@@ -149,7 +204,7 @@ async function composeImage(images, tokenId) {
     const composite = await sharp(join(imgDir, images.shift()))
       .composite(images.map(i => ({ input: join(imgDir, i) })))
       .toFile(img)
-    console.log(composite)
+    // console.log(composite)
   }
   return `/images/output/${tokenId}.png`
 }
