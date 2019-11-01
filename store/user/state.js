@@ -1,5 +1,4 @@
 export default () => ({
-  users: [],
-  sysUsers: [],
-  currentId: 0,
+  users: {},
+  current: null,
 })

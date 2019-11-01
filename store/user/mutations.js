@@ -1,47 +1,60 @@
 export default {
-  setUser(state, { id = null, mnemonic = null, name = null, address = null, password = null, ecpairPriv = null }) {
-    if (id !== null && id < state.users.length) {
-      state.users.splice(id, 1, { name, address, password, mnemonic, ecpairPriv })
-      state.currentId = id
+  setUser(state, { mnemonic = null, name = null, address = null, ecpairPriv = null, params = {} }) {
+    if (state.users[address]) {
+      console.log('upd user', address, state.users[address], params)
+      state.users = { ...state.users, [address]: { ...state.users[address], ...params } }
     } else {
-      state.currentId = state.users.length
-      state.users.push({ name, address, password, mnemonic, ecpairPriv })
+      state.users = { ...state.users, [address]: { name, address, mnemonic, ecpairPriv, ...params } }
     }
+    // state.current = address
   },
-  setSysUser(state, { id = null, mnemonic = null, name = null, address = null, ecpairPriv = null }) {
-    if (id !== null && id < state.users.length) {
-      state.sysUsers.splice(id, 1, { name, address, mnemonic, ecpairPriv })
+  setCurrentUser(state, address) {
+    if (state.users[address]) {
+      state.current = address
     } else {
-      state.sysUsers.push({ name, address, mnemonic, ecpairPriv })
-    }
-  },
-  setCurrentUser(state, id = 0) {
-    if (id < state.users.length) {
-      state.currentId = id
-    } else {
-      state.currentId = state.users.length ? state.users.length - 1 : null
-    }
-  },
-  delCurrentUser(state) {
-    state.users.splice(state.currentId, 1)
-    state.currentId = state.users.length ? 0 : null
-  },
-  delUser(state, id = 0) {
-    if (id < state.users.length) {
-      state.users.splice(id, 1)
-    } else {
-      state.currentId = state.users.length ? 0 : null
+      state.current = Object.keys(state.users)[0] || null
     }
   },
 
-  updateCurrentUser(state, params = {}) {
-    console.log(params)
-    state.users.splice(state.currentId, 1, { ...state.users[state.currentId], ...params })
+  delUser(state, address) {
+    state.users = Object.keys(state.users).reduce((object, key) => {
+      if (key !== address) {
+        object[key] = state.users[key]
+      }
+      return object
+    }, {})
+    // if (state.users[address]) {
+    //   delete state.users[address]
+    // }
+    if (state.current === address) {
+      state.current = Object.keys(state.users)[0] || null
+    }
   },
 
-  // eslint-disable-next-line camelcase
-  incSequenceCurrentUser(state) {
-    state.users[state.currentId].sequence++
-    // state.users.splice(state.currentId, 1, { ...state.users[state.currentId], account_number })
+  updateUser(state, { address, params = {} }) {
+    if (state.users[address]) {
+      const user = { ...state.users[address], ...params }
+      state.users = { ...state.users, [address]: user }
+    }
   },
+
+  loadLocalUsers(state) {
+    if (typeof Storage !== 'undefined') {
+      const users = JSON.parse(localStorage.getItem('users'))
+      const current = JSON.parse(localStorage.getItem('current'))
+      if (users && Object.keys(users).length) {
+        state.users = users
+        state.current = users[current] ? current : Object.keys(users)[0]
+      }
+    }
+  },
+
+  saveLocalUsers(state) {
+    if (typeof Storage !== 'undefined') {
+      console.log('save local', state.users)
+      localStorage.setItem('users', JSON.stringify(state.users))
+      localStorage.setItem('current', JSON.stringify(state.current))
+    }
+  },
+
 }

@@ -10,7 +10,7 @@ export default {
   props: {
     seed: {
       type: Number,
-      default: Math.round(Math.random() * 10000000),
+      default: Math.round(Math.random() * 10000),
     },
     diameter: {
       type: Number,
@@ -146,6 +146,7 @@ export default {
     },
     calcHash(text) {
       return text ? text.match(/\d/g).reduce((a, n) => a + n) : 0
+      // return text ? text.split('').reduce((a, n) => a + n.charCodeAt(0), 0) : 0
     },
   },
 }
