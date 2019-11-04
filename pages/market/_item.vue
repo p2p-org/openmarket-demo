@@ -13,7 +13,7 @@ export default {
   name: 'PageMarketItem',
   validate({ params }) {
     // Must be a number
-    return /^[\d\w]+$/.test(params.id)
+    return /^[\d\w]+$/.test(params.item)
   },
   components: { MarketItem, Page },
   // props: {
@@ -32,14 +32,12 @@ export default {
     ...mapGetters('user', ['currentUser']),
     ...mapGetters('market', ['findNft']),
     nft() {
-      return this.findNft(this.$route.params.id)
+      return this.findNft(this.$route.params.item)
     },
 
   },
   mounted() {
-    this.queryNft({ force: true, params: { tokenId: this.$route.params.id } })
-    console.log(this.nft)
-
+    this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
   },
   methods: {
     ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed']),

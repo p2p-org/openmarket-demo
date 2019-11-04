@@ -16,6 +16,11 @@ export default {
   components: { Page },
   data: () => ({
   }),
+  created() {
+    if (this.$route.name === 'index') {
+      this.$router.push({ name: 'market' })
+    }
+  },
   mounted() {
 
   },
