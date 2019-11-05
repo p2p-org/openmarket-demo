@@ -13,8 +13,9 @@ services:
       - GQL_URL=http://graphql:8080/v1/graphql
       - REST_URL=http://dwh_marketplace:1317
       - VIRTUAL_PORT=3000
-      - VIRTUAL_HOST=178.128.155.13
-      - LETSENCRYPT_HOST=178.128.155.13
+      - VIRTUAL_HOST=demo.openmarket.one
+      - LETSENCRYPT_HOST=demo.openmarket.one
+      - DEBUG=true
 
   nginx-proxy:
     image: jwilder/nginx-proxy
@@ -24,6 +25,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - ./nginx:/etc/nginx/conf.d
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - dhparam:/etc/nginx/dhparam
@@ -56,4 +58,3 @@ volumes:
   html:
   dhparam:
   certs:
-
