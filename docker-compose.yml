@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 services:
   nuxt:
     build:
@@ -12,20 +12,48 @@ services:
       - NODE_ENV=production
       - GQL_URL=http://graphql:8080/v1/graphql
       - REST_URL=http://dwh_marketplace:1317
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=178.128.155.13
+      - LETSENCRYPT_HOST=178.128.155.13
 
-  nginx:
-    image: nginx:1-alpine
+  nginx-proxy:
+    image: jwilder/nginx-proxy
     restart: unless-stopped
+    container_name: nginx-proxy
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - dwh-tier
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
     depends_on:
       - nuxt
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-proxy-le
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - dwh-tier
 
 networks:
   dwh-tier:
     external:
       name: dwh-network
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+
