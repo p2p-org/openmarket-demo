@@ -1,6 +1,6 @@
-# dgaming-market-demo
+# open-market-demo
 
-> DGaming Market API demo
+> Open Market API demo
 
 ## Build Setup
 

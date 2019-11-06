@@ -1,7 +1,7 @@
 {
-  "name": "dgaming-market-demo",
+  "name": "open-market-demo",
   "version": "1.0.0",
-  "description": "DGaming Market API demo",
+  "description": "Open Market SDK & API demo",
   "author": "KRogLA",
   "private": true,
   "scripts": {
