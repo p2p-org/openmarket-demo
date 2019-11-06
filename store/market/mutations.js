@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { MARKET_ALL_NFT, MARKET_MY_NFT } from '../mutation-types'
+import { MARKET_ALL_NFT, MARKET_ITEM_OFFERS, MARKET_MY_NFT } from '../mutation-types'
 
 // todo bignumbers
 function priceExt(p) {
@@ -18,6 +18,16 @@ function prepNft(n) {
     time_to_sell: n.time_to_sell ? moment(n.time_to_sell) : null,
   }
 }
+
+function prepOffer(o) {
+  return {
+    ...o,
+    price: o.price ? priceExt(o.price) : { value: 0, currency: null },
+    created_at: o.created_at ? moment(o.created_at) : null,
+    updated_at: o.updated_at ? moment(o.updated_at) : null,
+  }
+}
+
 export default {
   [MARKET_ALL_NFT](state, nfts = []) {
     state.nfts = state.nfts
@@ -27,12 +37,10 @@ export default {
       .concat(nfts.map(prepNft))
       .sort((a, b) => (a.token_id > b.token_id ? 1 : a.token_id > b.token_id ? -1 : 0))
   },
-  [MARKET_MY_NFT](state, nfts = []) {
-    state.myNfts = nfts
-    state.myNfts = state.myNfts
-      .filter(n => {
-        return nfts.findIndex(n1 => n1.token_id === n.token_id) === -1
-      })
-      .concat(nfts.map(prepNft))
+  [MARKET_ITEM_OFFERS](state, { tokenId, offers }) {
+    const idx = state.nfts.findIndex(n => n.token_id === tokenId)
+    if (idx !== -1) {
+      state.nfts.splice(idx, 1, { ...state.nfts[idx], offers: offers.map(prepOffer) })
+    }
   },
 }

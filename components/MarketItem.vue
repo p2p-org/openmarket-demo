@@ -305,7 +305,7 @@ export default {
       return this.nft.price
     },
     highestOffer() {
-      return this.nft.price
+      return this.nft.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 })
     },
     openinigPrice() {
       return this.nft.opening_price
@@ -353,6 +353,7 @@ export default {
   methods: {
     ...mapActions('market', [
       'queryNft',
+      'queryOffer',
       'nftSellFixed',
       'nftCancelFixed',
       'nftBuyFixed',
@@ -575,10 +576,12 @@ export default {
         console.log(r)
         // todo tx await
         setTimeout(() => {
-          this.queryNft({ force: true, params: { tokenId } }).then(r => {
-            this.busy = false
-            resolve()
-          })
+          this.queryNft({ force: true, params: { tokenId } })
+            .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
+            .then(r => {
+              this.busy = false
+              resolve()
+            })
           this.$bvModal.msgBoxOk(msg, { okVariant: 'success' })
         }, 2000)
       })

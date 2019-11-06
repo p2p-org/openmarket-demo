@@ -37,10 +37,12 @@ export default {
 
   },
   mounted() {
-    this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
+    this.queryNft({ force: true, params: { tokenId: this.$route.params.item } }).then(() =>
+      this.queryOffer({ params: { tokenId: this.$route.params.item } })
+    )
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed']),
+    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'queryOffer']),
     onSellFixed() {
 
     },
