@@ -1,4 +1,4 @@
-import { MARKET_ALL_NFT, MARKET_MY_NFT } from '../mutation-types'
+import { MARKET_ALL_NFT, MARKET_ITEM_OFFERS, MARKET_MY_NFT } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
 const mock = false
@@ -52,6 +52,27 @@ export function queryNft({ state, commit, rootState }, { force = false, my = fal
       .then(nfts => {
         console.log('!!!', nfts)
         commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
+        resolve()
+      })
+      .catch(reject)
+  })
+}
+
+export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
+  // readonly tokenId?: string
+  // readonly owner?: string
+  // readonly buyer?: string
+  // readonly limit?: number
+  // readonly offset?: number
+  // readonly orderPrice?: SortOrder
+  // readonly minPrice?: string
+  // readonly maxPrice?: string
+  return new Promise((resolve, reject) => {
+    this.$marketApi
+      .getNftOffers(params)
+      .then(offers => {
+        console.log('!!!', offers)
+        commit(MARKET_ITEM_OFFERS, offers)
         resolve()
       })
       .catch(reject)
@@ -132,8 +153,7 @@ export function nftMint({ state, commit, rootState }, { user, token } = {}) {
     })
     // console.log('sign msg', signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-    console.log('signed msg', signedTx)
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
 
@@ -157,10 +177,80 @@ export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, 
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    console.log('!!!!!', signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-    console.log(signedTx)
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
+export function nftMakeOffer({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    console.log('user', data)
+    const signMsg = this.$txMsgs.NewMsgMakeOffer({
+      buyer: user.address,
+      beneficiary: rootState.config.beneficiary.seller.address,
+      beneficiary_commission: rootState.config.beneficiary_commission,
+
+      token_id: token.id,
+      price: {
+        denom: 'token',
+        amount: token.price,
+      },
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
+export function nftAcceptOffer({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    console.log('user', data)
+    const signMsg = this.$txMsgs.NewMsgAcceptOffer({
+      seller: user.address,
+      beneficiary: rootState.config.beneficiary.seller.address,
+      beneficiary_commission: rootState.config.beneficiary_commission,
+
+      token_id: token.id,
+      offer_id: token.offerId,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
+export function nftCancelOffer({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    console.log('user', data)
+    const signMsg = this.$txMsgs.NewMsgRemoveOffer({
+      buyer: user.address,
+      token_id: token.id,
+      offer_id: token.offerId,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
 
@@ -180,9 +270,8 @@ export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, t
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    console.log(signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
 
@@ -200,9 +289,8 @@ export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    console.log(signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
 
@@ -220,9 +308,8 @@ export function nftCancelAuction({ state, commit, rootState, rootGetters }, { us
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    console.log(signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
 
@@ -242,8 +329,7 @@ export function nftTransfer({ state, commit, rootState, rootGetters }, { user, t
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    console.log(signMsg)
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }

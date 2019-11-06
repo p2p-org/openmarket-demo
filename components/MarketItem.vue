@@ -95,8 +95,9 @@
             </template>
             <template v-else>
               <template v-if="status === 1">
-                <form-item-buy :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" @submit="doBuyFixed" />
-                <form-item-owner :owner="owner" />
+                <form-item-offer v-if="buyOffer" :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" :close="true" @submit="doMakeOffer" @reset="buyOffer = !buyOffer"></form-item-offer>
+                <form-item-buy v-else :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" :offer="highestOffer" @submit="doBuyFixed" @offer="buyOffer = !buyOffer"/>
+                <form-item-owner v-if="!buyOffer" :owner="owner" />
               </template>
               <template v-else-if="status === 2">
                 <b-btn variant="info">
@@ -105,27 +106,14 @@
                 </b-btn>
               </template>
               <template v-else>
-                <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy" />
+                <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" @submit="doMakeOffer"/>
                 <form-item-owner :owner="owner" />
               </template>
             </template>
             <!--            </b-row>-->
           </b-card>
           <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">
-            <b-row>
-              <b-col md="6" class="d-flex flex-column pr-4">
-                <b-form-group class="my-0" label="Enter recipient address" label-class="pb-0">
-                  <!--                  <b-form-select v-model="recipient" :options="usersList" size="lg"></b-form-select>-->
-                  <b-form-input v-model="recipient" size="lg" />
-                </b-form-group>
-              </b-col>
-              <b-col md="6" class="d-flex flex-column p-2">
-                <b-btn variant="info" size="lg" :disabled="busy" class="py-3" @click="doTransfer">
-                  Gift token
-                  <b-spinner v-if="busy" type="grow" />
-                </b-btn>
-              </b-col>
-            </b-row>
+            <form-item-gift :busy="busy" @click="doTransfer" />
           </b-card>
 
           <h5 class="subtitle mt-3">
@@ -183,10 +171,12 @@ import FormItemOwner from './form/ItemOwner'
 import FormItemCancelSell from './form/ItemCancelSell'
 import FormItemBuy from './form/ItemBuy'
 import FormItemCancelAuction from './form/ItemCancelAuction'
+import FormItemGift from './form/ItemGift'
 
 export default {
   name: 'MarketItem',
   components: {
+    FormItemGift,
     FormItemCancelAuction,
     FormItemBuy,
     FormItemCancelSell,
@@ -233,6 +223,7 @@ export default {
       busy: false,
       owner: null,
       expandDescr: false,
+      buyOffer: false
     }
   },
   computed: {
@@ -291,6 +282,9 @@ export default {
     price() {
       return this.nft.price
     },
+    highestOffer() {
+      return this.nft.price
+    },
     openinigPrice() {
       return this.nft.opening_price
     },
@@ -335,7 +329,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed', 'nftTransfer', 'queryUser', 'nftCancelAuction']),
+    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed', 'nftTransfer', 'queryUser', 'nftCancelAuction', 'nftMakeOffer']),
     ...mapActions('user', ['loadCurrentUserInfo']),
 
     bgVar(i) {
@@ -409,6 +403,73 @@ export default {
         }
       })
     },
+    doMakeOffer({ price }) {
+      this.busy = true
+      this.$bvModal.msgBoxConfirm('Confirm make offer?').then(value => {
+        if (value) {
+          this.nftMakeOffer({
+            user: this.currentUser,
+            token: {
+              id: this.nft.token_id,
+              price,
+            },
+          })
+            .then(r => {
+              this.handleOk(this.nft.token_id, 'Offer committed!', r).then(() => {
+                // this.loadCurrentUserInfo()
+                this.buyOffer = false
+              })
+            })
+            .catch(this.handleErr)
+        } else {
+          this.busy = false
+        }
+      })
+    },
+    doAcceptOffer({ offerId }) {
+      this.busy = true
+      this.$bvModal.msgBoxConfirm('Confirm make offer?').then(value => {
+        if (value) {
+          this.nftBuyFixed({
+            user: this.currentUser,
+            token: {
+              id: this.nft.token_id,
+              offerId,
+            },
+          })
+            .then(r => {
+              this.handleOk(this.nft.token_id, 'You accepted the offer!', r).then(() => {
+                this.loadCurrentUserInfo()
+              })
+            })
+            .catch(this.handleErr)
+        } else {
+          this.busy = false
+        }
+      })
+    },
+    doCancelOffer({ offerId }) {
+      this.busy = true
+      this.$bvModal.msgBoxConfirm('Confirm cancel offer?').then(value => {
+        if (value) {
+          this.nftBuyFixed({
+            user: this.currentUser,
+            token: {
+              id: this.nft.token_id,
+              offerId,
+            },
+          })
+            .then(r => {
+              this.handleOk(this.nft.token_id, 'Offer removed!', r).then(() => {
+                // this.loadCurrentUserInfo()
+              })
+            })
+            .catch(this.handleErr)
+        } else {
+          this.busy = false
+        }
+      })
+    },
     doCancelFixed() {
       this.$emit('cancelFixed')
       this.busy = true
@@ -449,13 +510,13 @@ export default {
         }
       })
     },
-    doTransfer() {
+    doTransfer({ recipient }) {
       this.busy = true
       this.$bvModal.msgBoxConfirm('Confirm transfer?').then(value => {
         if (value) {
           this.nftTransfer({
             user: this.currentUser,
-            recipient: this.recipient,
+            recipient,
             token: {
               id: this.nft.token_id,
             },

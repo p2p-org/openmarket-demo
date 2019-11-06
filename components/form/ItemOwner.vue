@@ -1,5 +1,5 @@
 <template>
-  <b-row v-if="owner">
+  <b-row v-if="owner" class="mt-2">
     <b-col md="6" class="d-flex flex-column pr-4">
       <b-form-group label="Owner" label-class="pb-0">
         <client-only>

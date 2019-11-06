@@ -18,6 +18,19 @@ Vue.mixin({
         options: meta.definitions[trait] || null
       }
     },
+    nftAddMetaProp(meta, { trait, value, count = 1, order = null, display = null }) {
+      if (!meta.properties) {
+        meta.properties = []
+      }
+      meta.properties.push({
+        trait,
+        value,
+        display,
+        count,
+        order,
+      })
+    },
+
     nftMetaDisplay(meta, display, first = true) {
       const m = meta.properties
         .filter(p => p.display === display)
