@@ -28,7 +28,7 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
     })
 }
 
-export function queryNft({ state, commit, rootState }, { force = false, my = false, params = {} } = {}) {
+export function queryNft({ state, commit, rootState }, { force = false, params = {} } = {}) {
   // const nft = state.nfts.find(n => n.token_id === params.tokenId)
   // if (!nft || (state.nfts.length && !force)) return Promise.resolve()
   if (state.nfts.length && !force) return Promise.resolve()
@@ -50,8 +50,8 @@ export function queryNft({ state, commit, rootState }, { force = false, my = fal
         )
       })
       .then(nfts => {
-        console.log('!!!', nfts)
-        commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
+        // console.log('!!!', nfts)
+        commit(MARKET_ALL_NFT, nfts)
         resolve()
       })
       .catch(reject)
@@ -67,12 +67,13 @@ export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
   // readonly orderPrice?: SortOrder
   // readonly minPrice?: string
   // readonly maxPrice?: string
+  const { tokenId } = params
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNftOffers(params)
       .then(offers => {
         console.log('!!!', offers)
-        commit(MARKET_ITEM_OFFERS, offers)
+        commit(MARKET_ITEM_OFFERS, { tokenId, offers })
         resolve()
       })
       .catch(reject)
