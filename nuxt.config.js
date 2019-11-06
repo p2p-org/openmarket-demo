@@ -51,6 +51,8 @@ export default {
     { src: '~/plugins/directives' },
     { src: '~/plugins/filters' },
     { src: '~/plugins/methods' },
+    { src: '~/plugins/clipboard', mode: 'client' },
+    { src: '~plugins/vue-api-query' },
     { src: '~/plugins/market', mode: 'client' },
     // { src: '~/plugins/cosmos' },
     // { src: '~/plugins/identicon', mode: 'client' },

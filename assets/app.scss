@@ -317,3 +317,21 @@ p {
     fill: #bbb;
   }
 }
+
+/* transition */
+
+.page-enter-active, .page-leave-active {
+  transition: opacity .1s ease;
+}
+
+.page-enter, .page-leave-to {
+  opacity: 0
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.flip-list-enter, .flip-list-leave-to {
+  opacity: 0;
+  transform: translateX(3rem);
+}

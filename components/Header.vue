@@ -9,9 +9,9 @@
         <b-navbar-toggle target="nav_collapse" />
         <b-collapse id="nav_collapse" is-nav>
           <b-navbar-nav>
-            <b-nav-item :to="{ name: 'index' }" exact>
-              Home
-            </b-nav-item>
+<!--            <b-nav-item :to="{ name: 'index' }" exact>-->
+<!--              Home-->
+<!--            </b-nav-item>-->
             <b-nav-item :to="{ name: 'market' }" exact>
               Market
             </b-nav-item>
@@ -82,30 +82,43 @@
             <b-nav-item-dropdown right>
               <template slot="button-content">
 <!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
-                 <client-only v-if="currentUser">
-                <jazzicon :address="userAddress" :diameter="20" />
-                 </client-only>
-                 {{ userName | truncate(8) }} <small>{{ userBalance }}</small>
+                <template v-if="current">
+                  <client-only>
+                    <jazzicon :address="userAddress" :diameter="20" />
+                  </client-only>
+                  {{ userName | truncate(8) }} <small>{{ userBalance }}</small>
+                </template>
+                <template v-else>
+                  LOGIN
+                </template>
               </template>
-              <template v-if="users.length">
-                <b-dropdown-item-btn v-for="(a, id) in users" :key="`user_${id}`" :active="currentId === id" @click="setCurrentUser(id)">
-                  <b>{{ a.name }}</b> <small>({{ a.address | collapse(8, 5) }} )</small>
-<!--                  <div class="d-flex flex-row justify-content-between">-->
-<!--                  <span><b>{{ a.name }}</b> <small>({{ a.address | collapse(8, 5) }} )</small></span>-->
-<!--                  <span>-->
-<!--                    <b-btn :to="{ name: 'user-id', params: { id: id } }" variant="outline-info" size="sm">-->
-<!--                       <fa :icon="['fas', 'edit']" />-->
-<!--                    </b-btn>-->
-<!--                    <b-btn variant="outline-danger" size="sm">-->
-<!--                       <fa :icon="['fas', 'trash']" />-->
-<!--                    </b-btn>-->
-<!--                  </span>-->
-<!--                  </div>-->
+              <template v-if="usersList.length">
+                <b-dropdown-item-btn
+                  v-for="u in usersList"
+                  :key="`user_${u.address}`"
+                  :active="u.active"
+                  @click="setCurrentUser(u.address)"
+                >
+<!--                  <b>{{ u.name }}</b> <small>({{ u.address | collapse(8, 5) }} )</small>-->
+                  <div class="d-flex flex-row justify-content-between">
+                  <span><b>{{ u.name }}</b> <small>({{ u.address | collapse(8, 5) }} )</small></span>
+                  <span>
+                     <b-link v-b-tooltip.hover title="copy address" class="ml-1 text-info" @click.stop.prevent="copyAddress(u.address)">
+                      <fa :icon="['fas', 'clone']" />
+                    </b-link>
+                    <b-link v-b-tooltip.hover title="edit user"  :to="{ name: 'user-address', params: { address: u.address } }" class="ml-1 text-warning">
+                       <fa :icon="['fas', 'edit']" />
+                    </b-link>
+                    <b-link v-b-tooltip.hover title="user logout"  class="ml-1 text-danger" @click.prevent="delUser(u.address)">
+                      <fa :icon="['fas', 'sign-out-alt']" />
+                    </b-link>
+                  </span>
+                  </div>
                 </b-dropdown-item-btn>
                 <b-dropdown-divider />
               </template>
               <template v-if="mockUsers.length">
-                <b-dropdown-item disabled>Add mock user</b-dropdown-item>
+                <b-dropdown-item disabled>Mock users</b-dropdown-item>
                 <b-dropdown-item-btn v-for="(a, id) in mockUsers" :key="`mock_${id}`" @click="addMockUser(id)">
                   <fa :icon="['fas', 'plus']" /> {{ a.name }}
                 </b-dropdown-item-btn>
@@ -114,27 +127,27 @@
 
 <!--              <b-dropdown-item>-->
 <!--                <div class="d-flex flex-row justify-content-between">-->
-<!--                  <b-btn :to="{ name: 'user-id' }" variant="success" size="sm">-->
+<!--                  <b-btn :to="{ name: 'user-address' }" variant="success" size="sm">-->
 <!--                     <fa :icon="['fas', 'plus']" /> Add new-->
 <!--                  </b-btn>-->
-<!--                  <b-btn :to="{ name: 'user-id' }" variant="warning" size="sm" :disabled="!currentId">-->
+<!--                  <b-btn :to="{ name: 'user-address' }" variant="warning" size="sm" :disabled="!currentId">-->
 <!--                       <fa :icon="['fas', 'edit']" /> Edit-->
 <!--                  </b-btn>-->
-<!--                  <b-btn :to="{ name: 'user-id' }" variant="danger" size="sm" :disabled="!currentId" @click="delUser(id)">-->
+<!--                  <b-btn :to="{ name: 'user-address' }" variant="danger" size="sm" :disabled="!currentId" @click="delUser(id)">-->
 <!--                       <fa :icon="['fas', 'trash']" /> Delete-->
 <!--                  </b-btn>-->
 <!--                </div>-->
 <!--              </b-dropdown-item>-->
-              <b-dropdown-item :to="{ name: 'user-id' }" exact variant="success">
-                <fa :icon="['fas', 'plus']" /> add user
+              <b-dropdown-item :to="{ name: 'user-address' }" exact variant="success">
+                <fa :icon="['fas', 'sign-in-alt']" /> login
               </b-dropdown-item>
-              <template v-if="currentId !== null">
+              <template v-if="current">
                 <b-dropdown-divider />
-                <b-dropdown-item :to="{ name: 'user-id', params: { id: currentId } }" exact variant="warning">
-                  <fa :icon="['fas', 'edit']" /> edit user
+                <b-dropdown-item :to="{ name: 'user-address', params: { address: current } }" exact variant="warning">
+                  <fa :icon="['fas', 'edit']" /> details
                 </b-dropdown-item>
                 <b-dropdown-item variant="danger" @click="delCurrentUser">
-                  <fa :icon="['fas', 'trash']" /> del user
+                  <fa :icon="['fas', 'sign-out-alt']" /> log out
                 </b-dropdown-item>
               </template>
             </b-nav-item-dropdown>
@@ -167,13 +180,13 @@ export default {
   computed: {
     ...mapState({
       users: state => state.user.users,
-      mockUsers: state => state.users,
-      currentId: state => state.user.currentId,
+      mockUsers: state => state.config.mockUsers,
+      current: state => state.user.current,
     }),
     ...mapGetters(['getTheme']),
-    ...mapGetters('user', ['currentUser']),
+    ...mapGetters('user', ['currentUser', 'usersList']),
     userName() {
-      return this.currentUser ? this.currentUser.name : '<login>'
+      return this.currentUser ? this.currentUser.name : ''
     },
     userAddress() {
       return this.currentUser ? this.currentUser.address.substring(8) : ''
@@ -187,19 +200,19 @@ export default {
       }
       return `${val} ${denom}`
     },
+    // loggedUsers() {
+    //   console.log(this.users)
+    //   return Object.keys(this.users).map(u => ({ ...u, active: u.address === this.current }))
+    // },
   },
   // created() {
   //   // this.$root.$on('bv::scrollspy::activate', this.onActivate)
   //
   // },
   watch: {
-    currentUser(to, from) {
-      if (to) {
-        if (!from || from.address !== to.address) {
-          this.$nextTick(() => {
-            this.updCurrentUserBalance()
-          })
-        }
+    current(address) {
+      if (address) {
+        this.loadUserInfo({ address })
       }
     },
   },
@@ -209,11 +222,19 @@ export default {
   },
   methods: {
     ...mapActions(['setTheme']),
-    ...mapActions('user', ['delCurrentUser', 'setCurrentUser', 'setUser', 'loadLocalUsers', 'updCurrentUserBalance']),
+    ...mapActions('user', ['delCurrentUser', 'setCurrentUser', 'addUser', 'loadLocalUsers', 'loadUserInfo', 'delUser']),
 
     addMockUser(id) {
-      const password = '12345678'
-      this.setUser({ ...this.mockUsers[id], password })
+      this.addUser({ ...this.mockUsers[id] })
+        .then(address => {
+          this.$bvModal.msgBoxOk('User added', { title: 'Success', okVariant: 'success' })
+            .then(() => {
+              this.setCurrentUser(address)
+            })
+        })
+        .catch(err => {
+          this.$bvModal.msgBoxOk(err, { title: 'Error', okVariant: 'danger' })
+        })
     },
     // onActivate(target) {
     //   console.log('Received event: "bv::scrollspy::activate" for target ', target)
@@ -231,6 +252,19 @@ export default {
     //   }
     //   return window.scrollY > h * 2
     // },
+    copyAddress(address) {
+      // console.log(evt, address)
+      // const container = this.$refs[`fieldset-wallet-receive-${this.modalId}`]
+      this.$copyText(address).then(
+        e => {
+          console.log('copied', e)
+        },
+        e => {
+          alert('can not copy')
+          console.log(e)
+        }
+      )
+    },
   },
 }
 </script>

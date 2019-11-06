@@ -26,16 +26,18 @@ export default {
   components: { Page, MarketList },
   data: () => ({}),
   computed: {
-    ...mapGetters('user', ['currentUser']),
+    ...mapState({
+      current: state => state.user.current,
+    }),
     owner() {
       return this.$route.query.owner || null
     },
   },
   watch: {
-    currentUser(to, from) {
+    current(to, from) {
       if (to && from) {
-        if (this.owner === from.address) {
-          this.$router.push({ name: this.$route.name, query: { owner: to.address } })
+        if (this.owner === from) {
+          this.$router.push({ name: this.$route.name, query: { owner: to } })
         }
       }
     },

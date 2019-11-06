@@ -235,7 +235,7 @@ export default {
       if (this.search) {
         const t = this.findNft(this.search)
         if (t) {
-          this.$router.push({ name: 'market-id', params: { id: t.token_id } })
+          this.$router.push({ name: 'market-item', params: { item: t.token_id } })
         }
       }
     },

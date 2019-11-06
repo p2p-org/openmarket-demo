@@ -28,8 +28,12 @@ Vue.mixin({
     collapse(s, b = 5, e = 3) {
       return s && s.length > b + e ? s.substring(0, b) + '…' + s.substring(s.length - e) : s
     },
-    truncate(s, l = 45) {
-      return s && s.length > l ? s.substring(0, l) + '…' : s
+    truncate(s, l = 45, e = true) {
+      if (l < 0) {
+        return s && s.length > -l ? (e ? '…' : '') + s.substring(s.length + l, s.length) : s
+      } else {
+        return s && s.length > l ? s.substring(0, l) + (e ? '…' : '') : s
+      }
     },
     priceEth(v, r = 1, d = 5) {
       v = parseFloat(v) || 0

@@ -1,7 +1,7 @@
 <template>
   <b-card :img-src="image" :img-alt="title" img-top class="mb-3" @click="toItem">
     <div class="d-flex flex-row justify-content-between">
-      <b-link :to="{ name: 'market-id', params: { id: tokenId } }">
+      <b-link :to="{ name: 'market-item', params: { item: tokenId } }">
         <h5>{{ title | truncate }}</h5>
       </b-link>
       <small class="text-muted">#{{ tokenId }}</small>
@@ -15,7 +15,7 @@
             </span>
             <small v-if="price.value" class="text-muted">{{ price.value | priceEth }}</small>
           </h5>
-          <b-btn variant="danger" :to="{ name: 'market-id', params: { id: tokenId } }">
+          <b-btn variant="danger" :to="{ name: 'market-item', params: { item: tokenId } }">
             Cancel sell
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -27,14 +27,14 @@
             </span>
             <small v-if="openinigPrice.value" class="text-muted">{{ openinigPrice.value | priceEth }}</small>
           </h5>
-          <b-btn variant="danger" :to="{ name: 'market-id', params: { id: tokenId } }">
+          <b-btn variant="danger" :to="{ name: 'market-item', params: { item: tokenId } }">
             Cancel auction
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else>
           <div></div>
-          <b-btn variant="success" :to="{ name: 'market-id', params: { id: tokenId } }">
+          <b-btn variant="success" :to="{ name: 'market-item', params: { item: tokenId } }">
             Sell item
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -49,7 +49,7 @@
             </span>
             <small v-if="price.value" class="text-muted">{{ price.value | priceEth }}</small>
           </h5>
-          <b-btn variant="primary" :to="{ name: 'market-id', params: { id: tokenId } }">
+          <b-btn variant="primary" :to="{ name: 'market-item', params: { item: tokenId } }">
             Buy now
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -61,14 +61,14 @@
             </span>
             <small v-if="openinigPrice.value" class="text-muted">{{ openinigPrice.value | priceEth }} ETH</small>
           </h5>
-          <b-btn variant="info" :to="{ name: 'market-id', params: { id: tokenId } }">
+          <b-btn variant="info" :to="{ name: 'market-item', params: { item: tokenId } }">
             Place bid
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else>
           <div></div>
-          <b-btn variant="warning" :to="{ name: 'market-id', params: { id: tokenId } }">
+          <b-btn variant="warning" :to="{ name: 'market-item', params: { item: tokenId } }">
             Make offer
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     toItem() {
-      this.$router.push({ name: 'market-id', params: { id: this.tokenId } })
+      this.$router.push({ name: 'market-item', params: { item: this.tokenId } })
     },
   },
 }

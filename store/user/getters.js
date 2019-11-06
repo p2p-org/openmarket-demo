@@ -1,20 +1,16 @@
 export function currentUser(state) {
-  return state.users.length
-    ? {
-        ...state.users[state.currentId],
-        // account_number: state.currentUserInfo.account_number,
-        // sequence_number: state.currentUserInfo.sequence_number,
-      }
-    : null
+  return state.users[state.current] || null
+  // return state.users[state.current] ? { ...state.users[state.current] } : null
 }
 
 export function findUserByName(state) {
   return name => state.users.find(x => x.name === name)
 }
-export function findSysUserByName(state) {
-  return name => state.sysUsers.find(x => x.name === name)
-}
 
 export function userIdByAddress(state) {
   return address => state.users.findIndex(x => x.address === address)
+}
+
+export function usersList(state) {
+  return Object.keys(state.users).map(k => ({ ...state.users[k], active: k === state.current }))
 }
