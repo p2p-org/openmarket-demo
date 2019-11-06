@@ -590,7 +590,7 @@ export default {
         })
         return Promise.reject()
       }
-      return Promise.resolve
+      return Promise.resolve()
     },
   },
 }

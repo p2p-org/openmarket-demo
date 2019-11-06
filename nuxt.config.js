@@ -20,6 +20,7 @@ export default {
     ],
     link: [
       // { rel: 'manifest', href: '/manifest.json' },
+      { rel: 'manifest', href: '/site.webmanifest' },
       // { rel: 'apple-touch-icon', size: '57x57', href: '/apple-icon-57x57.png' },
       // { rel: 'apple-touch-icon', size: '60x60', href: '/apple-icon-60x60.png' },
       // { rel: 'apple-touch-icon', size: '72x72', href: '/apple-icon-72x72.png' },
@@ -28,11 +29,11 @@ export default {
       // { rel: 'apple-touch-icon', size: '120x120', href: '/apple-icon-120x120.png' },
       // { rel: 'apple-touch-icon', size: '144x144', href: '/apple-icon-144x144.png' },
       // { rel: 'apple-touch-icon', size: '152x152', href: '/apple-icon-152x152.png' },
-      // { rel: 'apple-touch-icon', size: '180x180', href: '/apple-icon-180x180.png' },
+      { rel: 'apple-touch-icon', size: '180x180', href: '/apple-icon-180x180.png' },
       // { rel: 'icon', type: 'image/png', size: '192x192', href: '/android-icon-192x192.png' },
-      // { rel: 'icon', type: 'image/png', size: '32x32', href: '/favicon-32x32.png' },
+      { rel: 'icon', type: 'image/png', size: '32x32', href: '/favicon-32x32.png' },
       // { rel: 'icon', type: 'image/png', size: '96x96', href: '/favicon-96x96.png' },
-      // { rel: 'icon', type: 'image/png', size: '16x16', href: '/favicon-16x16.png' },
+      { rel: 'icon', type: 'image/png', size: '16x16', href: '/favicon-16x16.png' },
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       // { rel: 'stylesheet', href: 'http://code.highcharts.com/css/themes/dark-unica.css' }
     ],
