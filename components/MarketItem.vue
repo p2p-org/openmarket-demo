@@ -79,6 +79,7 @@
                 <!--                  </b-col>-->
                 <!--                  </b-row>-->
                 <form-item-cancel-sell :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" @submit="doCancelFixed" />
+                <form-item-owner :owner="owner" />
               </template>
               <template v-else-if="status === 2">
                 <form-item-cancel-auction
@@ -88,9 +89,11 @@
                   :price="openinigPrice"
                   @submit="doCancelAuction"
                 />
+                <form-item-owner :owner="owner" />
               </template>
               <template v-else>
                 <form-item-sell :currency-image="currencyImage" :busy="busy" :rate="rate" @submit="doSellFixed" />
+                <form-item-owner :owner="owner" />
               </template>
             </template>
             <template v-else>
@@ -122,6 +125,7 @@
                   Place bid
                   <b-spinner v-if="busy" type="grow" />
                 </b-btn>
+                <form-item-owner :owner="owner" />
               </template>
               <template v-else>
                 <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" @submit="doMakeOffer" />
