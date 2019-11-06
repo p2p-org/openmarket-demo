@@ -3,8 +3,11 @@ export function txCheck(tx, msg) {
     console.log('tx send', tx, msg)
     let log = {}
     if (tx && tx.result && tx.result.raw_log) {
-      log = JSON.parse(tx.result.raw_log).pop()
-      console.log(log)
+      log = JSON.parse(tx.result.raw_log)
+      console.log('tx log', log)
+      if (Array.isArray(log)) {
+        log = log.pop()
+      }
       if (log.success) {
         resolve(tx)
         return
