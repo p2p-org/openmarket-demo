@@ -1,6 +1,6 @@
-export function txCheck(tx) {
+export function txCheck(tx, msg) {
   return new Promise((resolve, reject) => {
-    console.log('tx send', tx)
+    console.log('tx send', tx, msg)
     let log = {}
     if (tx && tx.result && tx.result.raw_log) {
       log = JSON.parse(tx.result.raw_log).pop()
