@@ -21,8 +21,6 @@ const NUMBER_ATTRIBUTES = [1, 2, 1, 1]
 
 const imgDir = join(__dirname, '../../static')
 
-const totalSupply = 123
-
 module.exports = tokenApi
 
 function tokenApi(db) {
@@ -80,7 +78,7 @@ function tokenApi(db) {
       await composeImage([`images/bases/base-${base}.png`, `images/eyes/eyes-${eyes}.png`, `images/mouths/mouth-${mouth}.png`], tokenId)
       addMetaProp(item.meta, {
         trait: 'image',
-        value: `${req.protocol}://${req.get('host')}/images/output/${tokenId}.png`,
+        value: `//${req.get('host')}/images/output/${tokenId}.png`,
         display: 'image',
       })
     }
@@ -102,7 +100,7 @@ function tokenApi(db) {
       item.meta,
       {
         trait: 'external_url',
-        value: `${req.protocol}://${req.get('host')}/api/token/${tokenId}`,
+        value: `//${req.get('host')}/api/token/${tokenId}`,
         display: 'link',
       },
       true
