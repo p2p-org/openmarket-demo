@@ -12,7 +12,7 @@
         </b-form-group>
       </b-col>
       <b-col md="6" class="d-flex flex-column pl-2 justify-content-begin align-items-end">
-        <b-button-close @click="reset"></b-button-close>
+        <b-button-close v-if="close" @click="reset"></b-button-close>
       </b-col>
     </b-row>
     <b-row class="mt-2">

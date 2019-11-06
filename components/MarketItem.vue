@@ -95,8 +95,26 @@
             </template>
             <template v-else>
               <template v-if="status === 1">
-                <form-item-offer v-if="buyOffer" :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" :close="true" @submit="doMakeOffer" @reset="buyOffer = !buyOffer"></form-item-offer>
-                <form-item-buy v-else :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" :offer="highestOffer" @submit="doBuyFixed" @offer="buyOffer = !buyOffer"/>
+                <form-item-offer
+                  v-if="buyOffer"
+                  :currency-image="currencyImage"
+                  :rate="rate"
+                  :busy="busy"
+                  :offer="highestOffer"
+                  :close="true"
+                  @submit="doMakeOffer"
+                  @reset="buyOffer = !buyOffer"
+                />
+                <form-item-buy
+                  v-else
+                  :currency-image="currencyImage"
+                  :busy="busy"
+                  :rate="rate"
+                  :price="price"
+                  :offer="highestOffer"
+                  @submit="doBuyFixed"
+                  @offer="buyOffer = !buyOffer"
+                />
                 <form-item-owner v-if="!buyOffer" :owner="owner" />
               </template>
               <template v-else-if="status === 2">
@@ -106,7 +124,7 @@
                 </b-btn>
               </template>
               <template v-else>
-                <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" @submit="doMakeOffer"/>
+                <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" @submit="doMakeOffer" />
                 <form-item-owner :owner="owner" />
               </template>
             </template>
@@ -223,7 +241,7 @@ export default {
       busy: false,
       owner: null,
       expandDescr: false,
-      buyOffer: false
+      buyOffer: false,
     }
   },
   computed: {
@@ -329,7 +347,16 @@ export default {
     }
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'nftBuyFixed', 'nftTransfer', 'queryUser', 'nftCancelAuction', 'nftMakeOffer']),
+    ...mapActions('market', [
+      'queryNft',
+      'nftSellFixed',
+      'nftCancelFixed',
+      'nftBuyFixed',
+      'nftTransfer',
+      'queryUser',
+      'nftCancelAuction',
+      'nftMakeOffer',
+    ]),
     ...mapActions('user', ['loadCurrentUserInfo']),
 
     bgVar(i) {
@@ -360,155 +387,164 @@ export default {
     },
     doSellFixed({ price }) {
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm sell?').then(value => {
-        if (value) {
-          this.nftSellFixed({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-              price,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'NFT Listed for Fixed Price', r)
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm sell?').then(value => {
+          if (value) {
+            this.nftSellFixed({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+                price,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'NFT Listed for Fixed Price', r)
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doBuyFixed() {
-      // this.$emit('buyFixed')
-
       this.busy = true
-
-      this.$bvModal.msgBoxConfirm('Confirm buy?').then(value => {
-        if (value) {
-          this.nftBuyFixed({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-              price: this.sellPrice,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'Yep, you bought it!', r).then(() => {
-                this.loadCurrentUserInfo()
-              })
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm buy?').then(value => {
+          if (value) {
+            this.nftBuyFixed({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+                price: this.sellPrice,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'Yep, you bought it!', r).then(() => {
+                  this.loadCurrentUserInfo()
+                })
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doMakeOffer({ price }) {
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm make offer?').then(value => {
-        if (value) {
-          this.nftMakeOffer({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-              price,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'Offer committed!', r).then(() => {
-                // this.loadCurrentUserInfo()
-                this.buyOffer = false
-              })
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm make offer?').then(value => {
+          if (value) {
+            this.nftMakeOffer({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+                price,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'Offer committed!', r).then(() => {
+                  // this.loadCurrentUserInfo()
+                  this.buyOffer = false
+                })
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doAcceptOffer({ offerId }) {
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm make offer?').then(value => {
-        if (value) {
-          this.nftBuyFixed({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-              offerId,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'You accepted the offer!', r).then(() => {
-                this.loadCurrentUserInfo()
-              })
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm make offer?').then(value => {
+          if (value) {
+            this.nftBuyFixed({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+                offerId,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'You accepted the offer!', r).then(() => {
+                  this.loadCurrentUserInfo()
+                })
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doCancelOffer({ offerId }) {
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm cancel offer?').then(value => {
-        if (value) {
-          this.nftBuyFixed({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-              offerId,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'Offer removed!', r).then(() => {
-                // this.loadCurrentUserInfo()
-              })
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm cancel offer?').then(value => {
+          if (value) {
+            this.nftBuyFixed({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+                offerId,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'Offer removed!', r).then(() => {
+                  // this.loadCurrentUserInfo()
+                })
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doCancelFixed() {
-      this.$emit('cancelFixed')
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm cancel sell?').then(value => {
-        if (value) {
-          this.nftCancelFixed({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'NFT Unlisted', r)
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm cancel sell?').then(value => {
+          if (value) {
+            this.nftCancelFixed({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'NFT Unlisted', r)
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doCancelAuction() {
-      this.$emit('cancelAuction')
       this.busy = true
-      this.$bvModal.msgBoxConfirm('Confirm cancel auction?').then(value => {
-        if (value) {
-          this.nftCancelAuction({
-            user: this.currentUser,
-            token: {
-              id: this.nft.token_id,
-            },
-          })
-            .then(r => {
-              this.handleOk(this.nft.token_id, 'NFT Unlisted', r)
+      this.checkUser().then(() =>
+        this.$bvModal.msgBoxConfirm('Confirm cancel auction?').then(value => {
+          if (value) {
+            this.nftCancelAuction({
+              user: this.currentUser,
+              token: {
+                id: this.nft.token_id,
+              },
             })
-            .catch(this.handleErr)
-        } else {
-          this.busy = false
-        }
-      })
+              .then(r => {
+                this.handleOk(this.nft.token_id, 'NFT Unlisted', r)
+              })
+              .catch(this.handleErr)
+          } else {
+            this.busy = false
+          }
+        })
+      )
     },
     doTransfer({ recipient }) {
       this.busy = true
@@ -546,6 +582,15 @@ export default {
     handleErr(e) {
       this.busy = false
       this.$bvModal.msgBoxOk(e.message, { title: 'Error', okVariant: 'danger' })
+    },
+    checkUser() {
+      if (!this.currentUser) {
+        this.$bvModal.msgBoxOk('Please login to continue', { title: 'Auth required', okVariant: 'warning' }).then(() => {
+          this.busy = false
+        })
+        return Promise.reject()
+      }
+      return Promise.resolve
     },
   },
 }

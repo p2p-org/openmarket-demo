@@ -3,18 +3,31 @@
     <b-container>
       <b-row class="">
         <b-col>
+          <b-alert show dismissible variant="info">
+            Please note, if you leave all fields empty, they will be automatically generated.
+          </b-alert>
           <b-card>
             <b-form v-if="show" novalidate @submit.prevent="onSubmit" @reset.prevent="onReset">
               <b-form-group id="input-group-1" label="Token ID:" label-for="input-1">
                 <b-form-input id="input-1" v-model="form.tokenId" type="text" required placeholder="Enter token ID" disabled />
               </b-form-group>
-              <b-form-group id="input-group-1" label="Token Name:" label-for="input-2" description="Can be left blank">
+              <b-form-group id="input-group-1" label="Token Name:" label-for="input-2" description="Left blank to automatically generate">
                 <b-form-input id="input-1" v-model="form.name" type="text" required trim placeholder="Enter token name" />
               </b-form-group>
-              <b-form-group id="input-group-1" label="Token description:" label-for="input-3" description="Can be left blank">
+              <b-form-group
+                id="input-group-1"
+                label="Token description:"
+                label-for="input-3"
+                description="Left blank to automatically generate"
+              >
                 <b-form-textarea id="input-1" v-model="form.description" required trim placeholder="Enter token description" />
               </b-form-group>
-              <b-form-group id="input-group-1" label="Token Image URL:" label-for="input-4" description="Can be left blank">
+              <b-form-group
+                id="input-group-1"
+                label="Token Image URL:"
+                label-for="input-4"
+                description="Left blank to automatically generate"
+              >
                 <b-form-input id="input-1" v-model="form.image" type="text" required trim placeholder="Enter token image URL" />
               </b-form-group>
 
@@ -74,7 +87,7 @@ export default {
     Nft.params({ t: Date.now() })
       .get()
       .then(nfts => {
-        console.log('12312312', nfts)
+        // console.log('12312312', nfts)
       })
   },
   methods: {
@@ -118,16 +131,14 @@ export default {
           })
         )
         .then(r => {
-          console.log(r)
+          // console.log(r)
           // todo
           setTimeout(() => {
             this.updNextTokenId()
-            this.$bvModal
-              .msgBoxOk('NFT Minted')
-              .then(value => {
-                this.busy = false
-                this.$router.push({ name: 'market-item', params: { item: tokenId } })
-              })
+            this.$bvModal.msgBoxOk('NFT Minted').then(value => {
+              this.busy = false
+              this.$router.push({ name: 'market-item', params: { item: tokenId } })
+            })
           }, 2000)
         })
         .catch(this.handleErr)
