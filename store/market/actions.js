@@ -1,7 +1,6 @@
-import { MARKET_ALL_NFT, MARKET_ITEM_OFFERS, MARKET_MY_NFT } from '../mutation-types'
+import { MARKET_ALL_NFT, MARKET_ITEM_OFFERS } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
-const mock = false
 function tokenId(token_id) {
   return parseInt(token_id.substring(6))
 }
@@ -23,7 +22,6 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
       )
     })
     .then(nfts => {
-      // console.log('!!!', nfts)
       commit(MARKET_ALL_NFT, { nfts })
     })
 }
@@ -36,7 +34,6 @@ export function queryNft({ state, commit, rootState }, { force = false, params =
   //   return Promise.all(state.nfts1.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))))
   //     .then(metas => state.nfts1.map((nft, idx) => ({ ...nft, meta: metas[idx] })))
   //     .then(nfts => {
-  //       console.log('!!!', nfts)
   //       commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
   //     })
   // }
@@ -50,7 +47,7 @@ export function queryNft({ state, commit, rootState }, { force = false, params =
         )
       })
       .then(nfts => {
-        // console.log('!!!', nfts)
+        console.debug('nfts', nfts)
         commit(MARKET_ALL_NFT, nfts)
         resolve()
       })
@@ -72,7 +69,7 @@ export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
     this.$marketApi
       .getNftOffers(params)
       .then(offers => {
-        console.log('!!!', offers)
+        console.debug('nft offers', offers)
         commit(MARKET_ITEM_OFFERS, { tokenId, offers })
         resolve()
       })
@@ -91,7 +88,6 @@ export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
 //         )
 //       })
 //       .then(nfts => {
-//         console.log('!!!', nfts)
 //         commit(MARKET_ALL_NFT, nfts)
 //       })
 //       .catch(reject)
@@ -103,7 +99,7 @@ export function queryUser({ commit, state, getters }, { address }) {
     this.$marketApi
       .getUser({ address })
       .then(users => {
-        // console.log(users)
+
         if (users.length) {
           resolve(users.pop())
         }
@@ -118,7 +114,6 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
   //   return Promise.all(state.nfts1.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))))
   //     .then(metas => state.nfts1.map((nft, idx) => ({ ...nft, meta: metas[idx] })))
   //     .then(nfts => {
-  //       console.log('!!!', nfts)
   //       commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
   //     })
   // }
@@ -134,11 +129,13 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
   })
 }
 
-export function nftMint({ state, commit, rootState }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+export function nftMint({ state, commit, rootGetters, rootState }, { user, token } = {}) {
+  const svcUser = rootGetters['user/serviceUser']
+  console.log(rootGetters['user/serviceUser'])
+  return this.$txApi.getAccounts(svcUser.address).then(data => {
     // console.log(this.$txApi.getECPairPriv(user.mnemonic))
     const signMsg = this.$txMsgs.NewMessageMintNFT({
-      sender: user.address,
+      sender: svcUser.address,
       recipient: user.address,
       token_id: token.id,
       denom: 'denom_basic',
@@ -153,12 +150,12 @@ export function nftMint({ state, commit, rootState }, { user, token } = {}) {
       sequence: data.result.value.sequence,
     })
     // console.log('sign msg', signMsg)
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(svcUser.ecpairPriv))
     return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
 
-export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+export function nftSellFixed({ state, commit, rootState }, { user, token } = {}) {
   return this.$txApi.getAccounts(user.address).then(data => {
     console.log('user', data)
     const signMsg = this.$txMsgs.NewMessagePutNFTOnMarket({
@@ -183,7 +180,7 @@ export function nftSellFixed({ state, commit, rootState, rootGetters }, { user, 
   })
 }
 
-export function nftMakeOffer({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+export function nftMakeOffer({ state, commit, rootState }, { user, token } = {}) {
   return this.$txApi.getAccounts(user.address).then(data => {
     console.log('user', data)
     const signMsg = this.$txMsgs.NewMsgMakeOffer({
@@ -333,4 +330,30 @@ export function nftTransfer({ state, commit, rootState, rootGetters }, { user, t
     const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
     return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
+}
+
+export function nftCheckBusy({ state }, { tokenId } = {}) {
+  const idx = state.nfts.findIndex(n => n.token_id === tokenId)
+  if (idx !== -1 && !state.nfts[idx].busy) {
+    return Promise.resolve()
+  }
+  return Promise.reject()
+}
+export function nftBusyLock({ state, commit }, { tokenId } = {}) {
+  const idx = state.nfts.findIndex(n => n.token_id === tokenId)
+  if (idx !== -1 && !state.nfts[idx].busy) {
+    commit('nftTriggerBusy', { tokenId, busy: true })
+    return Promise.resolve()
+  }
+  return Promise.reject()
+}
+
+export function nftBusyUnlock({ state, commit }, { tokenId } = {}) {
+  const idx = state.nfts.findIndex(n => n.token_id === tokenId)
+  if (idx !== -1) {
+    // && state.nfts[idx].busy
+    commit('nftTriggerBusy', { tokenId, busy: false })
+    return Promise.resolve()
+  }
+  return Promise.reject()
 }

@@ -54,18 +54,20 @@
         <b-card v-if="!nftsFiltered.length" body-class="text-center">
           no items yet
         </b-card>
-        <template v-else>
-          <b-card-group v-if="nftsPaged.length" deck>
+        <market v-else>
+<!--          <b-card-group v-if="nftsPaged.length" deck>-->
             <!--              :title="nft.meta.name"-->
             <!--              :image="nft.meta.image"-->
             <!--              :price="nft.price"-->
             <!--              :id="nft.id"-->
-            <market-card v-for="nft in nftsPaged" :key="nft.id" :nft="nft" :rate="rateETH" :buyer="buyer" />
+            <transition-group  v-if="nftsPaged.length" name="flip-list" tag="div" class="card-deck">
+              <market-card v-for="nft in nftsPaged" :key="nft.id" :nft="nft" :rate="rateETH"  />
+            </transition-group>
             <!--            {{ nfts }}-->
-          </b-card-group>
+<!--          </b-card-group>-->
 
           <b-pagination-nav v-model="currentPage" :link-gen="linkGen" :number-of-pages="numberOfPages" use-router align="center" />
-        </template>
+        </market>
       </b-col>
     </b-row>
   </b-container>
@@ -76,10 +78,11 @@ import { mapState, mapActions, mapGetters } from 'vuex'
 
 import SortDropdown from './form/SortDropdown'
 import MarketCard from './MarketCard'
+import Market from './Market'
 
 export default {
   name: 'MarketList',
-  components: { MarketCard, SortDropdown },
+  components: { Market, MarketCard, SortDropdown },
   props: {
     // buyer: {
     //   type: String,

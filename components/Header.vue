@@ -86,7 +86,7 @@
                   <client-only>
                     <jazzicon :address="userAddress" :diameter="20" />
                   </client-only>
-                  {{ userName | truncate(8) }} <small>{{ userBalance }}</small>
+                  {{ userName | truncate(10) }} <small>{{ userBalance }}</small>
                 </template>
                 <template v-else>
                   LOGIN

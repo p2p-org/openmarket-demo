@@ -234,7 +234,14 @@ $cards-per-line: (
     padding: 0 0 1rem 0;
   }
   .card {
-    cursor: pointer;
+    .nft-image {
+      cursor: pointer;
+      height: 250px;
+      &>img {
+        max-height: 100%;
+        max-width: 100%;
+      }
+    }
     .card-body {
       padding: 0.625rem;
     }
@@ -258,6 +265,39 @@ $cards-per-line: (
     }
   }
 
+  table.offers-list {
+    border-collapse: separate;
+    border-spacing:0 0.4375rem;
+    th {
+      font-weight: normal;
+      font-size: 0.875rem;
+      color: $text-muted;
+      padding-bottom: 0;
+    }
+    tr {
+      //width: 100%;
+      td {
+        //padding-bottom: 0.5rem;
+        background-color: $card-bg;
+        background-clip: border-box;
+        //border-top: $card-border-width solid $card-border-color;
+        //border-bottom: $card-border-width solid $card-border-color;
+        &:first-child {
+          //border-left: $card-border-width solid $card-border-color;
+          border-top-left-radius: $card-border-radius;
+          border-bottom-left-radius: $card-border-radius;
+        }
+        &:last-child {
+          //border-right: $card-border-width solid $card-border-color;
+          border-top-right-radius: $card-border-radius;
+          border-bottom-right-radius: $card-border-radius;
+        }
+        &.offer-actions {
+          width: 6rem;
+        }
+      }
+    }
+  }
 }
 
 p {

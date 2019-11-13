@@ -13,13 +13,17 @@ export function addUser({ state, commit, dispatch }, { name = null, mnemonic = n
   return Promise.resolve(address)
 }
 
-// export function setCurrentUser({ commit, dispatch }, id) {
-//   commit('setCurrentUser', id)
-//   dispatch('saveLocalUsers')
-//
-//   return Promise.resolve()
-//   // return dispatch('loadUserInfo')
-// }
+export function initServiceUser({ commit, rootState }) {
+  try {
+    const address = this.$txApi.getAddress(rootState.config.serviceUser.mnemonic)
+    const ecpairPriv = this.$txApi.getECPairPriv(rootState.config.serviceUser.mnemonic)
+    commit('setServiceUser', { address, ecpairPriv })
+  } catch (e) {
+    console.error('initService', e)
+    return Promise.reject(e)
+  }
+  return Promise.resolve()
+}
 
 export function setCurrentUser({ commit, dispatch }, address) {
   commit('setCurrentUser', address)

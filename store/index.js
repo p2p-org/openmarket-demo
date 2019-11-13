@@ -29,9 +29,9 @@ export const getters = {
 
 export const actions = {
   // server pre init
-  async nuxtServerInit({ state, commit, dispatch }, { req, app }) {
-    await dispatch('setTheme', app.$cookies.get(themeKeyName))
-    await dispatch('setTheme', app.$cookies.get(themeKeyName))
+  nuxtServerInit({ state, commit, dispatch }, { req, app }) {
+    dispatch('setTheme', app.$cookies.get(themeKeyName))
+    dispatch('user/initServiceUser')
 
     // if (process.env.GQL_WS_URL) {
     //   commit(`config/${CONFIG_URLS}`, {
@@ -45,20 +45,6 @@ export const actions = {
     // }
   },
 
-  initUsers({ state, dispatch }) {
-    // const password = '12345678'
-    // state.users.forEach((u, id) => {
-    //   dispatch('user/setUser', { ...u, id, password })
-    // })
-    // dispatch('user/setCurrentUser', 0)
-    if (typeof Storage !== 'undefined') {
-      // Code for localStorage
-      const users = JSON.parse(localStorage.getItem('users'))
-      console.log(users)
-    } else {
-      // No web storage Support.
-    }
-  },
   startLoader({ commit }) {
     commit(START_LOADER)
   },

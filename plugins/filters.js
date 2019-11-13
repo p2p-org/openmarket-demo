@@ -1,5 +1,15 @@
 import Vue from 'vue'
 // import { utils } from 'ethers'
+// import BN from 'bn.js'
+//
+// const tera = new BN(1e12)
+// const giga = new BN(1e9)
+const tera = 1e12
+const giga = 1e9
+const mega = 1e6
+const kilo = 1e3
+
+const round = v => Math.round((v + Number.EPSILON) * 10) / 10
 
 Vue.mixin({
   filters: {
@@ -35,9 +45,40 @@ Vue.mixin({
         return s && s.length > l ? s.substring(0, l) + (e ? '…' : '') : s
       }
     },
-    priceEth(v, r = 1, d = 5) {
+    priceEth(v, r = 1, d = 3) {
       v = parseFloat(v) || 0
-      return `${(v / r).toFixed(d)} ETH`
+      // return +(Math.round(v / r + 'e+'+d) + 'e-'+d) + 'ETH'
+      return `${(v / r).toPrecision(d)} ETH`
     },
+    priceBig(v, d = 5) {
+      if (!v) return v
+      v = parseFloat(v) || 0
+      //
+      // const p = new BN(v)
+      // console.log(v, p)
+      // if (p.gte(tera)) {
+      //   return p.div(tera).toString() + 'T'
+      // }
+      // if (p.gte(giga)) {
+      //   return p.div(giga).toString() + 'G'
+      // }
+      // if (p.gte(mega)) {
+      //   return p.div(mega).toString() + 'M'
+      // }
+      // return v
+      if (v >= tera) {
+        return round(v / tera) + 'T'
+      }
+      if (v >= giga) {
+        return round(v / giga) + 'G'
+      }
+      if (v >= mega) {
+        return round(v / mega) + 'M'
+      }
+      if (v >= kilo) {
+        return round(v / kilo) + 'K'
+      }
+      return v
+    }
   },
 })

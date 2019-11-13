@@ -8,9 +8,9 @@
         </b-form-group>
       </b-col>
       <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
-        <b-btn variant="warning" size="lg" class="py-2" :disabled="busy" type="submit">
+        <b-btn variant="warning" size="lg" class="py-2" :disabled="busy || !recipient" type="submit">
           Gift token
-          <b-spinner v-if="busy" type="grow" small/>
+          <b-spinner v-if="busy" type="grow" small />
         </b-btn>
       </b-col>
     </b-row>
@@ -39,7 +39,9 @@ export default {
   }),
   methods: {
     submit() {
-      this.$emit('submit', { recipient: this.recipient })
+      if (this.recipient) {
+        this.$emit('submit', { recipient: this.recipient })
+      }
     },
   },
 }

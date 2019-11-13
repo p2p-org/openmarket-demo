@@ -54,8 +54,9 @@ export default {
     { src: '~/plugins/filters' },
     { src: '~/plugins/methods' },
     { src: '~/plugins/clipboard', mode: 'client' },
+    { src: '~/plugins/dayjs', mode: 'client' },
     { src: '~plugins/vue-api-query' },
-    { src: '~/plugins/market', mode: 'client' },
+    { src: '~/plugins/market' },
     // { src: '~/plugins/cosmos' },
     // { src: '~/plugins/identicon', mode: 'client' },
   ],
@@ -89,7 +90,6 @@ export default {
         ],
       },
     ],
-    ['@nuxtjs/moment', { defaultLocale: 'en' }],
   ],
   router: {
     linkExactActiveClass: 'active',

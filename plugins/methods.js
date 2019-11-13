@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import moment from 'moment'
 
 Vue.mixin({
   methods: {
@@ -52,8 +51,8 @@ Vue.mixin({
     },
     sortTime(nfts, asc = true) {
       return nfts.sort((a, b) => {
-        if (moment.isMoment(a.created_at) && moment.isMoment(b.created_at)) {
-          // If both compared fields are moment instance
+        if (this.$dayjs.isDayjs(a.created_at) && this.$dayjs.isDayjs(b.created_at)) {
+          // If both compared fields are dayjs instance
           return a.created_at.isBefore(b.created_at) ? (asc ? 1 : -1) : a.created_at.isAfter(b.created_at) ? (asc ? -1 : 1) : 0
         }
         return 0
