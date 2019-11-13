@@ -29,10 +29,9 @@ export default {
     }),
   },
   mounted() {
-    this.initUsers().then(() => {
+    // this.initUsers().then(() => {
       this.stopLoader()
-    })
-    console.log('rrrr', this.$router)
+    // })
   },
   methods: {
     ...mapActions(['initUsers', 'stopLoader']),

@@ -37,7 +37,6 @@ export default {
       return this.owner ? this.owner.items_owned.aggregate.count : '-'
     },
     ownerItemsOnSaleCount() {
-      console.log(this.owner)
       return this.owner ? this.owner.items_on_sale.aggregate.count : '-'
     },
   },

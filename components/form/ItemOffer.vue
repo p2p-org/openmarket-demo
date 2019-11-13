@@ -1,5 +1,5 @@
 <template>
-  <b-form novalidate @submit.prevent="submit" @reset.prevent="reset">
+  <b-form novalidate @submit.stop.prevent="submit" @reset.stop.prevent="reset">
     <b-row>
       <b-col md="6" class="d-flex flex-column pr-2">
         <b-form-group class="my-0" label="Highest offer" label-class="pb-0">
@@ -34,7 +34,7 @@
       <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
           <b-btn variant="primary" size="lg" class="py-2" :disabled="busy" type="submit" block>
             Make offer
-            <b-spinner v-if="busy" type="grow" small/>
+            <b-spinner v-if="busy" type="grow" small />
           </b-btn>
       </b-col>
     </b-row>
@@ -69,6 +69,14 @@ export default {
   data: () => ({
     price: '1',
   }),
+  watch: {
+    offer(o) {
+      this.price = 1 + parseInt(o.value)
+    },
+  },
+  mounted() {
+    this.price = 1 + parseInt(this.offer.value)
+  },
   methods: {
     submit() {
       this.$emit('submit', { price: this.price })

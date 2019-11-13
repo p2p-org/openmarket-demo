@@ -7,4 +7,4 @@ export const MARKET_ALL_NFT = 'MARKET_ALL_NFT'
 export const MARKET_MY_NFT = 'MARKET_MY_NFT'
 export const MARKET_ITEM_OFFERS = 'MARKET_ITEM_OFFERS'
 
-
+export const MARKET_BUSY_NFT = 'MARKET_BUSY_NFT'
