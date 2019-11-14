@@ -9,6 +9,7 @@ services:
       - 3000:3000
     volumes:
       - nft-db:/app/db
+      - nft-img:/app/static/images/output
     environment:
       - NODE_ENV=production
       - GQL_URL=http://graphql:8080/v1/graphql
@@ -27,5 +28,6 @@ networks:
 
 volumes:
   nft-db:
+  nft-img:
 
 
