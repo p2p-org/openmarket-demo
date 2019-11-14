@@ -102,8 +102,14 @@ export default {
           })
 
       } else {
+        let name = this.form.name
+        if (!name) {
+          name = 'stranger' + (Object.keys(this.users).length + 1)
+        }
+        const mnemonic = this.form.mnemonic
+        this.form = { name, mnemonic, address: '...generating' }
         setTimeout(() => {
-          this.addUser({ ...this.form })
+          this.addUser({ mnemonic, name })
             .then(address => {
               console.log('new user added', address, this.currentUser)
               this.busy = false
@@ -124,7 +130,7 @@ export default {
     genUser() {
       let name = this.form.name
       if (!name) {
-        name = 'username' + (Object.keys(this.users).length + 1)
+        name = 'stranger' + (Object.keys(this.users).length + 1)
       }
       this.form = { name, mnemonic: '...generating', address: '...generating' }
 
