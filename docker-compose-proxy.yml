@@ -9,15 +9,20 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - DHPARAM_GENERATION=false
     volumes:
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - dwh-tier
+      - app-tier
 
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: letsencrypt-nginx-proxy-companion
+    container_name: nginx-proxy-le
     restart: always
     environment:
       - NGINX_PROXY_CONTAINER=nginx-proxy
@@ -26,6 +31,16 @@ services:
       - html:/usr/share/nginx/html
       - certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app-tier
+
+networks:
+  dwh-tier:
+    external:
+      name: dwh-network
+  app-tier:
+    external:
+      name: app-network
 
 volumes:
   vhost:

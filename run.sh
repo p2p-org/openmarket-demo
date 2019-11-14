@@ -15,7 +15,8 @@ while test $# -gt 0; do
       echo " "
       echo "options:"
       echo "help                        show brief help"
-      echo "up                          build & start app"
+      echo "build                       build app"
+      echo "up                          start app"
       echo "down                        stop app"
       echo "purge                       stop containers, except proxy, remove volumes"
       echo "up-proxy                    start web proxy with ssl"
@@ -23,14 +24,19 @@ while test $# -gt 0; do
       exit 0
       ;;
     up)
-      docker-compose up -d --build
+      docker-compose up -d
       exit 0
       ;;
     down)
       docker-compose down
       exit 0
       ;;
+    build)
+      docker-compose build
+      exit 0
+      ;;
     up-proxy)
+      docker network create app-network
       docker-compose -f docker-compose-proxy.yml up -d
       exit 0
       ;;
