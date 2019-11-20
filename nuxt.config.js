@@ -55,6 +55,7 @@ export default {
     { src: '~/plugins/methods' },
     { src: '~/plugins/clipboard', mode: 'client' },
     { src: '~/plugins/dayjs', mode: 'client' },
+    { src: '~/plugins/vee-validate' },
     { src: '~plugins/vue-api-query' },
     { src: '~/plugins/market' },
     // { src: '~/plugins/cosmos' },
@@ -115,6 +116,9 @@ export default {
    ** Build configuration
    */
   build: {
+    transpile: [
+      "vee-validate/dist/rules"
+    ],
     /*
      ** You can extend webpack config here
      */

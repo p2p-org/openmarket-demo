@@ -6,7 +6,7 @@
           <div class="d-flex justify-content-middle align-items-center">
             <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
             <h1 class="ml-2 my-0">
-              <b>{{ price.value }}</b> {{ price.currency }}
+              <b>{{ price.value | priceBig }}</b> {{ price.currency }}
             </h1>
           </div>
           <h4 class="mt-1">

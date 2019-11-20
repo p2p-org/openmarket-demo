@@ -4,10 +4,10 @@ export function txCheck(tx, msg) {
     let log = {}
     if (tx && tx.result && tx.result.raw_log) {
       log = JSON.parse(tx.result.raw_log)
-      console.log('tx log', log)
       if (Array.isArray(log)) {
         log = log.pop()
       }
+      console.log('tx log', log)
       if (log.success) {
         resolve(tx)
         return

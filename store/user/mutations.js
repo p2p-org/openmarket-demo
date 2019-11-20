@@ -50,7 +50,6 @@ export default {
 
   saveLocalUsers(state) {
     if (typeof Storage !== 'undefined') {
-      console.log('save local', state.users)
       localStorage.setItem('users', JSON.stringify(state.users))
       localStorage.setItem('current', JSON.stringify(state.current))
     }

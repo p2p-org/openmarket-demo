@@ -122,10 +122,17 @@
                   <form-item-owner v-if="!buyOffer" :owner="owner" />
                 </template>
                 <template v-else-if="status === 2">
-                  <b-btn variant="info">
-                    Place bid
-                    <b-spinner v-if="busy" type="grow" />
-                  </b-btn>
+                  <form-item-bid
+                    :currency-image="currencyImage"
+                    :rate="rate"
+                    :busy="busy"
+                    :bid="highestBid"
+                    @submit="onPlaceBid"
+                  />
+<!--                  <b-btn variant="info">-->
+<!--                    Place bid-->
+<!--                    <b-spinner v-if="busy" type="grow" />-->
+<!--                  </b-btn>-->
                   <form-item-owner :owner="owner" />
                 </template>
                 <template v-else>
@@ -189,7 +196,14 @@
           <b-row>
             <b-col>
               <b-card no-body>
-                <b-table striped hover :items="items" />
+                <b-table striped hover :items="items" :busy="true" >
+                  <template v-slot:table-busy>
+                    <div class="text-center  my-2">
+<!--                      <b-spinner class="align-middle"></b-spinner>-->
+                      <strong>under construction...</strong>
+                    </div>
+                  </template>
+                </b-table>
               </b-card>
             </b-col>
           </b-row>
@@ -210,10 +224,12 @@ import FormItemCancelAuction from './form/ItemCancelAuction'
 import FormItemGift from './form/ItemGift'
 import Market from './Market'
 import FormItemOffersList from './form/ItemOffersList'
+import FormItemBid from './form/ItemBid'
 
 export default {
   name: 'MarketItem',
   components: {
+    FormItemBid,
     FormItemOffersList,
     Market,
     FormItemGift,
@@ -233,6 +249,14 @@ export default {
     nft: {
       type: Object,
       default: null,
+    },
+    offers: {
+      type: Array,
+      default: () => [],
+    },
+    bids: {
+      type: Array,
+      default: () => [],
     },
     rate: {
       type: Number,
@@ -263,6 +287,7 @@ export default {
       // busy: false,
       expandDescr: false,
       buyOffer: false,
+      placeBid: false,
     }
   },
   computed: {
@@ -321,11 +346,11 @@ export default {
     price() {
       return this.nft.price
     },
-    offers() {
-      return this.nft.offers || []
-    },
     highestOffer() {
-      return this.nft.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 })
+      return this.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 })
+    },
+    highestBid() {
+      return this.bids.length ? this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 }) : this.openinigPrice
     },
     openinigPrice() {
       return this.nft.opening_price
@@ -361,6 +386,7 @@ export default {
     },
   },
   mounted() {
+    this.$root.$on('userActionOk', this.doResetUI)
   },
   methods: {
     ...mapActions('market', [
@@ -373,12 +399,15 @@ export default {
         case 1:
           return 'success'
         case 2:
-          return 'warning'
+          return 'info'
         case 3:
           return 'danger'
         default:
-          return 'info'
+          return 'warning'
       }
+    },
+    doResetUI() {
+      this.buyOffer = false
     },
     mkTitle(str) {
       str = str.toLowerCase().split('_')
@@ -405,6 +434,9 @@ export default {
     },
     onSellFixed({ price }) {
       this.$root.$emit('marketSellFixed', { id: this.nft.token_id, price, user: this.currentUser })
+    },
+    onPlaceBid({ price }) {
+      this.$root.$emit('marketPlaceBid', { id: this.nft.token_id, price, user: this.currentUser })
     },
     onCancelAuction() {
       this.$root.$emit('marketCancelAuction', { id: this.nft.token_id, user: this.currentUser })

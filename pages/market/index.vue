@@ -11,7 +11,7 @@
       </b-jumbotron>
     </b-container>
     <section class="market">
-      <market-list :owner="owner" />
+      <market-list :owner="owner" :search="search" />
     </section>
   </page>
 </template>
@@ -32,17 +32,18 @@ export default {
     owner() {
       return this.$route.query.owner || null
     },
+    search() {
+      return this.$route.query.q || null
+    },
   },
   watch: {
     current(to, from) {
       if (to && from) {
         if (this.owner === from) {
-          this.$router.push({ name: this.$route.name, query: { owner: to } })
+          this.$router.push({ name: this.$route.name, query: { ...this.$route.query, owner: to } })
         }
       }
     },
   },
-  mounted() {},
-  methods: {},
 }
 </script>

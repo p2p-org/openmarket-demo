@@ -75,9 +75,9 @@ Vue.mixin({
       if (v >= mega) {
         return round(v / mega) + 'M'
       }
-      if (v >= kilo) {
-        return round(v / kilo) + 'K'
-      }
+      // if (v >= kilo) {
+      //   return round(v / kilo) + 'K'
+      // }
       return v
     }
   },

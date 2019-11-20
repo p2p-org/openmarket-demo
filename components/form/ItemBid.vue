@@ -3,11 +3,11 @@
     <b-form novalidate @submit.stop.prevent="passes(submit)" @reset.stop.prevent="reset">
       <b-row>
         <b-col md="6" class="d-flex flex-column pr-2">
-          <b-form-group class="my-0" label="Highest offer" label-class="pb-0">
+          <b-form-group class="my-0" label="Highest bid" label-class="pb-0">
             <div class="d-flex justify-content-middle align-items-center">
               <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
               <h1 class="ml-2 my-0">
-                <b>{{ offer.value }}</b> {{ offer.currency }}
+                <b>{{ bid.value }}</b> {{ bid.currency }}
               </h1>
             </div>
           </b-form-group>
@@ -19,12 +19,12 @@
       <b-row class="mt-2">
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-price-input
-            rules="required|numeric"
-            name="Offer value"
+            :rules="{ required: true, numeric: true, min_value: bid.value + 1}"
+            name="Bid value"
             type="text"
-            label="Enter your offer"
+            label="Enter your bid"
             v-model="price"
-            placeholder="Offer value"
+            placeholder="Bid value"
             :currency-image="currencyImage"
           />
           <!--          <h4 class="mt-1">-->
@@ -33,7 +33,7 @@
         </b-col>
         <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
           <b-btn variant="primary" size="lg" class="py-2" :disabled="busy || invalid" type="submit" block>
-            Make offer
+            Place bid
             <b-spinner v-if="busy" type="grow" small />
           </b-btn>
         </b-col>
@@ -47,7 +47,7 @@ import { ValidationObserver } from 'vee-validate'
 import BPriceInput from './inputs/BPriceInput'
 
 export default {
-  name: 'FormItemOffer',
+  name: 'FormItemBid',
   components: {
     ValidationObserver,
     BPriceInput,
@@ -69,21 +69,21 @@ export default {
       type: Boolean,
       default: false,
     },
-    offer: {
+    bid: {
       type: Object,
       default: null,
     },
   },
   data: () => ({
-    price: '1',
+    price: 1,
   }),
   watch: {
-    offer(o) {
-      this.price = 1 + parseInt(o.value)
+    bid(b) {
+      this.price = 1 + parseInt(b.value)
     },
   },
   created() {
-    this.price = 1 + parseInt(this.offer.value)
+    this.price = 1 + parseInt(this.bid.value)
   },
   methods: {
     submit() {

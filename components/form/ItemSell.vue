@@ -1,34 +1,40 @@
 <template>
-  <b-form novalidate @submit.prevent="submit">
-    <b-row>
-      <b-col md="6" class="d-flex flex-column pr-2">
-        <b-form-group class="my-0" label="Enter fixed price" label-class="">
-          <b-input-group size="lg">
-            <template v-slot:prepend>
-              <b-input-group-text>
-                <b-img :src="currencyImage" rounded="circle" width="30px" height="30px" />
-              </b-input-group-text>
-            </template>
-            <b-form-input v-model="price" />
-          </b-input-group>
-<!--          <h4 class="mt-1">-->
-<!--            <small class="text-muted">{{ price | priceEth(rate) }}</small>-->
-<!--          </h4>-->
-        </b-form-group>
-      </b-col>
-      <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
-        <b-btn variant="primary" size="lg" class="py-2" :disabled="busy" type="submit">
-          Sell
-          <b-spinner v-if="busy" type="grow" small />
-        </b-btn>
-      </b-col>
-    </b-row>
-  </b-form>
+  <ValidationObserver ref="observer" v-slot="{ passes, invalid }">
+    <b-form novalidate @submit.stop.prevent="passes(submit)">
+      <b-row>
+        <b-col md="6" class="d-flex flex-column pr-2">
+          <b-price-input
+            v-model="price"
+            rules="required|numeric"
+            name="Fixed price"
+            type="text"
+            label="Enter fixed price"
+            placeholder="price"
+            :currency-image="currencyImage"
+          />
+        </b-col>
+        <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
+          <b-btn variant="primary" size="lg" class="py-2" :disabled="busy || invalid" type="submit" block>
+            Sell
+            <b-spinner v-if="busy" type="grow" small />
+          </b-btn>
+        </b-col>
+      </b-row>
+    </b-form>
+  </ValidationObserver>
 </template>
 
 <script>
+import { ValidationObserver } from 'vee-validate'
+import BPriceInput from './inputs/BPriceInput'
+
 export default {
   name: 'FormItemSell',
+  components: {
+    ValidationObserver,
+    BPriceInput,
+  },
+
   props: {
     currencyImage: {
       type: String,

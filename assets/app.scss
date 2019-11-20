@@ -305,6 +305,10 @@ p {
   line-height: 1.7;
 }
 
+.btn-outline-default {
+  color: $input-color;
+  border-color: $input-border-color;
+}
 //special
 
 .jumbotron {
@@ -358,6 +362,12 @@ p {
   }
 }
 
+
+span.value {
+  font-size: 1.5625rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
 /* transition */
 
 .page-enter-active, .page-leave-active {

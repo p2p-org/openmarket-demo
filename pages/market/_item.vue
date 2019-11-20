@@ -1,6 +1,6 @@
 <template>
   <page>
-    <market-item :nft="nft" :rate="rateETH" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
+    <market-item :nft="nft" :offers="offers" :rate="rateETH" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
   </page>
 </template>
 
@@ -30,19 +30,22 @@ export default {
     }),
 
     ...mapGetters('user', ['currentUser']),
-    ...mapGetters('market', ['findNft']),
+    ...mapGetters('market', ['findNft', 'findOffers']),
     nft() {
       return this.findNft(this.$route.params.item)
     },
-
+    offers() {
+      const o = this.findOffers(this.$route.params.item)
+      return o ? o.offers : []
+    },
   },
-  mounted() {
-    this.queryNft({ force: true, params: { tokenId: this.$route.params.item } }).then(() =>
-      this.queryOffer({ params: { tokenId: this.$route.params.item } })
-    )
+  created() {
+    this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
+      .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
+      .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'queryOffer']),
+    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'queryOffer', 'queryBid']),
     onSellFixed() {
 
     },

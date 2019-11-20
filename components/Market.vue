@@ -2,6 +2,7 @@
   <div><slot /></div>
 </template>
 
+
 <script>
 import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
 
@@ -25,6 +26,7 @@ export default {
     this.$root.$on('marketMakeOffer', this.doMakeOffer)
     this.$root.$on('marketAcceptOffer', this.doAcceptOffer)
     this.$root.$on('marketCancelOffer', this.doCancelOffer)
+    this.$root.$on('marketPlaceBid', this.doPlaceBid)
     this.$root.$on('marketCancelAuction', this.doCancelAuction)
     this.$root.$on('marketTransfer', this.doTransfer)
   },
@@ -36,6 +38,7 @@ export default {
       'nftCancelFixed',
       'nftBuyFixed',
       'nftTransfer',
+      'nftPlaceBid',
       'nftCancelAuction',
       'nftMakeOffer',
       'nftAcceptOffer',
@@ -43,11 +46,11 @@ export default {
       'nftCheckBusy',
       'nftBusyLock',
       'nftBusyUnlock',
+      'waitMarket',
     ]),
     ...mapActions('user', ['loadCurrentUserInfo']),
 
     doSellFixed({ price, id, user }) {
-      console.log('doSellFixed', id, price, user)
       this.userAction('sellFixed', id, 'Confirm sell?', 'NFT listed for Fixed Price', () =>
         this.nftSellFixed({
           user,
@@ -85,7 +88,6 @@ export default {
       )
     },
     doMakeOffer({ id, price, user }) {
-      console.log('makeOffer', id, price)
       this.userAction('makeOffer', id, 'Confirm make offer?', 'Offer committed!', () =>
         this.nftMakeOffer({
           user,
@@ -124,6 +126,17 @@ export default {
         })
       )
     },
+    doPlaceBid({ id, price, user }) {
+      this.userAction('placeBid', id, 'Confirm bid placing?', 'Your bid placed', () =>
+        this.nftPlaceBid({
+          user,
+          token: {
+            id,
+            price,
+          },
+        })
+      )
+    },
     doCancelAuction({ id, user }) {
       this.userAction('cancelAuction', id, 'Confirm cancel auction?', 'NFT unlisted from auction', () =>
         this.nftCancelAuction({
@@ -146,21 +159,19 @@ export default {
       )
     },
     handleOk(tokenId, msg, r) {
-      return new Promise(resolve => {
-        console.log(r)
-        // todo tx await
-        setTimeout(() => {
-          this.queryNft({ force: true, params: { tokenId } })
-            .then(() => this.queryOffer({ params: { tokenId } }))
-            .then(() => this.nftBusyUnlock({ tokenId }))
-            .then(r => resolve())
-          this.$bvModal.msgBoxOk(msg, { title: 'Great', okVariant: 'success' })
-        }, this.txWait)
+      return this.waitMarket({ hash: r.result.txhash }).then(tx => {
+        console.log('tx mined', tx)
+        this.$bvModal.msgBoxOk(msg, { title: 'Great', okVariant: 'success' })
+        this.$root.$emit('userActionOk', { tokenId })
+        return this.queryNft({ force: true, params: { tokenId } })
+          .then(() => this.queryOffer({ params: { tokenId } }))
+          .then(() => this.nftBusyUnlock({ tokenId }))
       })
     },
     handleErr(tokenId, e) {
-      this.nftBusyUnlock({ tokenId })
       this.$bvModal.msgBoxOk(e.message, { title: 'Error', okVariant: 'danger' })
+      this.$root.$emit('userActionFail', { tokenId })
+      return this.nftBusyUnlock({ tokenId })
     },
     checkUser() {
       if (!this.currentUser) {
@@ -177,7 +188,8 @@ export default {
           this.$bvModal.msgBoxConfirm(msgAction).then(value => {
             if (value) {
               return fAction()
-                .then(res => this.handleOk(id, msgSuccess, res).then(fSuccess))
+                .then(res => this.handleOk(id, msgSuccess, res))
+                .then(() => fSuccess())
                 .catch(err => this.handleErr(id, err))
             } else {
               return this.nftBusyUnlock({ tokenId: id })
