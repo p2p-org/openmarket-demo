@@ -1,5 +1,5 @@
-// import { DGMarketAPI, DGTxAPI, DGTxMsgs } from 'dgaming-market-sdk'
-import { DGMarketAPI, DGTxAPI, DGTxMsgs } from '../../dgaming-market-sdk'
+import { DGMarketAPI, DGTxAPI, DGTxMsgs } from 'dgaming-market-sdk'
+// import { DGMarketAPI, DGTxAPI, DGTxMsgs } from '../../dgaming-market-sdk'
 
 const buildPath = (...args) => {
   return args

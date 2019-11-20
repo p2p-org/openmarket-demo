@@ -399,11 +399,11 @@ export default {
         case 1:
           return 'success'
         case 2:
-          return 'warning'
+          return 'info'
         case 3:
           return 'danger'
         default:
-          return 'info'
+          return 'warning'
       }
     },
     doResetUI() {
