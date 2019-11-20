@@ -3,9 +3,15 @@
     <b-row class="">
       <b-col md="3">
         <b-card>
-          <b-form-group label="Rankings">
-            <b-form-checkbox-group v-model="selected" :options="options" name="flavour-2a" stacked />
-          </b-form-group>
+          <template v-if="nfts.length">
+            <b-form-group
+              v-for="p in nfts[0].meta.properties.filter(x => x.display === null)"
+              :key="p.trait"
+              :label="p.trait.toUpperCase()"
+            >
+              <b-form-checkbox-group v-model="selected[p.trait]" :options="nfts[0].meta.definitions[p.trait]" stacked />
+            </b-form-group>
+          </template>
         </b-card>
       </b-col>
       <b-col>
@@ -35,12 +41,12 @@
             </b-nav-form>
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
-            <b-nav-form>
+            <b-nav-form @submit.prevent="doSearch">
               <b-input-group>
-                <b-form-input id="input-nft-list" v-model="search" list="input-list" size="sm" placeholder="Search" />
+                <b-form-input id="input-nft-list" v-model="innerSearch" list="input-list" size="sm" placeholder="Search" />
                 <b-form-datalist id="input-list" :options="suggestions" />
                 <b-input-group-append>
-                  <b-button variant="outline-primary" size="sm" @click="doSearch">
+                  <b-button variant="outline-primary" size="sm" type="submit">
                     <fa :icon="['fas', 'search']" />
                   </b-button>
                 </b-input-group-append>
@@ -55,16 +61,16 @@
           no items yet
         </b-card>
         <market v-else>
-<!--          <b-card-group v-if="nftsPaged.length" deck>-->
-            <!--              :title="nft.meta.name"-->
-            <!--              :image="nft.meta.image"-->
-            <!--              :price="nft.price"-->
-            <!--              :id="nft.id"-->
-            <transition-group  v-if="nftsPaged.length" name="flip-list" tag="div" class="card-deck">
-              <market-card v-for="nft in nftsPaged" :key="nft.id" :nft="nft" :rate="rateETH"  />
-            </transition-group>
-            <!--            {{ nfts }}-->
-<!--          </b-card-group>-->
+          <!--          <b-card-group v-if="nftsPaged.length" deck>-->
+          <!--              :title="nft.meta.name"-->
+          <!--              :image="nft.meta.image"-->
+          <!--              :price="nft.price"-->
+          <!--              :id="nft.id"-->
+          <transition-group v-if="nftsPaged.length" name="flip-list" tag="div" class="card-deck">
+            <market-card v-for="nft in nftsPaged" :key="nft.id" :nft="nft" :rate="rateETH" />
+          </transition-group>
+          <!--            {{ nfts }}-->
+          <!--          </b-card-group>-->
 
           <b-pagination-nav v-model="currentPage" :link-gen="linkGen" :number-of-pages="numberOfPages" use-router align="center" />
         </market>
@@ -92,15 +98,19 @@ export default {
       type: String,
       default: null,
     },
+    search: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
       perPage: 6,
       currentPage: null,
 
-      search: null,
+      innerSearch: null,
 
-      selected: null,
+      selected: {},
       options: ['All', 'Fixed price', 'Auction'],
 
       // asc - true, desc - false
@@ -183,7 +193,24 @@ export default {
     // },
     nftsFiltered() {
       const tmpNfts = this.nfts
-        .filter(n => (this.owner ? n.owner.address === this.owner : true))
+        .filter(n => {
+          const traits = Object.keys(this.selected)
+          if (!traits.length) return true
+          return n.meta.properties.reduce((s, p) => s & (this.selected[p.trait] && this.selected[p.trait].length ? this.selected[p.trait].includes(p.value) : true), true)
+        })
+        .filter(
+          n =>
+            (this.owner ? n.owner.address === this.owner : true) &&
+            (this.innerSearch
+              ? n.token_id.includes(this.innerSearch) ||
+                this.nftMetaProp(n.meta, 'name')
+                  .value.toLowerCase()
+                  .includes(this.innerSearch) ||
+                this.nftMetaProp(n.meta, 'description')
+                  .value.toLowerCase()
+                  .includes(this.innerSearch)
+              : true)
+        )
         .filter(n => !this.filter.market.current || n.status === this.filter.market.current)
       return this.sort[this.sort._current.parameter].sortFunc(tmpNfts, this.sort._current.value === 'asc')
     },
@@ -212,9 +239,18 @@ export default {
     numberOfPages(n) {
       this.currentPage = null
     },
+    search(s) {
+      this.innerSearch = s
+    },
+  },
+  created() {
+    if (this.search) {
+      this.innerSearch = this.search;
+    }
   },
   mounted() {
     // this.reloadNftPage()
+    // todo search query to server
     this.queryNft({ force: true, params: { owner: this.owner } })
   },
   methods: {
@@ -222,7 +258,7 @@ export default {
     linkGen(pageNum) {
       return {
         name: 'market',
-        query: { page: pageNum === 1 ? null : pageNum, owner: this.owner },
+        query: { ...this.$route.query, page: pageNum === 1 ? null : pageNum },
       }
       // return pageNum === 1 ? '?' : `?page=${pageNum}`
     },
@@ -235,14 +271,8 @@ export default {
       })
     },
     doSearch() {
-      if (this.search) {
-        const t = this.findNft(this.search)
-        if (t) {
-          this.$router.push({ name: 'market-item', params: { item: t.token_id } })
-        }
-      }
+      this.$router.push({ name: 'market', query: { q: this.innerSearch } })
     },
-
     changeSortTime(value) {
       this.updSort('time', value)
     },

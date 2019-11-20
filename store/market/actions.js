@@ -1,4 +1,4 @@
-import { MARKET_ALL_NFT, MARKET_ITEM_OFFERS } from '../mutation-types'
+import { MARKET_ALL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
 function tokenId(token_id) {
@@ -77,6 +77,28 @@ export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
   })
 }
 
+export function queryBid({ state, commit, rootState }, { params = {} } = {}) {
+  // readonly tokenId?: string
+  // readonly owner?: string
+  // readonly bidder?: string
+  // readonly limit?: number
+  // readonly offset?: number
+  // readonly orderPrice?: SortOrder
+  // readonly minPrice?: string
+  // readonly maxPrice?: string
+  const { tokenId } = params
+  return new Promise((resolve, reject) => {
+    this.$marketApi
+      .getNftBids(params)
+      .then(bids => {
+        console.debug('nft bids', bids)
+        commit(MARKET_ITEM_BIDS, { tokenId, bids })
+        resolve()
+      })
+      .catch(reject)
+  })
+}
+
 // export function queryMyNft({ state, commit, rootState }, params = {}) {
 //   return new Promise((resolve, reject) => {
 //     this.$marketApi
@@ -131,7 +153,6 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
 
 export function nftMint({ state, commit, rootGetters, rootState }, { user, token } = {}) {
   const svcUser = rootGetters['user/serviceUser']
-  console.log(rootGetters['user/serviceUser'])
   return this.$txApi.getAccounts(svcUser.address).then(data => {
     // console.log(this.$txApi.getECPairPriv(user.mnemonic))
     const signMsg = this.$txMsgs.NewMessageMintNFT({
@@ -310,6 +331,30 @@ export function nftCancelAuction({ state, commit, rootState, rootGetters }, { us
     return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
+export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgMakeBidOnAuction({
+      price: {
+        denom: 'token',
+        amount: token.price,
+      },
+      bidder: user.address,
+      beneficiary: rootState.config.beneficiary.buyer.address,
+      commission: rootState.config.beneficiary_commission,
+      token_id: token.id,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
 
 export function nftTransfer({ state, commit, rootState, rootGetters }, { user, token, recipient } = {}) {
   return this.$txApi.getAccounts(user.address).then(data => {
@@ -339,6 +384,7 @@ export function nftCheckBusy({ state }, { tokenId } = {}) {
   }
   return Promise.reject()
 }
+
 export function nftBusyLock({ state, commit }, { tokenId } = {}) {
   const idx = state.nfts.findIndex(n => n.token_id === tokenId)
   if (idx !== -1 && !state.nfts[idx].busy) {
@@ -356,4 +402,36 @@ export function nftBusyUnlock({ state, commit }, { tokenId } = {}) {
     return Promise.resolve()
   }
   return Promise.reject()
+}
+
+export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
+  const retryLimit = 5
+  const timeOut = 500
+  let retryCnt = 0
+
+  return new Promise((resolve, reject) => {
+    const getTx = () => {
+      this.$marketApi
+        .getTxMsgs({ hash })
+        .then(tx => {
+          if (!tx) {
+            if (retryCnt > retryLimit) {
+              reject(new Error('tx wait timeout: probably the transaction was failing for some reason'))
+            } else {
+              retryCnt++
+              setTimeout(() => {
+                getTx()
+              }, timeOut)
+            }
+          } else {
+            resolve(tx)
+          }
+        })
+        .catch(reject)
+    }
+
+    setTimeout(() => {
+      getTx()
+    }, timeOut)
+  })
 }

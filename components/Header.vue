@@ -12,10 +12,10 @@
 <!--            <b-nav-item :to="{ name: 'index' }" exact>-->
 <!--              Home-->
 <!--            </b-nav-item>-->
-            <b-nav-item :to="{ name: 'market' }" exact>
+            <b-nav-item :to="{ name: 'market' }" :class="{ active: isMarketRoute && !isMyNftRoute }" exact>
               Market
             </b-nav-item>
-            <b-nav-item v-if="currentUser" :to="{ name: 'market', query: { owner: currentUser.address } }" exact>
+            <b-nav-item v-if="currentUser" :to="{ name: 'market', query: { owner: currentUser.address } }" :class="{ active: isMarketRoute && isMyNftRoute }" exact>
               My NFT's
             </b-nav-item>
             <b-nav-item v-if="currentUser" :to="{ name: 'nft' }">
@@ -58,8 +58,8 @@
 <!--              &lt;!&ndash;              name="theme-selector"&ndash;&gt;-->
 <!--              &lt;!&ndash;            ></b-form-radio-group>&ndash;&gt;-->
 <!--            </b-nav-form>-->
-            <b-nav-form>
-              <b-form-input size="sm" class="mr-sm-2" placeholder="Search" />
+            <b-nav-form @submit.prevent="doSearch">
+              <b-form-input v-model="search" size="sm" class="mr-sm-2" placeholder="Search" trim />
               <b-button size="sm" class="my-2 my-sm-0" type="submit" variant="primary">
                 Search
               </b-button>
@@ -171,10 +171,10 @@ export default {
   },
   data() {
     return {
-      theme: null,
-      isDark: false,
-      themes: ['light', 'dark'],
-      height: 220,
+      // theme: null,
+      // isDark: false,
+      // themes: ['light', 'dark'],
+      search: null
     }
   },
   computed: {
@@ -183,7 +183,7 @@ export default {
       mockUsers: state => state.config.mockUsers,
       current: state => state.user.current,
     }),
-    ...mapGetters(['getTheme']),
+    // ...mapGetters(['getTheme']),
     ...mapGetters('user', ['currentUser', 'usersList']),
     userName() {
       return this.currentUser ? this.currentUser.name : ''
@@ -204,6 +204,12 @@ export default {
     //   console.log(this.users)
     //   return Object.keys(this.users).map(u => ({ ...u, active: u.address === this.current }))
     // },
+    isMyNftRoute() {
+      return  this.currentUser && this.$route.query.owner && this.$route.query.owner === this.currentUser.address
+    },
+    isMarketRoute() {
+      return this.$route.name === 'market' || this.$route.name === 'market-item'
+    },
   },
   // created() {
   //   // this.$root.$on('bv::scrollspy::activate', this.onActivate)
@@ -217,11 +223,11 @@ export default {
     },
   },
   mounted() {
-    this.theme = this.getTheme
+    // this.theme = this.getTheme
     this.loadLocalUsers()
   },
   methods: {
-    ...mapActions(['setTheme']),
+    // ...mapActions(['setTheme']),
     ...mapActions('user', ['delCurrentUser', 'setCurrentUser', 'addUser', 'loadLocalUsers', 'loadUserInfo', 'delUser']),
 
     addMockUser(id) {
@@ -264,6 +270,11 @@ export default {
           console.log(e)
         }
       )
+    },
+    doSearch() {
+      // console.log(f)
+      // console.log({ name: 'market', query: { q: this.search } })
+      this.$router.push({ name: 'market', query: { q: this.search } })
     },
   },
 }
