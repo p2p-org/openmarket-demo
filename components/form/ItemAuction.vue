@@ -38,7 +38,7 @@
         <b-col md="6" class="d-flex flex-column pl-2">
           <b-text-input-prep
             v-model="duration"
-            rules="required|numeric"
+            :rules="{ required: true, numeric: true, min_value: 1 }"
             name="Duration"
             type="text"
             label="Enter duration (minutes)"

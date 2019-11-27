@@ -59,10 +59,11 @@
                     :currency-image="currencyImage"
                     :busy="busy"
                     :rate="rate"
-                    :price="openingPrice"
-                    :buyout="buyoutPrice"
+                    :opening-price="openingPrice"
+                    :buyout-price="buyoutPrice"
                     :ends="ends"
-                    :bid="highestBid"
+                    :highest-bid="highestBid"
+                    :bids-cnt="bidsCount"
                     @reset="onCancelAuction"
                     @submit="onFinishAuction"
                   />
@@ -122,8 +123,10 @@
                     :currency-image="currencyImage"
                     :rate="rate"
                     :busy="busy"
-                    :bid="highestBid"
-                    :buyout="buyoutPrice"
+                    :opening-price="openingPrice"
+                    :highest-bid="highestBid"
+                    :bids-cnt="bidsCount"
+                    :buyout-price="buyoutPrice"
                     :ends="ends"
                     @submit="onPlaceBid"
                     @buyout="onBuyout"
@@ -351,13 +354,19 @@ export default {
       return this.nft.price
     },
     highestOffer() {
-      return this.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 })
+      return this.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0, currency: this.currency })
     },
     lastSold() {
-      return { value: 0, currency: 'token' }
+      return { value: 0, currency: this.currency }
     },
     highestBid() {
-      return this.bids.length ? this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 }) : this.openingPrice
+      return this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0, currency: this.currency })
+      // return this.bids.length
+      //   ? this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0, currency: this.currency })
+      //   : { value: 0, currency: this.currency }
+    },
+    bidsCount() {
+      return this.bids.length || 0
     },
     openingPrice() {
       return this.nft.opening_price

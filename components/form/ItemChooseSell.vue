@@ -2,7 +2,7 @@
   <b-row>
     <b-col md="6" class="d-flex flex-column pr-2">
       <b-btn variant="primary" size="lg" class="py-2 my-3" :disabled="busy" @click.prevent="sellFixed">
-        Sell for fixed price
+        Sell for a fixed price
         <b-spinner v-if="busy" type="grow" small />
       </b-btn>
     </b-col>
