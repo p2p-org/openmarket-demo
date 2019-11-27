@@ -2,7 +2,6 @@
   <div><slot /></div>
 </template>
 
-
 <script>
 import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
 
@@ -29,6 +28,7 @@ export default {
     this.$root.$on('marketPlaceBid', this.doPlaceBid)
     this.$root.$on('marketBuyout', this.doBuyout)
     this.$root.$on('marketStartAuction', this.doStartAuction)
+    this.$root.$on('marketFinishAuction', this.doFinishAuction)
     this.$root.$on('marketCancelAuction', this.doCancelAuction)
     this.$root.$on('marketTransfer', this.doTransfer)
   },
@@ -44,6 +44,7 @@ export default {
       'nftPlaceBid',
       'nftBuyout',
       'nftStartAuction',
+      'nftFinishAuction',
       'nftCancelAuction',
       'nftMakeOffer',
       'nftAcceptOffer',
@@ -173,6 +174,22 @@ export default {
             id,
           },
         })
+      )
+    },
+    doFinishAuction({ id, user }) {
+      this.userAction(
+        'finishAuction',
+        id,
+        'Confirm auction finishing?',
+        'Auction finished!',
+        () =>
+          this.nftFinishAuction({
+            user,
+            token: {
+              id,
+            },
+          }),
+        () => this.loadCurrentUserInfo()
       )
     },
     doTransfer({ id, recipient, user }) {

@@ -2,15 +2,15 @@
   <b-form novalidate @submit.prevent="submit" @reset.stop.prevent="reset">
     <b-row>
       <b-col md="6" class="d-flex flex-column pr-2">
-        <b-form-group class="my-0" label="Auction opening price" label-class="pb-0">
+        <b-form-group class="my-0" label="Opening price" label-class="pb-0">
           <div class="d-flex align-items-center">
             <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
             <h1 class="ml-2 my-0">
-              <b>{{ price.value }}</b> {{ price.currency }}
+              <b>{{ openingPrice.value }}</b> {{ openingPrice.currency }}
             </h1>
           </div>
           <h4 class="mt-1">
-            <small class="text-muted">{{ bid.value | priceEth(rate) }}</small>
+            <small class="text-muted">{{ openingPrice.value | priceEth(rate) }}</small>
           </h4>
         </b-form-group>
       </b-col>
@@ -22,41 +22,40 @@
             </h1>
           </div>
           <h4 class="mt-1">
-            <small class="text-muted">{{ ends.format("D MMM YYYY HH:mm:ss UTC") }}</small>
+            <small class="text-muted">{{ ends.format('D MMM YYYY HH:mm:ss UTC') }}</small>
           </h4>
         </b-form-group>
       </b-col>
     </b-row>
-<!--    <b-row>-->
-<!--      <b-col md="6" class="d-flex flex-column pr-2">-->
-<!--        <b-form-group class="my-0" label="Highest bid" label-class="pb-0">-->
-<!--          <div class="d-flex align-items-center">-->
-<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
-<!--            <h1 class="ml-2 my-0">-->
-<!--              <b>{{ bid.value }}</b> {{ bid.currency }}-->
-<!--            </h1>-->
-<!--          </div>-->
-<!--          <h4 class="mt-1">-->
-<!--            <small class="text-muted">{{ bid.value | priceEth(rate) }}</small>-->
-<!--          </h4>-->
-
-<!--        </b-form-group>-->
-<!--      </b-col>-->
-<!--      <b-col md="6" class="d-flex flex-column pl-2">-->
-<!--        <b-form-group class="my-0" label="Ends" label-class="pb-0">-->
-<!--          <div class="d-flex align-items-end ">-->
-<!--            &lt;!&ndash;              <fa :icon="['fas', 'clock']" />&ndash;&gt;-->
-<!--            <h1 class="ml-2 my-0">-->
-<!--              {{ $dayjs().to(ends) }}-->
-<!--            </h1>-->
-<!--          </div>-->
-<!--          <h4 class="mt-1">-->
-<!--            <small class="text-muted">{{ ends.format("D MMM YYYY HH:mm:ss UTC") }}</small>-->
-<!--          </h4>-->
-<!--        </b-form-group>-->
-<!--      </b-col>-->
-<!--    </b-row>-->
-    <b-row>
+    <b-row class="mt-2">
+      <b-col md="6" class="d-flex flex-column pr-2">
+        <b-form-group class="my-0" label="Highest bid / bids count" label-class="pb-0">
+          <div class="d-flex align-items-center">
+            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
+            <h1 class="ml-2 my-0">
+              <b>{{ highestBid.value }}</b> {{ highestBid.currency }} <small>/ {{ bidsCnt }}</small>
+            </h1>
+          </div>
+          <h4 class="mt-1">
+            <small class="text-muted">{{ highestBid.value | priceEth(rate) }}</small>
+          </h4>
+        </b-form-group>
+      </b-col>
+      <b-col md="6" class="d-flex flex-column pl-2">
+        <b-form-group class="my-0" label="Buyout price" label-class="pb-0">
+          <div class="d-flex align-items-center">
+            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
+            <h1 class="ml-2 my-0">
+              <b>{{ buyoutPrice.value }}</b> {{ buyoutPrice.currency }}
+            </h1>
+          </div>
+          <h4 class="mt-1">
+            <small class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>
+          </h4>
+        </b-form-group>
+      </b-col>
+    </b-row>
+    <b-row class="mt-2">
       <b-col md="6" class="d-flex flex-column pr-2">
 <!--        <b-form-group class="my-0" label="Auction opening price" label-class="pb-0">-->
 <!--          <div class="d-flex justify-content-middle align-items-center">-->
@@ -100,15 +99,19 @@ export default {
       type: Boolean,
       default: false,
     },
-    price: {
+    openingPrice: {
       type: Object,
       default: null,
     },
-    bid: {
+    highestBid: {
       type: Object,
       default: null,
     },
-    buyout: {
+    bidsCnt: {
+      type: Number,
+      default: 0,
+    },
+    buyoutPrice: {
       type: Object,
       default: null,
     },

@@ -8,15 +8,15 @@
       </b-row>
       <b-row>
         <b-col md="6" class="d-flex flex-column pr-2">
-          <b-form-group class="my-0" label="Highest bid" label-class="pb-0">
+          <b-form-group class="my-0" label="Highest bid / bids count" label-class="pb-0">
             <div class="d-flex align-items-center">
               <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
               <h1 class="ml-2 my-0">
-                <b>{{ bid.value }}</b> {{ bid.currency }}
+                <b>{{ highestBid.value }}</b> {{ highestBid.currency }} <small>/ {{ bidsCnt }}</small>
               </h1>
             </div>
             <h4 class="mt-1">
-              <small class="text-muted">{{ bid.value | priceEth(rate) }}</small>
+              <small class="text-muted">{{ highestBid.value | priceEth(rate) }}</small>
             </h4>
 
           </b-form-group>
@@ -30,7 +30,7 @@
               </h1>
             </div>
             <h4 class="mt-1">
-              <small class="text-muted">{{ ends.format("D MMM YYYY HH:mm:ss UTC") }}</small>
+              <small class="text-muted">{{ ends.format('D MMM YYYY HH:mm:ss UTC') }}</small>
             </h4>
           </b-form-group>
         </b-col>
@@ -38,10 +38,10 @@
       <b-row class="mt-2">
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-price-input
-            :rules="{ required: true, numeric: true, min_value: bid.value + 1}"
+            :rules="{ required: true, numeric: true, min_value: minPrice.value }"
             name="Bid value"
             type="text"
-            label="Enter your bid"
+            :label="'Enter your bid, min ' + minPrice.value + ' ' + minPrice.currency"
             v-model="price"
             placeholder="Bid value"
             :currency-image="currencyImage"
@@ -54,17 +54,17 @@
           </b-btn>
         </b-col>
       </b-row>
-      <b-row class="mt-2">
+      <b-row class="mt-3">
         <b-col md="6" class="d-flex flex-column pr-4">
           <b-form-group class="my-0" label="Buyout price" label-class="pb-0">
             <div class="d-flex align-items-center">
               <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
               <h1 class="ml-2 my-0">
-                <b>{{ buyout.value }}</b> {{ buyout.currency }}
+                <b>{{ buyoutPrice.value }}</b> {{ buyoutPrice.currency }}
               </h1>
             </div>
             <h4 class="mt-1">
-              <small class="text-muted">{{ buyout.value | priceEth(rate) }}</small>
+              <small class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>
             </h4>
           </b-form-group>
         </b-col>
@@ -106,11 +106,19 @@ export default {
       type: Boolean,
       default: false,
     },
-    bid: {
+    openingPrice: {
       type: Object,
       default: null,
     },
-    buyout: {
+    highestBid: {
+      type: Object,
+      default: null,
+    },
+    bidsCnt: {
+      type: Number,
+      default: 0,
+    },
+    buyoutPrice: {
       type: Object,
       default: null,
     },
@@ -122,13 +130,20 @@ export default {
   data: () => ({
     price: 1,
   }),
+  computed: {
+    minPrice() {
+      return this.highestBid.value
+        ? { ...this.highestBid, value: 1 + parseInt(this.highestBid.value) }
+        : { ...this.openingPrice, value: parseInt(this.openingPrice.value) }
+    },
+  },
   watch: {
-    bid(b) {
-      this.price = 1 + parseInt(b.value)
+    highestBid(b) {
+      this.price = 1 + parseInt(b.value || this.openingPrice.value)
     },
   },
   created() {
-    this.price = 1 + parseInt(this.bid.value)
+    this.price = 1 + parseInt(this.highestBid.value || this.openingPrice.value)
   },
   methods: {
     submit() {

@@ -361,6 +361,26 @@ export function nftCancelAuction({ state, commit, rootState, rootGetters }, { us
     return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
   })
 }
+
+export function nftFinishAuction({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgFinishAuction({
+      owner: user.address,
+      token_id: token.id,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
 export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, token } = {}) {
   return this.$txApi.getAccounts(user.address).then(data => {
     const signMsg = this.$txMsgs.NewMsgMakeBidOnAuction({
