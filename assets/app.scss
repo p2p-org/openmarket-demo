@@ -309,6 +309,26 @@ p {
   color: $input-color;
   border-color: $input-border-color;
 }
+
+.form-group.is-invalid {
+  .input-group-text {
+    border-color: $danger;
+
+  }
+}
+.form-group.is-valid {
+  .input-group-text {
+    border-color: $success;
+  }
+}
+
+.was-validated .form-control:invalid, .form-control.is-invalid {
+  background-image: none;
+}
+.was-validated .form-control:valid, .form-control.is-valid {
+  background-image: none;
+}
+
 //special
 
 .jumbotron {

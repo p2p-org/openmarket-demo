@@ -51,34 +51,6 @@
               <!--            <b-row>-->
               <template v-if="owned">
                 <template v-if="status === 1">
-                  <!--                  <b-row>-->
-                  <!--                  <b-col md="6" class="d-flex flex-column pr-4">-->
-                  <!--                    <div class="label mb-1">-->
-                  <!--                      Fixed price-->
-                  <!--                    </div>-->
-                  <!--                    <div class="d-flex justify-content-middle align-items-center">-->
-                  <!--                      <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
-                  <!--                      <h1 class="ml-2 my-0">-->
-                  <!--                        <b>{{ price.value }}</b> {{ price.currency }}-->
-                  <!--                      </h1>-->
-                  <!--                    </div>-->
-                  <!--                    <h4 class="mt-1">-->
-                  <!--                      <small class="text-muted">{{ priceEth(price.value) }} ETH</small>-->
-                  <!--                    </h4>-->
-
-                  <!--                  </b-col>-->
-                  <!--                  <b-col md="6" class="d-flex flex-column p-2">-->
-                  <!--                    <b-btn variant="danger" size="lg" :disabled="busy" class="py-3" @click="onCancelFixed">-->
-                  <!--                      Cancel sell-->
-                  <!--                      <b-spinner v-if="busy" type="grow" />-->
-                  <!--                    </b-btn>-->
-
-                  <!--                    &lt;!&ndash;                    <div class="label  mb-1 mt-3">Last sold</div>&ndash;&gt;-->
-                  <!--                    &lt;!&ndash;                    <div class="">&ndash;&gt;-->
-                  <!--                    &lt;!&ndash;                      24 jul 2019 for <b>1804 USD</b>&ndash;&gt;-->
-                  <!--                    &lt;!&ndash;                    </div>&ndash;&gt;-->
-                  <!--                  </b-col>-->
-                  <!--                  </b-row>-->
                   <form-item-cancel-sell :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" @submit="onCancelFixed" />
                   <form-item-owner :owner="owner" />
                 </template>
@@ -87,27 +59,51 @@
                     :currency-image="currencyImage"
                     :busy="busy"
                     :rate="rate"
-                    :price="openinigPrice"
-                    @submit="onCancelAuction"
+                    :price="openingPrice"
+                    :buyout="buyoutPrice"
+                    :ends="ends"
+                    :bid="highestBid"
+                    @reset="onCancelAuction"
+                    @submit="onFinishAuction"
                   />
                   <form-item-owner :owner="owner" />
                 </template>
                 <template v-else>
-                  <form-item-sell :currency-image="currencyImage" :busy="busy" :rate="rate" @submit="onSellFixed" />
+                  <form-item-sell
+                    v-if="sell == 1"
+                    :currency-image="currencyImage"
+                    :busy="busy"
+                    :sold="lastSold"
+                    :close="true"
+                    :rate="rate"
+                    @submit="onSellFixed"
+                    @reset="sell = 0"
+                  />
+                  <form-item-auction
+                    v-else-if="sell == 2"
+                    :currency-image="currencyImage"
+                    :busy="busy"
+                    :sold="lastSold"
+                    :close="true"
+                    :rate="rate"
+                    @submit="onStartAuction"
+                    @reset="sell = 0"
+                  />
+                  <form-choose-sell v-else @fixed="sell = 1" @auction="sell = 2" />
                   <form-item-owner :owner="owner" />
                 </template>
               </template>
               <template v-else>
                 <template v-if="status === 1">
                   <form-item-offer
-                    v-if="buyOffer"
+                    v-if="buy == 1"
                     :currency-image="currencyImage"
                     :rate="rate"
                     :busy="busy"
                     :offer="highestOffer"
                     :close="true"
                     @submit="onMakeOffer"
-                    @reset="buyOffer = !buyOffer"
+                    @reset="buy = 0"
                   />
                   <form-item-buy
                     v-else
@@ -117,9 +113,9 @@
                     :price="price"
                     :offer="highestOffer"
                     @submit="onBuyFixed"
-                    @offer="buyOffer = !buyOffer"
+                    @offer="buy = 1"
                   />
-                  <form-item-owner v-if="!buyOffer" :owner="owner" />
+                  <form-item-owner v-if="buy == 0" :owner="owner" />
                 </template>
                 <template v-else-if="status === 2">
                   <form-item-bid
@@ -127,12 +123,15 @@
                     :rate="rate"
                     :busy="busy"
                     :bid="highestBid"
+                    :buyout="buyoutPrice"
+                    :ends="ends"
                     @submit="onPlaceBid"
+                    @buyout="onBuyout"
                   />
-<!--                  <b-btn variant="info">-->
-<!--                    Place bid-->
-<!--                    <b-spinner v-if="busy" type="grow" />-->
-<!--                  </b-btn>-->
+                  <!--                  <b-btn variant="info">-->
+                  <!--                    Place bid-->
+                  <!--                    <b-spinner v-if="busy" type="grow" />-->
+                  <!--                  </b-btn>-->
                   <form-item-owner :owner="owner" />
                 </template>
                 <template v-else>
@@ -146,17 +145,17 @@
               <form-item-gift :busy="busy" @submit="onTransfer" />
             </b-card>
             <template v-if="offers.length">
-            <h5 class="subtitle mt-3">
-              Offers
-            </h5>
-            <form-item-offers-list
-              :currency-image="currencyImage"
-              :items="offers"
-              :owner="owner"
-              :busy="busy"
-              @cancel="onCancelOffer"
-              @accept="onAcceptOffer"
-            />
+              <h5 class="subtitle mt-3">
+                Offers
+              </h5>
+              <form-item-offers-list
+                :currency-image="currencyImage"
+                :items="offers"
+                :owner="owner"
+                :busy="busy"
+                @cancel="onCancelOffer"
+                @accept="onAcceptOffer"
+              />
             </template>
           </market>
           <h5 class="subtitle mt-3">
@@ -196,10 +195,10 @@
           <b-row>
             <b-col>
               <b-card no-body>
-                <b-table striped hover :items="items" :busy="true" >
+                <b-table striped hover :items="items" :busy="true">
                   <template v-slot:table-busy>
                     <div class="text-center  my-2">
-<!--                      <b-spinner class="align-middle"></b-spinner>-->
+                      <!--                      <b-spinner class="align-middle"></b-spinner>-->
                       <strong>under construction...</strong>
                     </div>
                   </template>
@@ -225,10 +224,14 @@ import FormItemGift from './form/ItemGift'
 import Market from './Market'
 import FormItemOffersList from './form/ItemOffersList'
 import FormItemBid from './form/ItemBid'
+import FormItemAuction from './form/ItemAuction'
+import FormChooseSell from './form/ItemChooseSell'
 
 export default {
   name: 'MarketItem',
   components: {
+    FormChooseSell,
+    FormItemAuction,
     FormItemBid,
     FormItemOffersList,
     Market,
@@ -286,8 +289,9 @@ export default {
       currency: 'token',
       // busy: false,
       expandDescr: false,
-      buyOffer: false,
       placeBid: false,
+      buy: false,
+      sell: 0,
     }
   },
   computed: {
@@ -349,11 +353,20 @@ export default {
     highestOffer() {
       return this.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 })
     },
-    highestBid() {
-      return this.bids.length ? this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 }) : this.openinigPrice
+    lastSold() {
+      return { value: 0, currency: 'token' }
     },
-    openinigPrice() {
+    highestBid() {
+      return this.bids.length ? this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0 }) : this.openingPrice
+    },
+    openingPrice() {
       return this.nft.opening_price
+    },
+    buyoutPrice() {
+      return this.nft.buyout_price
+    },
+    ends() {
+      return this.nft.time_to_sell
     },
     status() {
       return this.nft.status
@@ -389,9 +402,7 @@ export default {
     this.$root.$on('userActionOk', this.doResetUI)
   },
   methods: {
-    ...mapActions('market', [
-      'queryUser',
-    ]),
+    ...mapActions('market', ['queryUser']),
     bgVar(i) {
       switch (i % 4) {
         case 0:
@@ -407,7 +418,8 @@ export default {
       }
     },
     doResetUI() {
-      this.buyOffer = false
+      this.buy = 0
+      this.sell = 0
     },
     mkTitle(str) {
       str = str.toLowerCase().split('_')
@@ -435,16 +447,26 @@ export default {
     onSellFixed({ price }) {
       this.$root.$emit('marketSellFixed', { id: this.nft.token_id, price, user: this.currentUser })
     },
+    onStartAuction({ price, buyout, duration }) {
+      console.log({ price, buyout, duration })
+      const ends = this.$dayjs().add(duration, 'minute').toISOString()
+      this.$root.$emit('marketStartAuction', { id: this.nft.token_id, price, buyout, ends, user: this.currentUser })
+    },
     onPlaceBid({ price }) {
       this.$root.$emit('marketPlaceBid', { id: this.nft.token_id, price, user: this.currentUser })
+    },
+    onBuyout() {
+      this.$root.$emit('marketBuyout', { id: this.nft.token_id, user: this.currentUser })
     },
     onCancelAuction() {
       this.$root.$emit('marketCancelAuction', { id: this.nft.token_id, user: this.currentUser })
     },
+    onFinishAuction() {
+      this.$root.$emit('marketFinishAuction', { id: this.nft.token_id, user: this.currentUser })
+    },
     onTransfer({ recipient }) {
       this.$root.$emit('marketTransfer', { id: this.nft.token_id, recipient, user: this.currentUser })
     },
-
   },
 }
 </script>

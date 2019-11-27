@@ -1,6 +1,6 @@
 <template>
   <page>
-    <market-item :nft="nft" :offers="offers" :rate="rateETH" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
+    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rateETH" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
   </page>
 </template>
 
@@ -30,13 +30,17 @@ export default {
     }),
 
     ...mapGetters('user', ['currentUser']),
-    ...mapGetters('market', ['findNft', 'findOffers']),
+    ...mapGetters('market', ['findNft', 'findOffers', 'findBids']),
     nft() {
       return this.findNft(this.$route.params.item)
     },
     offers() {
       const o = this.findOffers(this.$route.params.item)
       return o ? o.offers : []
+    },
+    bids() {
+      const o = this.findBids(this.$route.params.item)
+      return o ? o.bids : []
     },
   },
   created() {

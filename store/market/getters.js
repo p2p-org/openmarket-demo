@@ -6,6 +6,9 @@ export function findNft(state) {
 export function findOffers(state) {
   return id => state.offers.find(x => x.token_id === id)
 }
+export function findBids(state) {
+  return id => state.bids.find(x => x.token_id === id)
+}
 export function findMyNft(state) {
   return id => state.myNfts.find(x => x.token_id === id)
 }

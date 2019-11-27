@@ -15,7 +15,7 @@
         </b-form-group>
       </b-col>
       <b-col md="6" class="d-flex flex-column p-2">
-        <b-btn variant="danger" size="lg" class="py-3" :disabled="busy" type="submit">
+        <b-btn variant="danger" size="lg" :disabled="busy" type="submit">
           Cancel sell
           <b-spinner v-if="busy" type="grow" />
         </b-btn>

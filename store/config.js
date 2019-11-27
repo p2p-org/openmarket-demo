@@ -7,6 +7,7 @@ export const state = () => ({
   chainId: 'mpchain',
   nodeId: 'e65a518a5bb43acbdfd537234f5dcab48d7a7ba7',
   tokenBaseUrl: '/api/token/',
+  hasuraAccessKey: 'q5WNqC6MP6123123',
   rateETH: 1234,
   beneficiary_commission: '0.04',
   beneficiary: {

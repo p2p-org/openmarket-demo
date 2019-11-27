@@ -1,23 +1,83 @@
 <template>
-  <b-form novalidate @submit.prevent="submit">
-    <b-row v-if="price">
-      <b-col md="6" class="d-flex flex-column pr-4">
+  <b-form novalidate @submit.prevent="submit" @reset.stop.prevent="reset">
+    <b-row>
+      <b-col md="6" class="d-flex flex-column pr-2">
         <b-form-group class="my-0" label="Auction opening price" label-class="pb-0">
-          <div class="d-flex justify-content-middle align-items-center">
+          <div class="d-flex align-items-center">
             <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
             <h1 class="ml-2 my-0">
               <b>{{ price.value }}</b> {{ price.currency }}
             </h1>
           </div>
           <h4 class="mt-1">
-            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>
+            <small class="text-muted">{{ bid.value | priceEth(rate) }}</small>
           </h4>
         </b-form-group>
       </b-col>
-      <b-col md="6" class="d-flex flex-column p-2">
-        <b-btn variant="danger" size="lg" class="py-3" :disabled="busy" type="submit">
+      <b-col md="6" class="d-flex flex-column pl-2">
+        <b-form-group class="my-0" label="Ends" label-class="pb-0">
+          <div class="d-flex align-items-end ">
+            <h1 class="ml-2 my-0">
+              {{ $dayjs().to(ends) }}
+            </h1>
+          </div>
+          <h4 class="mt-1">
+            <small class="text-muted">{{ ends.format("D MMM YYYY HH:mm:ss UTC") }}</small>
+          </h4>
+        </b-form-group>
+      </b-col>
+    </b-row>
+<!--    <b-row>-->
+<!--      <b-col md="6" class="d-flex flex-column pr-2">-->
+<!--        <b-form-group class="my-0" label="Highest bid" label-class="pb-0">-->
+<!--          <div class="d-flex align-items-center">-->
+<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              <b>{{ bid.value }}</b> {{ bid.currency }}-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ bid.value | priceEth(rate) }}</small>-->
+<!--          </h4>-->
+
+<!--        </b-form-group>-->
+<!--      </b-col>-->
+<!--      <b-col md="6" class="d-flex flex-column pl-2">-->
+<!--        <b-form-group class="my-0" label="Ends" label-class="pb-0">-->
+<!--          <div class="d-flex align-items-end ">-->
+<!--            &lt;!&ndash;              <fa :icon="['fas', 'clock']" />&ndash;&gt;-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              {{ $dayjs().to(ends) }}-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ ends.format("D MMM YYYY HH:mm:ss UTC") }}</small>-->
+<!--          </h4>-->
+<!--        </b-form-group>-->
+<!--      </b-col>-->
+<!--    </b-row>-->
+    <b-row>
+      <b-col md="6" class="d-flex flex-column pr-2">
+<!--        <b-form-group class="my-0" label="Auction opening price" label-class="pb-0">-->
+<!--          <div class="d-flex justify-content-middle align-items-center">-->
+<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              <b>{{ price.value }}</b> {{ price.currency }}-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>-->
+<!--          </h4>-->
+<!--        </b-form-group>-->
+        <b-btn variant="primary" size="lg" :disabled="busy" type="submit">
+          Finish auction
+          <b-spinner v-if="busy" type="grow" small/>
+        </b-btn>
+      </b-col>
+      <b-col md="6" class="d-flex flex-column pl-2">
+        <b-btn variant="danger" size="lg" :disabled="busy" type="reset">
           Cancel auction
-          <b-spinner v-if="busy" type="grow" />
+          <b-spinner v-if="busy" type="grow" small/>
         </b-btn>
       </b-col>
     </b-row>
@@ -44,10 +104,26 @@ export default {
       type: Object,
       default: null,
     },
+    bid: {
+      type: Object,
+      default: null,
+    },
+    buyout: {
+      type: Object,
+      default: null,
+    },
+    ends: {
+      type: Object,
+      default: null,
+    },
+
   },
   methods: {
     submit() {
       this.$emit('submit')
+    },
+    reset() {
+      this.$emit('reset')
     },
   },
 }
