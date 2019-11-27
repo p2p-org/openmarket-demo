@@ -21,7 +21,7 @@
     "color": "latest",
     "cookie-universal-nuxt": "^2.0.18",
     "dayjs": "^1.8.17",
-    "dgaming-market-sdk": "0.0.11",
+    "dgaming-market-sdk": "0.0.13",
     "express": "^4.17.1",
     "express-query-boolean": "^2.0.0",
     "gsap": "^2.1.3",

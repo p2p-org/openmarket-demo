@@ -12,6 +12,8 @@ export function txCheck(tx, msg) {
         resolve(tx)
         return
       }
+    } else if (tx && tx.error) {
+      log.message = tx.error
     }
     reject(new Error(log && log.message ? log.message : 'unknown tx error'))
   })

@@ -1,8 +1,8 @@
 import { MARKET_ALL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
-function tokenId(token_id) {
-  return parseInt(token_id.substring(6))
+function tokenId(tokenId) {
+  return parseInt(tokenId.substring(6))
 }
 
 // function metaProp(meta, trait) {
@@ -313,6 +313,36 @@ export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user
   })
 }
 
+export function nftStartAuction({ state, commit, rootState }, { user, token } = {}) {
+  console.log(token)
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgPutNFTOnAuction({
+      owner: user.address,
+      beneficiary: rootState.config.beneficiary.seller.address,
+      token_id: token.id,
+      price: {
+        denom: 'token',
+        amount: token.price,
+      },
+      buyout: {
+        denom: 'token',
+        amount: token.buyout,
+      },
+      time_to_sell: token.ends,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
 export function nftCancelAuction({ state, commit, rootState, rootGetters }, { user, token } = {}) {
   return this.$txApi.getAccounts(user.address).then(data => {
     const signMsg = this.$txMsgs.NewMsgRemoveNFTFromAuction({
@@ -339,6 +369,27 @@ export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, t
         amount: token.price,
       },
       bidder: user.address,
+      beneficiary: rootState.config.beneficiary.buyer.address,
+      commission: rootState.config.beneficiary_commission,
+      token_id: token.id,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
+export function nftBuyout({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgBuyoutOnAuction({
+      buyer: user.address,
       beneficiary: rootState.config.beneficiary.buyer.address,
       commission: rootState.config.beneficiary_commission,
       token_id: token.id,

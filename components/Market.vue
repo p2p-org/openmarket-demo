@@ -27,6 +27,8 @@ export default {
     this.$root.$on('marketAcceptOffer', this.doAcceptOffer)
     this.$root.$on('marketCancelOffer', this.doCancelOffer)
     this.$root.$on('marketPlaceBid', this.doPlaceBid)
+    this.$root.$on('marketBuyout', this.doBuyout)
+    this.$root.$on('marketStartAuction', this.doStartAuction)
     this.$root.$on('marketCancelAuction', this.doCancelAuction)
     this.$root.$on('marketTransfer', this.doTransfer)
   },
@@ -34,11 +36,14 @@ export default {
     ...mapActions('market', [
       'queryNft',
       'queryOffer',
+      'queryBid',
       'nftSellFixed',
       'nftCancelFixed',
       'nftBuyFixed',
       'nftTransfer',
       'nftPlaceBid',
+      'nftBuyout',
+      'nftStartAuction',
       'nftCancelAuction',
       'nftMakeOffer',
       'nftAcceptOffer',
@@ -98,6 +103,19 @@ export default {
         })
       )
     },
+    doStartAuction({ id, price, user, buyout, ends }) {
+      this.userAction('startAuction', id, 'Confirm start auction?', 'Auction for item started!', () =>
+        this.nftStartAuction({
+          user,
+          token: {
+            id,
+            price,
+            buyout,
+            ends,
+          },
+        })
+      )
+    },
     doAcceptOffer({ id, offerId, user }) {
       this.userAction(
         'acceptOffer',
@@ -137,6 +155,16 @@ export default {
         })
       )
     },
+    doBuyout({ id, user }) {
+      this.userAction('buyout', id, 'Confirm item buyout?', 'Yep, you bought it!', () =>
+        this.nftBuyout({
+          user,
+          token: {
+            id,
+          },
+        })
+      )
+    },
     doCancelAuction({ id, user }) {
       this.userAction('cancelAuction', id, 'Confirm cancel auction?', 'NFT unlisted from auction', () =>
         this.nftCancelAuction({
@@ -165,6 +193,7 @@ export default {
         this.$root.$emit('userActionOk', { tokenId })
         return this.queryNft({ force: true, params: { tokenId } })
           .then(() => this.queryOffer({ params: { tokenId } }))
+          .then(() => this.queryBid({ params: { tokenId } }))
           .then(() => this.nftBusyUnlock({ tokenId }))
       })
     },

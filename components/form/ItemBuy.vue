@@ -9,9 +9,9 @@
               <b>{{ price.value | priceBig }}</b> {{ price.currency }}
             </h1>
           </div>
-<!--          <h4 class="mt-1">-->
-<!--            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>-->
-<!--          </h4>-->
+          <h4 class="mt-1">
+            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>
+          </h4>
         </b-form-group>
         <b-btn variant="primary" size="lg" class="py-2 my-3" :disabled="busy" type="submit">
           Buy
@@ -26,6 +26,10 @@
               <b>{{ offer.value | priceBig }}</b> {{ offer.currency }}
             </h1>
           </div>
+          <h4 class="mt-1">
+            <small class="text-muted">{{ offer.value | priceEth(rate) }}</small>
+          </h4>
+
         </b-form-group>
         <b-btn variant="outline-primary" size="lg" class="py-2 my-3" :disabled="busy" @click.prevent="makeOffer">
           Make offer

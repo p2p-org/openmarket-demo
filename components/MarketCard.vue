@@ -27,9 +27,9 @@
         <template v-else-if="status === 2">
           <h5 class="m-0 d-flex flex-column">
             <span>
-              <b>{{ openinigPrice.value | priceBig }}</b> {{ openinigPrice.currency }}
+              <b>{{ openingPrice.value | priceBig }}</b> {{ openingPrice.currency }}
             </span>
-            <small v-if="openinigPrice.value" class="text-muted">{{ openinigPrice.value | priceEth(rate) }}</small>
+            <small v-if="openingPrice.value" class="text-muted">{{ openingPrice.value | priceEth(rate) }}</small>
           </h5>
           <b-btn variant="danger" :disabled="busy" @click.stop="onCancelAuction">
             Cancel auction
@@ -61,12 +61,12 @@
         <template v-else-if="status === 2">
           <h5 class="m-0 d-flex flex-column">
             <span>
-              <b>{{ openinigPrice.value | priceBig }}</b> {{ openinigPrice.currency }}
+              <b>{{ buyoutPrice.value | priceBig }}</b> {{ buyoutPrice.currency }}
             </span>
-            <small v-if="openinigPrice.value" class="text-muted">{{ openinigPrice.value | priceEth(rate) }}</small>
+            <small v-if="buyoutPrice.value" class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>
           </h5>
           <b-btn variant="info" :disabled="busy" :to="{ name: 'market-item', params: { item: tokenId } }">
-            Place bid
+            Buyout or bid
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
@@ -130,9 +130,13 @@ export default {
     price() {
       return this.nft.price
     },
-    openinigPrice() {
+    openingPrice() {
       return this.nft.opening_price
     },
+    buyoutPrice() {
+      return this.nft.buyout_price
+    },
+
     status() {
       return this.nft.status
     },

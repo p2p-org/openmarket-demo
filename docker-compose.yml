@@ -5,8 +5,8 @@ services:
       context: .
     container_name: openmarket-demo
     restart: unless-stopped
-    ports:
-      - 3000:3000
+    #ports:
+    #  - 3000:3000
     volumes:
       - nft-db:/app/db
       - nft-img:/app/static/images/output
