@@ -230,9 +230,6 @@ export default {
     },
   },
   watch: {
-    owner(owner) {
-      this.queryNft({ force: true, params: { owner } })
-    },
     // currentPage(p) {
     //   this.reloadNftPage(p)
     // }
@@ -245,16 +242,10 @@ export default {
   },
   created() {
     if (this.search) {
-      this.innerSearch = this.search;
+      this.innerSearch = this.search
     }
   },
-  mounted() {
-    // this.reloadNftPage()
-    // todo search query to server
-    this.queryNft({ force: true, params: { owner: this.owner } })
-  },
   methods: {
-    ...mapActions('market', ['queryNft']),
     linkGen(pageNum) {
       return {
         name: 'market',
@@ -262,14 +253,14 @@ export default {
       }
       // return pageNum === 1 ? '?' : `?page=${pageNum}`
     },
-    reloadNftPage(page = null) {
-      this.queryNft({
-        params: {
-          // limit: this.perPage,
-          // offset: (page || this.currentPage || 1 - 1) * this.perPage,
-        },
-      })
-    },
+    // reloadNftPage(page = null) {
+    //   this.queryNft({
+    //     params: {
+    //       // limit: this.perPage,
+    //       // offset: (page || this.currentPage || 1 - 1) * this.perPage,
+    //     },
+    //   })
+    // },
     doSearch() {
       this.$router.push({ name: 'market', query: { q: this.innerSearch } })
     },

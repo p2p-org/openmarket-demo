@@ -35,6 +35,12 @@ while test $# -gt 0; do
       docker-compose build
       exit 0
       ;;
+    upgrade)
+      docker-compose build
+      docker-compose down
+      docker-compose up -d
+      exit 0
+      ;;
     up-proxy)
       docker network create app-network
       docker-compose -f docker-compose-proxy.yml up -d

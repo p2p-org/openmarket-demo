@@ -9,6 +9,8 @@ export const state = () => ({
   tokenBaseUrl: '/api/token/',
   hasuraAccessKey: 'q5WNqC6MP6123123',
   rateETH: 1234,
+  denomNft: 'denom_basic',
+  denomToken: 'token',
   beneficiary_commission: '0.04',
   beneficiary: {
     seller: {
