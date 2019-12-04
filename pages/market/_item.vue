@@ -1,6 +1,6 @@
 <template>
   <page>
-    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rateETH" @sell-fixed="onSellFixed" @cancel-fixed="onCancelFixed"></market-item>
+    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rateETH"></market-item>
   </page>
 </template>
 
@@ -43,6 +43,13 @@ export default {
       return o ? o.bids : []
     },
   },
+  watch: {
+    nft(nft) {
+      if (!nft) {
+        this.$router.push({ name: 'market', query: { owner: this.currentUser.address } })
+      }
+    },
+  },
   created() {
     this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
       .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
@@ -50,12 +57,6 @@ export default {
   },
   methods: {
     ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'queryOffer', 'queryBid']),
-    onSellFixed() {
-
-    },
-    onCancelFixed() {
-
-    }
   },
 }
 </script>

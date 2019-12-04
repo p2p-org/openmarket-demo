@@ -209,6 +209,10 @@
               </b-card>
             </b-col>
           </b-row>
+          <h5 class="subtitle mt-5 mb-3">
+            Burn <small class="text-danger">(be careful, it's irreversible)</small>
+          </h5>
+          <form-item-burn v-if="owned" :busy="busy" @submit="onBurn" />
         </b-col>
       </b-row>
     </b-container>
@@ -229,10 +233,12 @@ import FormItemOffersList from './form/ItemOffersList'
 import FormItemBid from './form/ItemBid'
 import FormItemAuction from './form/ItemAuction'
 import FormChooseSell from './form/ItemChooseSell'
+import FormItemBurn from './form/ItemBurn'
 
 export default {
   name: 'MarketItem',
   components: {
+    FormItemBurn,
     FormChooseSell,
     FormItemAuction,
     FormItemBid,
@@ -457,7 +463,7 @@ export default {
       this.$root.$emit('marketSellFixed', { id: this.nft.token_id, price, user: this.currentUser })
     },
     onStartAuction({ price, buyout, duration }) {
-      console.log({ price, buyout, duration })
+      // console.log({ price, buyout, duration })
       const ends = this.$dayjs().add(duration, 'minute').toISOString()
       this.$root.$emit('marketStartAuction', { id: this.nft.token_id, price, buyout, ends, user: this.currentUser })
     },
@@ -472,6 +478,9 @@ export default {
     },
     onFinishAuction() {
       this.$root.$emit('marketFinishAuction', { id: this.nft.token_id, user: this.currentUser })
+    },
+    onBurn() {
+      this.$root.$emit('marketBurn', { id: this.nft.token_id, user: this.currentUser })
     },
     onTransfer({ recipient }) {
       this.$root.$emit('marketTransfer', { id: this.nft.token_id, recipient, user: this.currentUser })

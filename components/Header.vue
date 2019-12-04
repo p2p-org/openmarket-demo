@@ -267,7 +267,7 @@ export default {
         },
         e => {
           alert('can not copy')
-          console.log(e)
+          console.log('can not copy', e)
         }
       )
     },

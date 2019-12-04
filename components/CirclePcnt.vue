@@ -21,7 +21,7 @@ export default {
   // }),
   mounted() {
     const $statCircle = this.$refs.circle.querySelectorAll('circle')
-    console.log($statCircle)
+    // console.log($statCircle)
     for (let i = 0; i < $statCircle.length; i++) {
       const p = parseFloat($statCircle[i].dataset.percentage)
       const off = -51 - (51 / 100) * p

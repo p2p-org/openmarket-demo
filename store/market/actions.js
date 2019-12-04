@@ -1,4 +1,4 @@
-import { MARKET_ALL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
+import { MARKET_ALL_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
 function tokenId(tokenId) {
@@ -16,7 +16,6 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
   return this.$marketApi
     .getAllNft()
     .then(nfts => {
-      // todo token_uri
       return Promise.all(nfts.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then(metas =>
         nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
       )
@@ -30,29 +29,24 @@ export function queryNft({ state, commit, rootState }, { force = false, params =
   // const nft = state.nfts.find(n => n.token_id === params.tokenId)
   // if (!nft || (state.nfts.length && !force)) return Promise.resolve()
   if (state.nfts.length && !force) return Promise.resolve()
-  // if (mock) {
-  //   return Promise.all(state.nfts1.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))))
-  //     .then(metas => state.nfts1.map((nft, idx) => ({ ...nft, meta: metas[idx] })))
-  //     .then(nfts => {
-  //       commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
-  //     })
-  // }
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNfts(params)
       .then(nfts => {
-        // todo token_uri
         return Promise.all(nfts.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then(metas =>
           nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
         )
       })
       .then(nfts => {
         console.debug('nfts', nfts)
-        commit(MARKET_ALL_NFT, nfts)
+        commit(MARKET_ALL_NFT, { nfts })
         resolve()
       })
       .catch(reject)
   })
+}
+export function clearNft({ commit }, tokenId) {
+  commit(MARKET_DEL_NFT, tokenId)
 }
 
 export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
@@ -99,29 +93,11 @@ export function queryBid({ state, commit, rootState }, { params = {} } = {}) {
   })
 }
 
-// export function queryMyNft({ state, commit, rootState }, params = {}) {
-//   return new Promise((resolve, reject) => {
-//     this.$marketApi
-//       .getNfts(params)
-//       .then(nfts => {
-//         // todo token_uri
-//         return Promise.all(nfts.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then(metas =>
-//           nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
-//         )
-//       })
-//       .then(nfts => {
-//         commit(MARKET_ALL_NFT, nfts)
-//       })
-//       .catch(reject)
-//   })
-// }
-
 export function queryUser({ commit, state, getters }, { address }) {
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getUser({ address })
       .then(users => {
-
         if (users.length) {
           resolve(users.pop())
         }
@@ -132,14 +108,6 @@ export function queryUser({ commit, state, getters }, { address }) {
 }
 
 export function getOneNft({ state, commit, rootState }, { force = false, id = null, mock = false } = {}) {
-  // if (mock) {
-  //   return Promise.all(state.nfts1.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))))
-  //     .then(metas => state.nfts1.map((nft, idx) => ({ ...nft, meta: metas[idx] })))
-  //     .then(nfts => {
-  //       commit(my ? MARKET_MY_NFT : MARKET_ALL_NFT, nfts)
-  //     })
-  // }
-
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getOneNft(id)
@@ -159,7 +127,7 @@ export function nftMint({ state, commit, rootGetters, rootState }, { user, token
       sender: svcUser.address,
       recipient: user.address,
       token_id: token.id,
-      denom: 'denom_basic',
+      denom: rootState.config.denomNft,
       token_uri: token.uri || '',
 
       // this part is necessary
@@ -184,7 +152,7 @@ export function nftSellFixed({ state, commit, rootState }, { user, token } = {})
       beneficiary: rootState.config.beneficiary.seller.address,
       token_id: token.id,
       price: {
-        denom: 'token',
+        denom: rootState.config.denomToken,
         amount: token.price,
       },
 
@@ -211,7 +179,7 @@ export function nftMakeOffer({ state, commit, rootState }, { user, token } = {})
 
       token_id: token.id,
       price: {
-        denom: 'token',
+        denom: rootState.config.denomToken,
         amount: token.price,
       },
 
@@ -321,11 +289,11 @@ export function nftStartAuction({ state, commit, rootState }, { user, token } = 
       beneficiary: rootState.config.beneficiary.seller.address,
       token_id: token.id,
       price: {
-        denom: 'token',
+        denom: rootState.config.denomToken,
         amount: token.price,
       },
       buyout: {
-        denom: 'token',
+        denom: rootState.config.denomToken,
         amount: token.buyout,
       },
       time_to_sell: token.ends,
@@ -385,7 +353,7 @@ export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, t
   return this.$txApi.getAccounts(user.address).then(data => {
     const signMsg = this.$txMsgs.NewMsgMakeBidOnAuction({
       price: {
-        denom: 'token',
+        denom: rootState.config.denomToken,
         amount: token.price,
       },
       bidder: user.address,
@@ -433,7 +401,27 @@ export function nftTransfer({ state, commit, rootState, rootGetters }, { user, t
       sender: user.address,
       token_id: token.id,
       recipient,
-      denom: 'denom_basic',
+      denom: rootState.config.denomNft,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
+export function nftBurn({ state, commit, rootState, rootGetters }, { user, token } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMessageBurnNFT({
+      sender: user.address,
+      token_id: token.id,
+      denom: rootState.config.denomNft,
 
       // this part is necessary
       fee: 0,

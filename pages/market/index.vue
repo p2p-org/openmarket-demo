@@ -37,6 +37,9 @@ export default {
     },
   },
   watch: {
+    owner(owner) {
+      this.queryNft({ force: true, params: { owner } })
+    },
     current(to, from) {
       if (to && from) {
         if (this.owner === from) {
@@ -44,6 +47,14 @@ export default {
         }
       }
     },
+  },
+  created() {
+    // this.reloadNftPage()
+    // todo search query to server
+    this.queryNft({ force: true, params: { owner: this.owner } })
+  },
+  methods: {
+    ...mapActions('market', ['queryNft']),
   },
 }
 </script>
