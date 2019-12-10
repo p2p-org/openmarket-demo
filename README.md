@@ -1,6 +1,6 @@
 # open-market-demo
 
-> Open Market API demo
+> Open Market SDK & API demo
 
 ## Build Setup
 
