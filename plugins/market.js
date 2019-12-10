@@ -1,5 +1,5 @@
-import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from 'dgaming-market-sdk'
-// import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from '../../dgaming-market-sdk'
+// import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from 'dgaming-market-sdk'
+import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from '../../dgaming-market-sdk'
 
 const buildPath = (...args) => {
   return args
@@ -18,11 +18,12 @@ export default ({ store, req }, inject) => {
   let proto
   if (process.server) {
     host = req.headers.host
-    // console.log('srv', host)
+    proto = 'http:'
+    console.log('srv', host, proto)
   } else {
     host = window.location.host
     proto = window.location.protocol
-    // console.log('cli', window.location)
+    console.log('cli', host, proto)
   }
 
   // console.log(hostname)

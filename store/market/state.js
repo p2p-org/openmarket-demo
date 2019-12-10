@@ -4,4 +4,5 @@ export default () => ({
   nfts: [],
   offers: [],
   bids: [],
+  tokens: [],
 })

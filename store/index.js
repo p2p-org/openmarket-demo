@@ -1,4 +1,4 @@
-import { CONFIG_URLS, FINISH_LOADER, START_LOADER, THEME } from './mutation-types'
+import { CONFIG_URLS, FINISH_LOADER, MARKET_TOKENS, START_LOADER, THEME } from './mutation-types'
 
 const themeKeyName = 'theme'
 export const state = () => ({
@@ -43,6 +43,8 @@ export const actions = {
     //     gqlHttpUrl: process.env.GQL_HTTP_URL,
     //   })
     // }
+    commit(`market/${MARKET_TOKENS}`, [state.config.denomToken])
+    dispatch('market/queryTokens')
   },
 
   startLoader({ commit }) {

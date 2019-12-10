@@ -18,6 +18,7 @@ while test $# -gt 0; do
       echo "build                       build app"
       echo "up                          start app"
       echo "down                        stop app"
+      echo "upgrade                     rebuild contaner and restarts"
       echo "purge                       stop containers, except proxy, remove volumes"
       echo "up-proxy                    start web proxy with ssl"
       echo "down-proxy                  stop proxy"

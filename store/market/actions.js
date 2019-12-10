@@ -1,4 +1,4 @@
-import { MARKET_ALL_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
+import { MARKET_ALL_NFT, MARKET_BUSY_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
 function tokenId(tokenId) {
@@ -21,7 +21,7 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
       )
     })
     .then(nfts => {
-      commit(MARKET_ALL_NFT, { nfts })
+      commit(MARKET_ALL_NFT, nfts)
     })
 }
 
@@ -39,7 +39,7 @@ export function queryNft({ state, commit, rootState }, { force = false, params =
       })
       .then(nfts => {
         console.debug('nfts', nfts)
-        commit(MARKET_ALL_NFT, { nfts })
+        commit(MARKET_ALL_NFT, nfts)
         resolve()
       })
       .catch(reject)
@@ -447,7 +447,7 @@ export function nftCheckBusy({ state }, { tokenId } = {}) {
 export function nftBusyLock({ state, commit }, { tokenId } = {}) {
   const idx = state.nfts.findIndex(n => n.token_id === tokenId)
   if (idx !== -1 && !state.nfts[idx].busy) {
-    commit('nftTriggerBusy', { tokenId, busy: true })
+    commit(MARKET_BUSY_NFT, { tokenId, busy: true })
     return Promise.resolve()
   }
   return Promise.reject()
@@ -457,7 +457,7 @@ export function nftBusyUnlock({ state, commit }, { tokenId } = {}) {
   const idx = state.nfts.findIndex(n => n.token_id === tokenId)
   if (idx !== -1) {
     // && state.nfts[idx].busy
-    commit('nftTriggerBusy', { tokenId, busy: false })
+    commit(MARKET_BUSY_NFT, { tokenId, busy: false })
     return Promise.resolve()
   }
   return Promise.reject()
@@ -492,5 +492,15 @@ export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
     setTimeout(() => {
       getTx()
     }, timeOut)
+  })
+}
+
+export function queryTokens({ commit, state, getters }) {
+  return this.$marketApi.getTokens().then(tokens => {
+    console.log(tokens)
+
+    if (tokens.length) {
+      commit(MARKET_ITEM_BIDS, tokens)
+    }
   })
 }

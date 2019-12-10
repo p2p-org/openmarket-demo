@@ -1,5 +1,12 @@
 import dayjs from 'dayjs'
-import { MARKET_ALL_NFT, MARKET_BUSY_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS, MARKET_MY_NFT } from '../mutation-types'
+import {
+  MARKET_ALL_NFT,
+  MARKET_BUSY_NFT,
+  MARKET_DEL_NFT,
+  MARKET_ITEM_BIDS,
+  MARKET_ITEM_OFFERS,
+  MARKET_TOKENS,
+} from '../mutation-types'
 
 // todo bignumbers
 function priceExt(p) {
@@ -29,6 +36,10 @@ function prepOffer(o) {
   }
 }
 
+function prepToken(t) {
+  return t.denom || t
+}
+
 function prepBid(b) {
   return {
     ...b,
@@ -39,7 +50,7 @@ function prepBid(b) {
 }
 
 export default {
-  [MARKET_ALL_NFT](state, { nfts = [] }) {
+  [MARKET_ALL_NFT](state, nfts = []) {
     state.nfts = state.nfts
       .filter(n => {
         return nfts.findIndex(n1 => n1.token_id === n.token_id) === -1
@@ -70,10 +81,14 @@ export default {
       state.bids.push({ token_id: tokenId, bids: bids.map(prepBid) })
     }
   },
-  nftTriggerBusy(state, { tokenId, busy = false }) {
+  [MARKET_BUSY_NFT](state, { tokenId, busy = false }) {
     const idx = state.nfts.findIndex(n => n.token_id === tokenId)
     if (idx !== -1) {
       state.nfts.splice(idx, 1, { ...state.nfts[idx], busy })
     }
+  },
+  [MARKET_TOKENS](state, tokens = []) {
+    state.tokens = state.tokens.concat(tokens.filter(t => !state.tokens.includes(t)).map(prepToken)).sort()
+    console.log('set token', tokens.filter(t => !state.tokens.includes(t)).map(prepToken))
   },
 }
