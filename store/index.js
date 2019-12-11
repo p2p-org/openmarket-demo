@@ -31,7 +31,7 @@ export const actions = {
   // server pre init
   async nuxtServerInit({ state, commit, dispatch }, { req, app }) {
     await dispatch('setTheme', app.$cookies.get(themeKeyName))
-    await dispatch('market/queryCoins')
+    // await dispatch('market/queryCoins')
 
     await dispatch('user/initServiceUser')
 

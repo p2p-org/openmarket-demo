@@ -32,6 +32,10 @@ while test $# -gt 0; do
       docker-compose down
       exit 0
       ;;
+    log)
+      docker-compose logs -f --tail=500
+      exit 0
+      ;;
     build)
       docker-compose build
       exit 0
