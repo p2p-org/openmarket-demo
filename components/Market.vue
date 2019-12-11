@@ -56,6 +56,7 @@ export default {
       'nftBusyUnlock',
       'waitMarket',
       'clearNft',
+      'coinTransfer'
     ]),
     ...mapActions('user', ['loadCurrentUserInfo']),
     loadNft(tokenId = null) {
@@ -264,6 +265,21 @@ export default {
         () => this.loadNft(id)
       )
     },
+    doCoinTransfer({ coin, recipient, user }) {
+      this.userAction(
+        'coinTransfer',
+        null,
+        'Confirm coin transfer?',
+        'Coin transfered',
+        () =>
+          this.coinTransfer({
+            user,
+            recipient,
+            coin,
+          }),
+        () => this.loadCurrentUserInfo()
+      )
+    },
     doBurn({ id, user }) {
       this.userAction(
         'burn',
@@ -313,14 +329,15 @@ export default {
               })
               .then(() => this.handleOk(id, msgSuccess))
               .catch(err => this.handleErr(id, err))
+              .then(() => this.nftBusyUnlock({ tokenId: id }))
           } else {
-            return Promise.resolve()
+            return this.nftBusyUnlock({ tokenId: id })
           }
         })
         .catch(e => {
           // just silence
         })
-        .then(() => this.nftBusyUnlock({ tokenId: id }))
+
     },
   },
 }

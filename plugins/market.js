@@ -1,5 +1,5 @@
-// import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from 'dgaming-market-sdk'
-import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from '../../dgaming-market-sdk'
+import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from 'openmarket-sdk'
+// import { OpenMarketAPI, OpenMarketTxAPI, OpenMarketTxMsgs } from '../../openmarket-sdk'
 
 const buildPath = (...args) => {
   return args

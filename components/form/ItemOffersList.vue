@@ -1,19 +1,20 @@
 <template>
   <b-table v-if="items.length" class="offers-list" borderless :items="items" :fields="fields" >
     <template v-slot:cell(price)="data">
-      <div class="d-flex justify-content-start align-items-center">
-        <b-img :src="currencyImage" rounded="circle" width="31px" height="31px" />
-        <h6 class="ml-2 my-0">
-          <b>{{ data.item.price.value }}</b> {{ data.item.price.currency }}
-        </h6>
-      </div>
+      <coin-price-inline :price="data.item.price" />
+<!--      <div class="d-flex justify-content-start align-items-center">-->
+<!--        <b-img :src="currencyImage" rounded="circle" width="31px" height="31px" />-->
+<!--        <h6 class="ml-2 my-0">-->
+<!--          <b>{{ data.item.price.value }}</b> {{ data.item.price.currency }}-->
+<!--        </h6>-->
+<!--      </div>-->
     </template>
     <template v-slot:cell(buyer)="data">
       <div class="d-flex justify-content-start align-items-center">
       <client-only>
         <jazzicon :address="data.item.buyer" :diameter="31" />
       </client-only>
-      <b-link :to="{ name: 'market', query: { owner: data.item.buyer } }" class="ml-2">
+      <b-link :to="localePath({ name: 'market', query: { owner: data.item.buyer } })" class="ml-2">
         {{ data.item.buyer | collapse(10, 5) }}
       </b-link>
       </div>
@@ -32,10 +33,11 @@
 import { mapState, mapActions, mapGetters } from 'vuex'
 
 import Jazzicon from '../Jazzicon'
+import CoinPriceInline from '../elements/CoinPriceInline'
 
 export default {
   name: 'FormItemOffersList',
-  components: { Jazzicon },
+  components: { CoinPriceInline, Jazzicon },
   props: {
     currencyImage: {
       type: String,

@@ -47,8 +47,9 @@ Vue.mixin({
     },
     priceEth(v, r = 1, d = 3) {
       v = parseFloat(v) || 0
+      r = parseFloat(r) || 0
       // return +(Math.round(v / r + 'e+'+d) + 'e-'+d) + 'ETH'
-      return `${(v / r).toPrecision(d)} ETH`
+      return `${(v * r).toPrecision(d)} ETH`
     },
     priceBig(v, d = 5) {
       if (!v) return v

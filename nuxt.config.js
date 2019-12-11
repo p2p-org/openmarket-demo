@@ -79,6 +79,36 @@ export default {
     '@nuxtjs/proxy',
     'cookie-universal-nuxt',
     [
+      'nuxt-i18n',
+      {
+        // !!! IMPORTANT !!!
+        // don't forget to add locales from vee-validate-i18n plugin
+        locales: [
+          {
+            code: 'en',
+            file: 'en-US.js',
+            iso: 'en-US',
+            name: 'English',
+          },
+          // {
+          //   code: 'ru',
+          //   file: 'ru-RU.js',
+          //   iso: 'ru-RU',
+          //   name: 'Русский',
+          // },
+        ],
+        defaultLocale: 'en',
+        lazy: true,
+        langDir: 'lang/',
+        strategy: 'prefix_and_default',
+        detectBrowserLanguage: {
+          useCookie: true,
+          // cookieKey: 'i18n_redirected',
+          // alwaysRedirect: true
+        },
+      },
+    ],
+    [
       'nuxt-fontawesome',
       {
         component: 'fa',

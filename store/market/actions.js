@@ -1,4 +1,5 @@
-import { MARKET_ALL_NFT, MARKET_BUSY_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS } from '../mutation-types'
+import dayjs from 'dayjs'
+import { MARKET_ALL_NFT, MARKET_BUSY_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS, MARKET_COINS } from '../mutation-types'
 import { txCheck } from '../../helpers'
 
 function tokenId(tokenId) {
@@ -127,7 +128,7 @@ export function nftMint({ state, commit, rootGetters, rootState }, { user, token
       sender: svcUser.address,
       recipient: user.address,
       token_id: token.id,
-      denom: rootState.config.denomNft,
+      denom: rootState.config.baseNftDenom,
       token_uri: token.uri || '',
 
       // this part is necessary
@@ -152,8 +153,8 @@ export function nftSellFixed({ state, commit, rootState }, { user, token } = {})
       beneficiary: rootState.config.beneficiary.seller.address,
       token_id: token.id,
       price: {
-        denom: rootState.config.denomToken,
-        amount: token.price,
+        denom: token.price.denom,
+        amount: token.price.amount,
       },
 
       // this part is necessary
@@ -179,8 +180,8 @@ export function nftMakeOffer({ state, commit, rootState }, { user, token } = {})
 
       token_id: token.id,
       price: {
-        denom: rootState.config.denomToken,
-        amount: token.price,
+        denom: token.price.denom,
+        amount: token.price.amount,
       },
 
       // this part is necessary
@@ -289,12 +290,12 @@ export function nftStartAuction({ state, commit, rootState }, { user, token } = 
       beneficiary: rootState.config.beneficiary.seller.address,
       token_id: token.id,
       price: {
-        denom: rootState.config.denomToken,
-        amount: token.price,
+        denom: token.price.denom,
+        amount: token.price.amount,
       },
       buyout: {
-        denom: rootState.config.denomToken,
-        amount: token.buyout,
+        denom: token.buyout.denom,
+        amount: token.buyout.amount,
       },
       time_to_sell: token.ends,
 
@@ -353,8 +354,8 @@ export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, t
   return this.$txApi.getAccounts(user.address).then(data => {
     const signMsg = this.$txMsgs.NewMsgMakeBidOnAuction({
       price: {
-        denom: rootState.config.denomToken,
-        amount: token.price,
+        denom: token.price.denom,
+        amount: token.price.amount,
       },
       bidder: user.address,
       beneficiary: rootState.config.beneficiary.buyer.address,
@@ -401,7 +402,28 @@ export function nftTransfer({ state, commit, rootState, rootGetters }, { user, t
       sender: user.address,
       token_id: token.id,
       recipient,
-      denom: rootState.config.denomNft,
+      denom: rootState.config.baseNftDenom,
+
+      // this part is necessary
+      fee: 0,
+      gas: '200000',
+      memo: '',
+      chain_id: rootState.config.chainId,
+      account_number: data.result.value.account_number,
+      sequence: data.result.value.sequence,
+    })
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+  })
+}
+
+export function coinTransfer({ state, commit, rootState, rootGetters }, { user, coin, recipient } = {}) {
+  return this.$txApi.getAccounts(user.address).then(data => {
+    const signMsg = this.$txMsgs.NewMsgTransferFungibleTokens({
+      owner: user.address,
+      recipient,
+      denom: coin.denom,
+      amount: coin.amount,
 
       // this part is necessary
       fee: 0,
@@ -421,7 +443,7 @@ export function nftBurn({ state, commit, rootState, rootGetters }, { user, token
     const signMsg = this.$txMsgs.NewMessageBurnNFT({
       sender: user.address,
       token_id: token.id,
-      denom: rootState.config.denomNft,
+      denom: rootState.config.baseNftDenom,
 
       // this part is necessary
       fee: 0,
@@ -437,16 +459,12 @@ export function nftBurn({ state, commit, rootState, rootGetters }, { user, token
 }
 
 export function nftCheckBusy({ state }, { tokenId } = {}) {
-  const idx = state.nfts.findIndex(n => n.token_id === tokenId)
-  if (idx !== -1 && !state.nfts[idx].busy) {
-    return Promise.resolve()
-  }
-  return Promise.reject()
+  return state.busy[tokenId] ? Promise.reject() : Promise.resolve()
 }
 
 export function nftBusyLock({ state, commit }, { tokenId } = {}) {
-  const idx = state.nfts.findIndex(n => n.token_id === tokenId)
-  if (idx !== -1 && !state.nfts[idx].busy) {
+  if (!state.busy[tokenId]) {
+    console.log('lock', tokenId)
     commit(MARKET_BUSY_NFT, { tokenId, busy: true })
     return Promise.resolve()
   }
@@ -454,13 +472,12 @@ export function nftBusyLock({ state, commit }, { tokenId } = {}) {
 }
 
 export function nftBusyUnlock({ state, commit }, { tokenId } = {}) {
-  const idx = state.nfts.findIndex(n => n.token_id === tokenId)
-  if (idx !== -1) {
-    // && state.nfts[idx].busy
+  if (state.busy[tokenId]) {
+    console.log('unlock', tokenId)
     commit(MARKET_BUSY_NFT, { tokenId, busy: false })
-    return Promise.resolve()
   }
-  return Promise.reject()
+  return Promise.resolve()
+  // return Promise.reject()
 }
 
 export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
@@ -495,12 +512,11 @@ export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
   })
 }
 
-export function queryTokens({ commit, state, getters }) {
-  return this.$marketApi.getTokens().then(tokens => {
-    console.log(tokens)
-
-    if (tokens.length) {
-      commit(MARKET_ITEM_BIDS, tokens)
+export function queryCoins({ rootState, commit }) {
+  commit(MARKET_COINS, [rootState.config.baseCoinDenom])
+  return this.$marketApi.getTokens().then(coins => {
+    if (coins && coins.length) {
+      commit(MARKET_COINS, coins)
     }
   })
 }

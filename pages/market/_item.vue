@@ -46,14 +46,19 @@ export default {
   watch: {
     nft(nft) {
       if (!nft) {
-        this.$router.push({ name: 'market', query: { owner: this.currentUser.address } })
+        this.$router.push(this.localePath({ name: 'market', query: { owner: this.currentUser.address } }))
       }
     },
   },
   created() {
     this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
-      .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
-      .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
+    .then(() => {
+      if (!this.nft) {
+        this.$router.push(this.localePath({ name: 'market' }))
+      }
+    })
+      // .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
+      // .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
   },
   methods: {
     ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'queryOffer', 'queryBid']),

@@ -2,6 +2,14 @@ export function currentUser(state) {
   return state.users[state.current] || null
   // return state.users[state.current] ? { ...state.users[state.current] } : null
 }
+
+// export function currentUserCoins(state, getters, rootState) {
+//   if (state.users[state.current]) {
+//     return rootState.config.coins.filter(c => state.users[state.current].coins.findIndex(x => x.denom === c.denom) !== -1)
+//   }
+//   return []
+// }
+
 export function serviceUser(state) {
   return state.service || null
 }

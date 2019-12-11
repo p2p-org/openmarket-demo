@@ -5,7 +5,7 @@
     </div>
     <b-card-body class="d-flex flex-column justify-content-between">
     <div class="d-flex flex-row justify-content-between">
-      <b-link :to="{ name: 'market-item', params: { item: tokenId } }">
+      <b-link :to="localePath({ name: 'market-item', params: { item: tokenId } })">
         <h5>{{ title | truncate }}</h5>
       </b-link>
       <small class="text-muted">#{{ tokenId }}</small>
@@ -13,24 +13,14 @@
     <div class="d-flex flex-row justify-content-between">
       <template v-if="owned">
         <template v-if="status === 1">
-          <h5 class="m-0 d-flex flex-column">
-            <span>
-              <b>{{ price.value | priceBig }}</b> {{ price.currency }}
-            </span>
-            <small v-if="price.value" class="text-muted">{{ price.value | priceEth(rate) }}</small>
-          </h5>
+          <coin-price-compact :price="price" />
           <b-btn variant="danger" :disabled="busy" @click.stop="onCancelFixed">
             Cancel sell
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else-if="status === 2">
-          <h5 class="m-0 d-flex flex-column">
-            <span>
-              <b>{{ openingPrice.value | priceBig }}</b> {{ openingPrice.currency }}
-            </span>
-            <small v-if="openingPrice.value" class="text-muted">{{ openingPrice.value | priceEth(rate) }}</small>
-          </h5>
+          <coin-price-compact :price="highestBid" />
           <b-btn variant="danger" :disabled="busy" @click.stop="onCancelAuction">
             Cancel auction
             <b-spinner v-if="busy" small type="grow"></b-spinner>
@@ -38,7 +28,7 @@
         </template>
         <template v-else>
           <div></div>
-          <b-btn variant="success" :disabled="busy" :to="{ name: 'market-item', params: { item: tokenId } }">
+          <b-btn variant="success" :disabled="busy" :to="localePath({ name: 'market-item', params: { item: tokenId } })">
             Sell item
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -47,32 +37,28 @@
       </template>
       <template v-else>
         <template v-if="status === 1">
-          <h5 class="m-0 d-flex flex-column">
-            <span>
-              <b>{{ price.value | priceBig }}</b> {{ price.currency }}
-            </span>
-            <small v-if="price.value" class="text-muted">{{ price.value | priceEth(rate) }}</small>
-          </h5>
+          <coin-price-compact :price="price" />
           <b-btn variant="primary" :disabled="busy" @click.stop="onBuyFixed">
             Buy now
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else-if="status === 2">
-          <h5 class="m-0 d-flex flex-column">
-            <span>
-              <b>{{ buyoutPrice.value | priceBig }}</b> {{ buyoutPrice.currency }}
-            </span>
-            <small v-if="buyoutPrice.value" class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>
-          </h5>
-          <b-btn variant="info" :disabled="busy" :to="{ name: 'market-item', params: { item: tokenId } }">
+          <coin-price-compact :price="highestBid" />
+<!--          <h5 class="m-0 d-flex flex-column">-->
+<!--            <span>-->
+<!--              <b>{{ buyoutPrice.value | priceBig }}</b> {{ buyoutPrice.currency }}-->
+<!--            </span>-->
+<!--            <small v-if="buyoutPrice.value" class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>-->
+<!--          </h5>-->
+          <b-btn variant="info" :disabled="busy" :to="localePath({ name: 'market-item', params: { item: tokenId } })">
             Buyout or bid
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
         </template>
         <template v-else>
           <div></div>
-          <b-btn variant="warning" :disabled="busy" :to="{ name: 'market-item', params: { item: tokenId } }">
+          <b-btn variant="warning" :disabled="busy" :to="localePath({ name: 'market-item', params: { item: tokenId } })">
             Make offer
             <b-spinner v-if="busy" small type="grow"></b-spinner>
           </b-btn>
@@ -87,9 +73,11 @@
 
 <script>
 import {  mapGetters } from 'vuex'
+import CoinPriceCompact from './elements/CoinPriceCompact'
 
 export default {
   name: 'MarketCard',
+  components: { CoinPriceCompact },
   filters: {
     truncate(value) {
       return value.length > 46 ? value.substring(0, 46) + '...' : value
@@ -110,11 +98,9 @@ export default {
   }),
   computed: {
     ...mapGetters('user', ['currentUser']),
-    id() {
-      return this.nft.id
-    },
+    ...mapGetters('market', ['findOffers', 'findBids', 'isBusyNft']),
     busy() {
-      return this.nft.busy
+      return this.isBusyNft(this.nft.token_id)
     },
     tokenId() {
       return this.nft.token_id
@@ -136,6 +122,12 @@ export default {
     buyoutPrice() {
       return this.nft.buyout_price
     },
+    highestOffer() {
+      return this.offers.reduce((p, o) => (o.price.amount > p.amount ? o.price : p), { amount: 0, denom: this.nft.opening_price.denom })
+    },
+    highestBid() {
+      return this.bids.reduce((p, o) => (o.price.amount > p.amount ? o.price : p), { amount: 0, denom: this.nft.opening_price.denom })
+    },
 
     status() {
       return this.nft.status
@@ -152,10 +144,18 @@ export default {
     //   const m = this.price.match(/([\d.]+)([\w]+)/i)
     //   return m ? { value: m[1], currency: m[2] } : { value: this.price, currency: '' }
     // },
+    offers() {
+      const o = this.findOffers(this.nft.token_id)
+      return o ? o.offers : []
+    },
+    bids() {
+      const o = this.findBids(this.nft.token_id)
+      return o ? o.bids : []
+    },
   },
   methods: {
     toItem() {
-      this.$router.push({ name: 'market-item', params: { item: this.tokenId } })
+      this.$router.push(this.localePath({ name: 'market-item', params: { item: this.tokenId } }))
     },
     onCancelFixed() {
       this.$root.$emit('marketCancelFixed', { id: this.nft.token_id, user: this.currentUser })

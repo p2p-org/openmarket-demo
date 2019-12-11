@@ -9,15 +9,7 @@
       <b-row>
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-form-group class="my-0" label="Last sold for" label-class="pb-0">
-            <div class="d-flex justify-content-middle align-items-center">
-              <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-              <h1 class="ml-2 my-0">
-                <b>{{ sold.value }}</b> {{ sold.currency }}
-              </h1>
-            </div>
-            <h4 class="mt-1">
-              <small class="text-muted">{{ sold.value | priceEth(rate) }}</small>
-            </h4>
+            <coin-price :price="sold" />
           </b-form-group>
         </b-col>
         <b-col md="6" class="d-flex flex-row pl-2">
@@ -27,12 +19,11 @@
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-price-input
             v-model="price"
-            rules="required|numeric"
+            :rules="{ required: true, numeric: true, min_value: 1 }"
             name="Start price"
             type="text"
             label="Enter start price"
             placeholder="start price"
-            :currency-image="currencyImage"
           />
         </b-col>
         <b-col md="6" class="d-flex flex-column pl-2">
@@ -52,12 +43,11 @@
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-price-input
             v-model="buyout"
-            rules="required|numeric"
+            :rules="{ required: true, numeric: true, min_value: price.amount || 1 }"
             name="Buyout price"
             type="text"
             label="Enter buyout price"
             placeholder="buyout price"
-            :currency-image="currencyImage"
           />
         </b-col>
         <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
@@ -72,22 +62,21 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { ValidationObserver } from 'vee-validate'
 import BPriceInput from './inputs/BPriceInput'
 import BTextInputPrep from './inputs/BTextInputPrep'
+import CoinPrice from '../elements/CoinPrice'
 
 export default {
   name: 'FormItemAuction',
   components: {
+    CoinPrice,
     BTextInputPrep,
     ValidationObserver,
     BPriceInput,
   },
   props: {
-    currencyImage: {
-      type: String,
-      default: null,
-    },
     rate: {
       type: Number,
       default: 1,
@@ -104,13 +93,40 @@ export default {
       type: Object,
       default: null,
     },
-
+  },
+  computed: {
+    ...mapState({
+      baseCoinDenom: state => state.config.baseCoinDenom,
+    }),
+    ...mapGetters('config', ['coinImage', 'coinName']),
   },
   data: () => ({
-    price: '1',
-    buyout: '10',
+    price: null,
+    buyout: null,
     duration: '1968',
   }),
+  watch: {
+    'price.denom'(denom) {
+      if (this.buyout.denom !== denom) {
+        this.buyout.denom = denom
+      }
+    },
+    'buyout.denom'(denom) {
+      if (this.price.denom !== denom) {
+        this.price.denom = denom
+      }
+    },
+  },
+  created() {
+    this.price = {
+      amount: '1',
+      denom: this.baseCoinDenom,
+    }
+    this.buyout = {
+      amount: '10',
+      denom: this.baseCoinDenom,
+    }
+  },
   methods: {
     submit() {
       this.$emit('submit', { price: this.price, buyout: this.buyout, duration: this.duration })
