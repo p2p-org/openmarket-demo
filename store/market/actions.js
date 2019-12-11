@@ -514,7 +514,9 @@ export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
 
 export function queryCoins({ rootState, commit }) {
   commit(MARKET_COINS, [rootState.config.baseCoinDenom])
+  // console.log('get coins')
   return this.$marketApi.getTokens().then(coins => {
+    console.log('get coins', coins)
     if (coins && coins.length) {
       commit(MARKET_COINS, coins)
     }

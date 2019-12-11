@@ -31,10 +31,12 @@ export default {
   mounted() {
     // this.initUsers().then(() => {
       this.stopLoader()
+    this.queryCoins()
     // })
   },
   methods: {
     ...mapActions(['initUsers', 'stopLoader']),
+    ...mapActions('market', ['queryCoins']),
   },
 }
 </script>
