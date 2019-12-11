@@ -12,7 +12,7 @@ services:
       - nft-img:/app/static/images/output
     environment:
       - NODE_ENV=production
-      - GQL_URL=http://graphql:8080/v1/graphql
+      - GQL_URL=http://dwh_graphql:8080/v1/graphql
       - REST_URL=http://dwh_marketplace_api:1317
       - VIRTUAL_PORT=3000
       - VIRTUAL_HOST=demo.openmarket.one
