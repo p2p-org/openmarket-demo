@@ -9,8 +9,36 @@ export const state = () => ({
   tokenBaseUrl: '/api/token/',
   hasuraAccessKey: 'q5WNqC6MP6123123',
   rateETH: 1234,
-  denomNft: 'denom_basic',
-  denomToken: 'token',
+  baseNftDenom: 'denom_basic',
+  baseCoinDenom: 'token',
+  baseCoinImage: '/images/currency_atom.png',
+  coins: {
+    token: {
+      name: 'TKN',
+      image: '/images/currency_atom.png',
+      rate: 0.321,
+    },
+    stake: {
+      name: 'STAKE',
+      image: '/images/currency_stake.png',
+      rate: 0,
+    },
+    terra: {
+      name: 'TRC',
+      image: '/images/currency_terra.png',
+      rate: 0.123,
+    },
+    bitcoin: {
+      name: 'BTC',
+      image: '/images/currency_btc.png',
+      rate: 9,
+    },
+    tugrik: {
+      name: 'TGRG',
+      image: '/images/currency_tugrik.png',
+      rate: 0.01875,
+    },
+  },
   beneficiary_commission: '0.04',
   beneficiary: {
     seller: {
@@ -83,5 +111,21 @@ export const mutations = {
 export const getters = {
   getMockUser(state) {
     return name => state.mockUsers.find(x => x.name === name)
+  },
+
+  coinImage(state) {
+    return denom => {
+      return state.coins[denom] ? state.coins[denom].image : state.baseCoinImage
+    }
+  },
+  coinName(state) {
+    return denom => {
+      return state.coins[denom] ? state.coins[denom].name : denom
+    }
+  },
+  coinRate(state) {
+    return denom => {
+      return state.coins[denom] ? state.coins[denom].rate : 0
+    }
   },
 }

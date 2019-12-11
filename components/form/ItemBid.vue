@@ -9,22 +9,15 @@
       <b-row>
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-form-group class="my-0" label="Highest bid / bids count" label-class="pb-0">
-            <div class="d-flex align-items-center">
-              <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-              <h1 class="ml-2 my-0">
-                <b>{{ highestBid.value }}</b> {{ highestBid.currency }} <small>/ {{ bidsCnt }}</small>
-              </h1>
-            </div>
-            <h4 class="mt-1">
-              <small class="text-muted">{{ highestBid.value | priceEth(rate) }}</small>
-            </h4>
-
+            <coin-price-cnt :price="highestBid">
+              {{ bidsCnt }}
+            </coin-price-cnt>
           </b-form-group>
         </b-col>
         <b-col md="6" class="d-flex flex-column pl-2">
           <b-form-group class="my-0" label="Ends" label-class="pb-0">
             <div class="d-flex align-items-end ">
-<!--              <fa :icon="['fas', 'clock']" />-->
+              <!--              <fa :icon="['fas', 'clock']" />-->
               <h1 class="ml-2 my-0">
                 {{ $dayjs().to(ends) }}
               </h1>
@@ -37,14 +30,14 @@
       </b-row>
       <b-row class="mt-2">
         <b-col md="6" class="d-flex flex-column pr-2">
-          <b-price-input
-            :rules="{ required: true, numeric: true, min_value: minPrice.value }"
+          <b-price-user-input
+            v-model="price"
+            :rules="{ min_value: minPrice.amount }"
+            :denoms="denoms"
             name="Bid value"
             type="text"
-            :label="'Enter your bid, min ' + minPrice.value + ' ' + minPrice.currency"
-            v-model="price"
-            placeholder="Bid value"
-            :currency-image="currencyImage"
+            :label="'Enter your bid, min ' + minPrice.amount + ' ' + minPrice.denom"
+            placeholder="amount"
           />
         </b-col>
         <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
@@ -57,15 +50,7 @@
       <b-row class="mt-3">
         <b-col md="6" class="d-flex flex-column pr-4">
           <b-form-group class="my-0" label="Buyout price" label-class="pb-0">
-            <div class="d-flex align-items-center">
-              <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-              <h1 class="ml-2 my-0">
-                <b>{{ buyoutPrice.value }}</b> {{ buyoutPrice.currency }}
-              </h1>
-            </div>
-            <h4 class="mt-1">
-              <small class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>
-            </h4>
+            <coin-price :price="buyoutPrice" />
           </b-form-group>
         </b-col>
         <b-col md="6" class="d-flex flex-column p-2">
@@ -81,19 +66,19 @@
 
 <script>
 import { ValidationObserver } from 'vee-validate'
-import BPriceInput from './inputs/BPriceInput'
+import CoinPriceCnt from '../elements/CoinPriceCnt'
+import CoinPrice from '../elements/CoinPrice'
+import BPriceUserInput from './inputs/BPriceUserInput'
 
 export default {
   name: 'FormItemBid',
   components: {
+    BPriceUserInput,
+    CoinPrice,
+    CoinPriceCnt,
     ValidationObserver,
-    BPriceInput,
   },
   props: {
-    currencyImage: {
-      type: String,
-      default: null,
-    },
     rate: {
       type: Number,
       default: 1,
@@ -128,25 +113,46 @@ export default {
     },
   },
   data: () => ({
-    price: 1,
+    price: null,
   }),
   computed: {
     minPrice() {
-      return this.highestBid.value
-        ? { ...this.highestBid, value: 1 + parseInt(this.highestBid.value) }
-        : { ...this.openingPrice, value: parseInt(this.openingPrice.value) }
+      return this.highestBid.amount
+        ? { ...this.highestBid, amount: 1 + parseInt(this.highestBid.amount) }
+        : { ...this.openingPrice, amount: parseInt(this.openingPrice.amount) }
     },
+    denoms() {
+      return [this.openingPrice.denom]
+    }
   },
   watch: {
-    highestBid(b) {
-      this.price = 1 + parseInt(b.value || this.openingPrice.value)
+    // highestBid(b) {
+    //   this.price = 1 + parseInt(b.amount || this.openingPrice.amount)
+    // },
+    highestBid: {
+      handler(b) {
+        if (b) {
+          this.price = {
+            amount: 1 + parseInt(b.amount || this.openingPrice.amount),
+            denom: b.denom,
+          }
+        } else {
+          this.price = {
+            amount: this.openingPrice.amount,
+            denom: this.openingPrice.denom,
+          }
+        }
+      },
+      immediate: true,
+      deep: true,
     },
   },
   created() {
-    this.price = 1 + parseInt(this.highestBid.value || this.openingPrice.value)
+    // this.price = 1 + parseInt(this.highestBid.amount || this.openingPrice.amount)
   },
   methods: {
     submit() {
+      console.log(this.price)
       this.$emit('submit', { price: this.price })
     },
     reset() {

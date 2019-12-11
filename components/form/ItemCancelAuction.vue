@@ -3,15 +3,16 @@
     <b-row>
       <b-col md="6" class="d-flex flex-column pr-2">
         <b-form-group class="my-0" label="Opening price" label-class="pb-0">
-          <div class="d-flex align-items-center">
-            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-            <h1 class="ml-2 my-0">
-              <b>{{ openingPrice.value }}</b> {{ openingPrice.currency }}
-            </h1>
-          </div>
-          <h4 class="mt-1">
-            <small class="text-muted">{{ openingPrice.value | priceEth(rate) }}</small>
-          </h4>
+          <coin-price :price="openingPrice" />
+<!--          <div class="d-flex align-items-center">-->
+<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              <b>{{ openingPrice.value }}</b> {{ openingPrice.currency }}-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ openingPrice.value | priceEth(rate) }}</small>-->
+<!--          </h4>-->
         </b-form-group>
       </b-col>
       <b-col md="6" class="d-flex flex-column pl-2">
@@ -30,28 +31,30 @@
     <b-row class="mt-2">
       <b-col md="6" class="d-flex flex-column pr-2">
         <b-form-group class="my-0" label="Highest bid / bids count" label-class="pb-0">
-          <div class="d-flex align-items-center">
-            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-            <h1 class="ml-2 my-0">
-              <b>{{ highestBid.value }}</b> {{ highestBid.currency }} <small>/ {{ bidsCnt }}</small>
-            </h1>
-          </div>
-          <h4 class="mt-1">
-            <small class="text-muted">{{ highestBid.value | priceEth(rate) }}</small>
-          </h4>
+          <coin-price-cnt :price="highestBid">{{ bidsCnt }}</coin-price-cnt>
+<!--          <div class="d-flex align-items-center">-->
+<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              <b>{{ highestBid.value }}</b> {{ highestBid.currency }} <small>/ {{ bidsCnt }}</small>-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ highestBid.value | priceEth(rate) }}</small>-->
+<!--          </h4>-->
         </b-form-group>
       </b-col>
       <b-col md="6" class="d-flex flex-column pl-2">
         <b-form-group class="my-0" label="Buyout price" label-class="pb-0">
-          <div class="d-flex align-items-center">
-            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-            <h1 class="ml-2 my-0">
-              <b>{{ buyoutPrice.value }}</b> {{ buyoutPrice.currency }}
-            </h1>
-          </div>
-          <h4 class="mt-1">
-            <small class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>
-          </h4>
+          <coin-price :price="buyoutPrice" />
+<!--          <div class="d-flex align-items-center">-->
+<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              <b>{{ buyoutPrice.value }}</b> {{ buyoutPrice.currency }}-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ buyoutPrice.value | priceEth(rate) }}</small>-->
+<!--          </h4>-->
         </b-form-group>
       </b-col>
     </b-row>
@@ -84,8 +87,11 @@
 </template>
 
 <script>
+import CoinPrice from '../elements/CoinPrice'
+import CoinPriceCnt from '../elements/CoinPriceCnt'
 export default {
   name: 'FormItemCancelAuction',
+  components: { CoinPriceCnt, CoinPrice },
   props: {
     currencyImage: {
       type: String,

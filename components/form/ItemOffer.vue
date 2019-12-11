@@ -9,31 +9,19 @@
       <b-row>
         <b-col md="6" class="d-flex flex-column pr-2">
           <b-form-group class="my-0" label="Highest offer" label-class="pb-0">
-            <div class="d-flex justify-content-middle align-items-center">
-              <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-              <h1 class="ml-2 my-0">
-                <b>{{ offer.value }}</b> {{ offer.currency }}
-              </h1>
-            </div>
-            <h4 class="mt-1">
-              <small class="text-muted">{{ offer.value | priceEth(rate) }}</small>
-            </h4>
-
+            <coin-price :price="offer" />
           </b-form-group>
         </b-col>
-        <b-col md="6" class="d-flex flex-row pl-2">
-        </b-col>
+        <b-col md="6" class="d-flex flex-row pl-2" />
       </b-row>
       <b-row class="mt-2">
         <b-col md="6" class="d-flex flex-column pr-2">
-          <b-price-input
-            rules="required|numeric"
+          <b-price-user-input
+            v-model="price"
             name="Offer value"
             type="text"
             label="Enter your offer"
-            v-model="price"
             placeholder="Offer value"
-            :currency-image="currencyImage"
           />
           <!--          <h4 class="mt-1">-->
           <!--            <small class="text-muted">{{ price | priceEth(rate) }}</small>-->
@@ -51,12 +39,17 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { ValidationObserver } from 'vee-validate'
+import CoinPrice from '../elements/CoinPrice'
 import BPriceInput from './inputs/BPriceInput'
+import BPriceUserInput from './inputs/BPriceUserInput'
 
 export default {
   name: 'FormItemOffer',
   components: {
+    BPriceUserInput,
+    CoinPrice,
     ValidationObserver,
     BPriceInput,
   },
@@ -83,15 +76,42 @@ export default {
     },
   },
   data: () => ({
-    price: '1',
+    price: null,
   }),
+  computed: {
+    ...mapState({
+      baseCoinDenom: state => state.config.baseCoinDenom,
+    }),
+  },
   watch: {
-    offer(o) {
-      this.price = 1 + parseInt(o.value)
+    // offer(o) {
+    //   this.price = 1 + parseInt(o.value)
+    // },
+
+    offer: {
+      handler(o) {
+        if (o) {
+          this.price = {
+            amount: 1 + parseInt(o.amount),
+            denom: o.denom,
+          }
+        } else {
+          this.price = {
+            amount: 1,
+            denom: this.baseCoinDenom,
+          }
+        }
+      },
+      immediate: true,
+      deep: true,
     },
   },
   created() {
-    this.price = 1 + parseInt(this.offer.value)
+    // this.price = 1 + parseInt(this.offer.value)
+    // this.price = {
+    //   amount: '1',
+    //   denom: this.baseCoinDenom,
+    // }
   },
   methods: {
     submit() {

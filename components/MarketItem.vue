@@ -51,12 +51,11 @@
               <!--            <b-row>-->
               <template v-if="owned">
                 <template v-if="status === 1">
-                  <form-item-cancel-sell :currency-image="currencyImage" :busy="busy" :rate="rate" :price="price" @submit="onCancelFixed" />
+                  <form-item-cancel-sell :busy="busy" :rate="rate" :price="price" @submit="onCancelFixed" />
                   <form-item-owner :owner="owner" />
                 </template>
                 <template v-else-if="status === 2">
                   <form-item-cancel-auction
-                    :currency-image="currencyImage"
                     :busy="busy"
                     :rate="rate"
                     :opening-price="openingPrice"
@@ -72,7 +71,6 @@
                 <template v-else>
                   <form-item-sell
                     v-if="sell == 1"
-                    :currency-image="currencyImage"
                     :busy="busy"
                     :sold="lastSold"
                     :close="true"
@@ -82,7 +80,6 @@
                   />
                   <form-item-auction
                     v-else-if="sell == 2"
-                    :currency-image="currencyImage"
                     :busy="busy"
                     :sold="lastSold"
                     :close="true"
@@ -98,7 +95,6 @@
                 <template v-if="status === 1">
                   <form-item-offer
                     v-if="buy == 1"
-                    :currency-image="currencyImage"
                     :rate="rate"
                     :busy="busy"
                     :offer="highestOffer"
@@ -108,7 +104,6 @@
                   />
                   <form-item-buy
                     v-else
-                    :currency-image="currencyImage"
                     :busy="busy"
                     :rate="rate"
                     :price="price"
@@ -120,7 +115,6 @@
                 </template>
                 <template v-else-if="status === 2">
                   <form-item-bid
-                    :currency-image="currencyImage"
                     :rate="rate"
                     :busy="busy"
                     :opening-price="openingPrice"
@@ -138,7 +132,7 @@
                   <form-item-owner :owner="owner" />
                 </template>
                 <template v-else>
-                  <form-item-offer :currency-image="currencyImage" :rate="rate" :busy="busy" :offer="highestOffer" @submit="onMakeOffer" />
+                  <form-item-offer :rate="rate" :busy="busy" :offer="highestOffer" @submit="onMakeOffer" />
                   <form-item-owner :owner="owner" />
                 </template>
               </template>
@@ -152,7 +146,6 @@
                 Offers
               </h5>
               <form-item-offers-list
-                :currency-image="currencyImage"
                 :items="offers"
                 :owner="owner"
                 :busy="busy"
@@ -295,7 +288,6 @@ export default {
       sellPrice: '1',
       offerPrice: '1',
       recipient: null,
-      currency: 'token',
       // busy: false,
       expandDescr: false,
       placeBid: false,
@@ -305,10 +297,10 @@ export default {
   },
   computed: {
     ...mapState({
-      users: state => state.user.users,
-      // nfts: state => state.market.nfts,
+      baseCoinDenom: state => state.config.baseCoinDenom,
     }),
     ...mapGetters('user', ['currentUser']),
+    ...mapGetters('market', ['isBusyNft']),
 
     // nft() {
     //   return this.findNft(this.id)
@@ -360,16 +352,16 @@ export default {
       return this.nft.price
     },
     highestOffer() {
-      return this.offers.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0, currency: this.currency })
+      return this.offers.reduce((p, o) => (o.price.amount > p.amount ? o.price : p), { amount: 0, denom: this.baseCoinDenom })
     },
     lastSold() {
-      return { value: 0, currency: this.currency }
+      return { amount: 0, denom: this.baseCoinDenom }
     },
     highestBid() {
-      return this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0, currency: this.currency })
+      return this.bids.reduce((p, o) => (o.price.amount > p.amount ? o.price : p), { amount: 0, denom: this.openingPrice.denom })
       // return this.bids.length
-      //   ? this.bids.reduce((p, o) => (o.price.value > p.value ? o.price : p), { value: 0, currency: this.currency })
-      //   : { value: 0, currency: this.currency }
+      //   ? this.bids.reduce((p, o) => (o.price.amount > p.amount ? o.price : p), { amount: 0, denom: this.baseCoinDenom })
+      //   : { amount: 0, denom: this.baseCoinDenom }
     },
     bidsCount() {
       return this.bids.length || 0
@@ -389,20 +381,6 @@ export default {
     owned() {
       return this.nft.owner.address === this.buyer
     },
-    currencyImage() {
-      switch (this.currency) {
-        case 'btc':
-          return '/images/currency_btc.png'
-        default:
-          return '/images/currency_atom.png'
-      }
-    },
-
-    usersList() {
-      return [{ value: null, text: '- select -', disabled: true }].concat(
-        this.users.filter(u => u.address !== this.buyer).map(u => ({ value: u.address, text: u.name }))
-      )
-    },
     buyer() {
       return this.currentUser ? this.currentUser.address : null
     },
@@ -410,7 +388,7 @@ export default {
       return this.nft.owner || null
     },
     busy() {
-      return this.nft.busy
+      return this.isBusyNft(this.nft.token_id)
     },
   },
   mounted() {

@@ -1,20 +1,19 @@
-import { required, numeric, regex, min_value } from 'vee-validate/dist/rules'
-import { extend } from 'vee-validate'
-import en from 'vee-validate/dist/locale/en.json'
+// eslint-disable-next-line camelcase
+import { required, numeric, regex, min_value, max_value } from 'vee-validate/dist/rules'
+import { extend, configure } from 'vee-validate'
 
-extend('required', {
-  ...required,
-  message: en.messages.required,
-})
-extend('numeric', {
-  ...numeric,
-  message: en.messages.numeric,
-})
-extend('regex', {
-  ...regex,
-  message: en.messages.regex,
-})
-extend('min_value', {
-  ...min_value,
-  message: en.messages.min_value,
-})
+extend('required', required)
+extend('numeric', numeric)
+extend('regex', regex)
+// extend('email', email)
+// extend('length', length)
+// extend('confirmed', confirmed)
+extend('min_value', min_value)
+extend('max_value', max_value)
+
+export default function({ app }) {
+  configure({
+    // this will be used to generate messages.
+    defaultMessage: (_, values) => app.i18n.t(`validations.${values._rule_}`, values),
+  })
+}
