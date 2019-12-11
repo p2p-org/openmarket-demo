@@ -13,7 +13,7 @@ services:
     environment:
       - NODE_ENV=production
       - GQL_URL=http://graphql:8080/v1/graphql
-      - REST_URL=http://dwh_marketplace:1317
+      - REST_URL=http://dwh_marketplace_api:1317
       - VIRTUAL_PORT=3000
       - VIRTUAL_HOST=demo.openmarket.one
       - LETSENCRYPT_HOST=demo.openmarket.one
