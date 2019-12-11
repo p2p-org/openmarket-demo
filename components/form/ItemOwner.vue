@@ -5,7 +5,7 @@
         <client-only>
           <jazzicon :address="ownerAddress" :diameter="20" />
         </client-only>
-        <b-link :to="{ name: 'market', query: { owner: ownerAddress } }">
+        <b-link :to="localePath({ name: 'market', query: { owner: ownerAddress } })">
           {{ ownerAddress | collapse(10, 5) }}
         </b-link>
         <span class="text-muted"> items on sale {{ ownerItemsOnSaleCount }} / {{ ownerItemsCount }}</span>

@@ -9,16 +9,16 @@
         <b-navbar-toggle target="nav_collapse" />
         <b-collapse id="nav_collapse" is-nav>
           <b-navbar-nav>
-<!--            <b-nav-item :to="{ name: 'index' }" exact>-->
+<!--            <b-nav-item :to="localePath({ name: 'index' })" exact>-->
 <!--              Home-->
 <!--            </b-nav-item>-->
-            <b-nav-item :to="{ name: 'market' }" :class="{ active: isMarketRoute && !isMyNftRoute }" exact>
+            <b-nav-item :to="localePath({ name: 'market' })" :class="{ active: isMarketRoute && !isMyNftRoute }" exact>
               Market
             </b-nav-item>
-            <b-nav-item v-if="currentUser" :to="{ name: 'market', query: { owner: currentUser.address } }" :class="{ active: isMarketRoute && isMyNftRoute }" exact>
+            <b-nav-item v-if="currentUser" :to="localePath({ name: 'market', query: { owner: currentUser.address } })" :class="{ active: isMarketRoute && isMyNftRoute }" exact>
               My NFT's
             </b-nav-item>
-            <b-nav-item v-if="currentUser" :to="{ name: 'nft' }">
+            <b-nav-item v-if="currentUser" :to="localePath({ name: 'nft' })">
               Mint
             </b-nav-item>
 
@@ -68,10 +68,10 @@
 <!--              <template v-slot:button-content>-->
 <!--                <fa :icon="['fas', 'user']" />-->
 <!--              </template>-->
-<!--              <b-dropdown-item :to="{ name: 'nft' }">-->
+<!--              <b-dropdown-item :to="localePath({ name: 'nft' })">-->
 <!--                NFT Manage-->
 <!--              </b-dropdown-item>-->
-<!--              <b-dropdown-item :to="{ name: 'my' }">-->
+<!--              <b-dropdown-item :to="localePath({ name: 'my' })">-->
 <!--                My NFTs-->
 <!--              </b-dropdown-item>-->
 <!--              &lt;!&ndash;            <b-dropdown-item href="#">Profile</b-druseropdown-item>&ndash;&gt;-->
@@ -79,14 +79,14 @@
 <!--                Sign Out-->
 <!--              </b-dropdown-item>-->
 <!--            </b-nav-item-dropdown>-->
-            <b-nav-item-dropdown right>
+            <b-nav-item-dropdown right toggle-class="d-flex flex-row align-items-center">
               <template slot="button-content">
 <!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
                 <template v-if="current">
                   <client-only>
-                    <jazzicon :address="userAddress" :diameter="20" />
+                    <jazzicon :address="userAddress" :diameter="24" />
                   </client-only>
-                  {{ userName | truncate(10) }} <small>{{ userBalance }}</small>
+                  <h6 class="my-0">{{ userName | truncate(10) }} <small>{{ userBalance }} {{ coinName(baseCoinDenom) }}</small></h6>
                 </template>
                 <template v-else>
                   LOGIN
@@ -106,7 +106,7 @@
                      <b-link v-b-tooltip.hover title="copy address" class="ml-1 text-info" @click.stop.prevent="copyAddress(u.address)">
                       <fa :icon="['fas', 'clone']" />
                     </b-link>
-                    <b-link v-b-tooltip.hover title="edit user"  :to="{ name: 'user-address', params: { address: u.address } }" class="ml-1 text-warning">
+                    <b-link v-b-tooltip.hover title="edit user"  :to="localePath({ name: 'user-address', params: { address: u.address } })" class="ml-1 text-warning">
                        <fa :icon="['fas', 'edit']" />
                     </b-link>
                     <b-link v-b-tooltip.hover title="user logout"  class="ml-1 text-danger" @click.prevent="delUser(u.address)">
@@ -127,23 +127,23 @@
 
 <!--              <b-dropdown-item>-->
 <!--                <div class="d-flex flex-row justify-content-between">-->
-<!--                  <b-btn :to="{ name: 'user-address' }" variant="success" size="sm">-->
+<!--                  <b-btn :to="localePath({ name: 'user-address' })" variant="success" size="sm">-->
 <!--                     <fa :icon="['fas', 'plus']" /> Add new-->
 <!--                  </b-btn>-->
-<!--                  <b-btn :to="{ name: 'user-address' }" variant="warning" size="sm" :disabled="!currentId">-->
+<!--                  <b-btn :to="localePath({ name: 'user-address' })" variant="warning" size="sm" :disabled="!currentId">-->
 <!--                       <fa :icon="['fas', 'edit']" /> Edit-->
 <!--                  </b-btn>-->
-<!--                  <b-btn :to="{ name: 'user-address' }" variant="danger" size="sm" :disabled="!currentId" @click="delUser(id)">-->
+<!--                  <b-btn :to="localePath({ name: 'user-address' })" variant="danger" size="sm" :disabled="!currentId" @click="delUser(id)">-->
 <!--                       <fa :icon="['fas', 'trash']" /> Delete-->
 <!--                  </b-btn>-->
 <!--                </div>-->
 <!--              </b-dropdown-item>-->
-              <b-dropdown-item :to="{ name: 'user-address' }" exact variant="success">
+              <b-dropdown-item :to="localePath({ name: 'user-address' })" exact variant="success">
                 <fa :icon="['fas', 'sign-in-alt']" /> login
               </b-dropdown-item>
               <template v-if="current">
                 <b-dropdown-divider />
-                <b-dropdown-item :to="{ name: 'user-address', params: { address: current } }" exact variant="warning">
+                <b-dropdown-item :to="localePath({ name: 'user-address', params: { address: current } })" exact variant="warning">
                   <fa :icon="['fas', 'edit']" /> details
                 </b-dropdown-item>
                 <b-dropdown-item variant="danger" @click="delCurrentUser">
@@ -181,10 +181,12 @@ export default {
     ...mapState({
       users: state => state.user.users,
       mockUsers: state => state.config.mockUsers,
+      baseCoinDenom: state => state.config.baseCoinDenom,
       current: state => state.user.current,
     }),
     // ...mapGetters(['getTheme']),
     ...mapGetters('user', ['currentUser', 'usersList']),
+    ...mapGetters('config', ['coinImage', 'coinName']),
     userName() {
       return this.currentUser ? this.currentUser.name : ''
     },
@@ -192,13 +194,12 @@ export default {
       return this.currentUser ? this.currentUser.address.substring(8) : ''
     },
     userBalance() {
-      const denom = 'token'
       let val = 0
       if (this.currentUser && this.currentUser.coins && this.currentUser.coins.length) {
-        val = this.currentUser.coins.find(x => x.denom === denom)
+        val = this.currentUser.coins.find(x => x.denom === this.baseCoinDenom)
         val = val ? val.amount : 0
       }
-      return `${val} ${denom}`
+      return val
     },
     // loggedUsers() {
     //   console.log(this.users)
@@ -274,7 +275,7 @@ export default {
     doSearch() {
       // console.log(f)
       // console.log({ name: 'market', query: { q: this.search } })
-      this.$router.push({ name: 'market', query: { q: this.search } })
+      this.$router.push(this.localePath({ name: 'market', query: { q: this.search } }))
     },
   },
 }

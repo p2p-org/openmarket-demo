@@ -1,0 +1,72 @@
+<template>
+  <ValidationProvider v-slot="{ validated, dirty, errors }" :vid="vid" :name="$attrs.name" :rules="rules">
+<!--    :invalid-feedback="errors[0]"-->
+    <b-form-group class="my-0" v-bind="$attrs" :state="validateState(validated, dirty, errors)">
+      <b-input-group>
+        <template v-slot:prepend>
+          <b-input-group-text><fa :icon="['fas', 'clock']"/></b-input-group-text>
+        </template>
+        <b-form-input v-model="innerValue" v-bind="$attrs" :state="validateState(validated, dirty, errors)" size="lg" />
+        <template v-slot:append>
+          <b-dropdown text="unit" variant="outline-secondary" v-for="i in 2" :key="i">
+            <b-dropdown-item>mins</b-dropdown-item>
+            <b-dropdown-item>hours</b-dropdown-item>
+          </b-dropdown>
+        </template>
+      </b-input-group>
+    </b-form-group>
+  </ValidationProvider>
+</template>
+
+<script>
+import { ValidationProvider } from 'vee-validate'
+
+export default {
+  components: {
+    ValidationProvider,
+  },
+  props: {
+    vid: {
+      type: String,
+    },
+    rules: {
+      type: [Object, String],
+      default: '',
+    },
+    // must be included in props
+    value: {
+      type: null,
+    },
+  },
+  data: () => ({
+    innerValue: '',
+    units: [
+      'minutes',
+      'hours',
+    ],
+  }),
+  watch: {
+    // Handles internal model changes.
+    innerValue(newVal) {
+      this.$emit('input', newVal)
+    },
+    // Handles external model changes.
+    value(newVal) {
+      this.innerValue = newVal
+    },
+  },
+  created() {
+    if (this.value) {
+      this.innerValue = this.value
+    }
+  },
+  methods: {
+    validateState(validated, dirty, errors) {
+      if (dirty || validated) {
+        return !errors.length
+      }
+      return null
+    },
+  },
+}
+</script>

@@ -3,21 +3,13 @@
     <b-row v-if="price">
       <b-col md="6" class="d-flex flex-column pr-4">
         <b-form-group class="my-0" label="Fixed price" label-class="pb-0">
-          <div class="d-flex justify-content-middle align-items-center">
-            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-            <h1 class="ml-2 my-0">
-              <b>{{ price.value | priceBig }}</b> {{ price.currency }}
-            </h1>
-          </div>
-          <h4 class="mt-1">
-            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>
-          </h4>
+          <coin-price :price="price" />
         </b-form-group>
       </b-col>
       <b-col md="6" class="d-flex flex-column p-2">
         <b-btn variant="danger" size="lg" :disabled="busy" type="submit">
           Cancel sell
-          <b-spinner v-if="busy" type="grow" />
+          <b-spinner v-if="busy" type="grow" small/>
         </b-btn>
       </b-col>
     </b-row>
@@ -25,13 +17,11 @@
 </template>
 
 <script>
+import CoinPrice from '../elements/CoinPrice'
 export default {
   name: 'FormItemCancelSell',
+  components: { CoinPrice },
   props: {
-    currencyImage: {
-      type: String,
-      default: null,
-    },
     rate: {
       type: Number,
       default: 1,

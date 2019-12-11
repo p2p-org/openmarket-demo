@@ -31,7 +31,7 @@ import { ValidationObserver } from 'vee-validate'
 import BTextInputPrep from './inputs/BTextInputPrep'
 
 export default {
-  name: 'FormItemGift',
+  name: 'FormCoinSend',
   components: {
     BTextInputPrep,
     ValidationObserver

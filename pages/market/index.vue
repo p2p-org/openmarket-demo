@@ -37,8 +37,11 @@ export default {
     },
   },
   watch: {
-    owner(owner) {
-      this.queryNft({ force: true, params: { owner } })
+    owner: {
+      handler(owner) {
+        this.queryNft({ force: true, params: { owner } })
+      },
+      immediate: true
     },
     current(to, from) {
       if (to && from) {
@@ -51,7 +54,11 @@ export default {
   created() {
     // this.reloadNftPage()
     // todo search query to server
-    this.queryNft({ force: true, params: { owner: this.owner } })
+    // this.queryNft({ force: true, params: { owner: this.owner } })
+
+    // this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
+      // .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
+      // .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
   },
   methods: {
     ...mapActions('market', ['queryNft']),

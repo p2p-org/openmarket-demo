@@ -1,4 +1,4 @@
-# open-market-demo
+# openmarket-demo
 
 > Open Market API demo
 

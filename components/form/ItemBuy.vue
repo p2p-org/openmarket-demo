@@ -3,15 +3,16 @@
     <b-row>
       <b-col md="6" class="d-flex flex-column pr-2">
         <b-form-group class="my-0" label="Fixed price" label-class="pb-0">
-          <div class="d-flex justify-content-middle align-items-center">
-            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-            <h1 class="ml-2 my-0">
-              <b>{{ price.value | priceBig }}</b> {{ price.currency }}
-            </h1>
-          </div>
-          <h4 class="mt-1">
-            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>
-          </h4>
+<!--          <div class="d-flex justify-content-middle align-items-center">-->
+<!--            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />-->
+<!--            <h1 class="ml-2 my-0">-->
+<!--              <b>{{ price.value | priceBig }}</b> {{ price.currency }}-->
+<!--            </h1>-->
+<!--          </div>-->
+<!--          <h4 class="mt-1">-->
+<!--            <small class="text-muted">{{ price.value | priceEth(rate) }}</small>-->
+<!--          </h4>-->
+          <coin-price :price="price" />
         </b-form-group>
         <b-btn variant="primary" size="lg" class="py-2 my-3" :disabled="busy" type="submit">
           Buy
@@ -20,16 +21,7 @@
       </b-col>
       <b-col md="6" class="d-flex flex-column pl-2">
         <b-form-group class="my-0" label="Highest offer" label-class="pb-0">
-          <div class="d-flex justify-content-middle align-items-center">
-            <b-img :src="currencyImage" rounded="circle" width="33px" height="33px" />
-            <h1 class="ml-2 my-0">
-              <b>{{ offer.value | priceBig }}</b> {{ offer.currency }}
-            </h1>
-          </div>
-          <h4 class="mt-1">
-            <small class="text-muted">{{ offer.value | priceEth(rate) }}</small>
-          </h4>
-
+          <coin-price :price="offer" />
         </b-form-group>
         <b-btn variant="outline-primary" size="lg" class="py-2 my-3" :disabled="busy" @click.prevent="makeOffer">
           Make offer
@@ -41,8 +33,10 @@
 </template>
 
 <script>
+import CoinPrice from '../elements/CoinPrice'
 export default {
   name: 'FormItemBuy',
+  components: { CoinPrice },
   props: {
     currencyImage: {
       type: String,

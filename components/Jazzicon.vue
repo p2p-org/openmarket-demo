@@ -28,26 +28,22 @@ export default {
       type: Array,
       default: () => [
         '#01888C', // teal
-        '#FC7500', // bright orange
-        '#034F5D', // dark teal
-        '#F73F01', // orangered
+        '#71E2B5',
         '#FC1960', // magenta
         '#C7144C', // raspberry
         '#F3C100', // goldenrod
         '#1598F2', // lightning blue
+        '#F87173',
         '#2465E1', // sail blue
-        '#F19E02', // gold
+        '#FC7500', // bright orange
+        '#FDBB69', // gold
       ],
-    },
-    svgns: {
-      type: String,
-      default: 'http://www.w3.org/2000/svg',
     },
   },
   data() {
     return {
       generator: null,
-      i: null
+      svgns: 'http://www.w3.org/2000/svg',
     }
   },
   watch: {
@@ -78,11 +74,11 @@ export default {
       await this.$refs.jazzicon.append(el)
     },
     newPaper(diameter, color) {
-      const container = document.createElement('span')
+      const container = document.createElement('div')
       container.style.borderRadius = `${diameter / 2}px`
       container.style.overflow = 'hidden'
-      // container.style.padding = '0px'
-      // container.style.margin = '0px'
+      container.style.padding = '0px'
+      container.style.margin = '0px'
       container.style.width = '' + diameter + 'px'
       container.style.height = '' + diameter + 'px'
       container.style.display = 'inline-block'
@@ -132,8 +128,7 @@ export default {
     },
     genColor(colors) {
       const idx = Math.floor(colors.length * this.generator.random())
-      const color = colors.splice(idx, 1)[0]
-      return color
+      return colors.splice(idx, 1)[0]
     },
     hueShift(colors, generator) {
       const wobble = 30
@@ -145,6 +140,7 @@ export default {
       })
     },
     calcHash(text) {
+      // return parseInt(text.slice(2, 10), 26)
       return text ? text.match(/\d/g).reduce((a, n) => a + n) : 0
       // return text ? text.split('').reduce((a, n) => a + n.charCodeAt(0), 0) : 0
     },

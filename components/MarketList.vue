@@ -67,7 +67,7 @@
           <!--              :price="nft.price"-->
           <!--              :id="nft.id"-->
           <transition-group v-if="nftsPaged.length" name="flip-list" tag="div" class="card-deck">
-            <market-card v-for="nft in nftsPaged" :key="nft.id" :nft="nft" :rate="rateETH" />
+            <market-card v-for="nft in nftsPaged" :key="nft.token_id" :nft="nft" :rate="rateETH" />
           </transition-group>
           <!--            {{ nfts }}-->
           <!--          </b-card-group>-->
@@ -247,10 +247,10 @@ export default {
   },
   methods: {
     linkGen(pageNum) {
-      return {
+      return this.localePath({
         name: 'market',
         query: { ...this.$route.query, page: pageNum === 1 ? null : pageNum },
-      }
+      })
       // return pageNum === 1 ? '?' : `?page=${pageNum}`
     },
     // reloadNftPage(page = null) {
@@ -262,7 +262,7 @@ export default {
     //   })
     // },
     doSearch() {
-      this.$router.push({ name: 'market', query: { q: this.innerSearch } })
+      this.$router.push(this.localePath({ name: 'market', query: { q: this.innerSearch } }))
     },
     changeSortTime(value) {
       this.updSort('time', value)

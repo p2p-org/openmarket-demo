@@ -7,3 +7,7 @@ export function findOffers(state) {
 export function findBids(state) {
   return id => state.bids.find(x => x.token_id === id)
 }
+
+export function isBusyNft(state) {
+  return id => !!state.busy[id]
+}

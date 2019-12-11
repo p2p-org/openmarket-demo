@@ -1,4 +1,4 @@
-import { CONFIG_URLS, FINISH_LOADER, START_LOADER, THEME } from './mutation-types'
+import { CONFIG_URLS, FINISH_LOADER, MARKET_COINS, START_LOADER, THEME } from './mutation-types'
 
 const themeKeyName = 'theme'
 export const state = () => ({
@@ -29,9 +29,11 @@ export const getters = {
 
 export const actions = {
   // server pre init
-  nuxtServerInit({ state, commit, dispatch }, { req, app }) {
-    dispatch('setTheme', app.$cookies.get(themeKeyName))
-    dispatch('user/initServiceUser')
+  async nuxtServerInit({ state, commit, dispatch }, { req, app }) {
+    await dispatch('setTheme', app.$cookies.get(themeKeyName))
+    await dispatch('market/queryCoins')
+
+    await dispatch('user/initServiceUser')
 
     // if (process.env.GQL_WS_URL) {
     //   commit(`config/${CONFIG_URLS}`, {

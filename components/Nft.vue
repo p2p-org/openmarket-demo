@@ -137,7 +137,7 @@ export default {
             this.updNextTokenId()
             this.$bvModal.msgBoxOk('NFT Minted').then(value => {
               this.busy = false
-              this.$router.push({ name: 'market-item', params: { item: tokenId } })
+              this.$router.push(this.localePath({ name: 'market-item', params: { item: tokenId } }))
             })
           }, 2000)
         })
