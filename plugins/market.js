@@ -19,11 +19,11 @@ export default ({ store, req }, inject) => {
   if (process.server) {
     host = req.headers.host
     proto = 'http:'
-    console.log('srv', host, proto)
+    // console.log('srv', host, proto)
   } else {
     host = window.location.host
     proto = window.location.protocol
-    console.log('cli', host, proto)
+    // console.log('cli', host, proto)
   }
 
   // console.log(hostname)
