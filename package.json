@@ -14,9 +14,10 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.26",
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
-    "@fortawesome/vue-fontawesome": "^0.1.8",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "@nuxtjs/axios": "^5.8.0",
     "@nuxtjs/proxy": "^1.3.3",
+    "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.1.0",
     "color": "latest",
     "cookie-universal-nuxt": "^2.1.0",
@@ -36,7 +37,7 @@
     "sass-loader": "^8.0.0",
     "secp256k1": "^3.7.1",
     "sharp": "^0.23.4",
-    "vee-validate": "^3.1.3",
+    "vee-validate": "^3.2.0",
     "vue-api-query": "^1.5.1",
     "vue-clipboard2": "^0.3.1"
   },

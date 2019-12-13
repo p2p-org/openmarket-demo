@@ -17,9 +17,9 @@ export default {
   data: () => ({
   }),
   created() {
-    if (this.$route.name === 'index') {
+    // if (this.$route.name === 'index') {
       this.$router.push(this.localePath({ name: 'market' }))
-    }
+    // }
   },
   mounted() {
 

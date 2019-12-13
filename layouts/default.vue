@@ -29,9 +29,9 @@ export default {
     }),
   },
   mounted() {
+    this.queryCoins()
     // this.initUsers().then(() => {
       this.stopLoader()
-    this.queryCoins()
     // })
   },
   methods: {
