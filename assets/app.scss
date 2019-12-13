@@ -1,46 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700,900&display=swap&subset=cyrillic,cyrillic-ext');
 @import url('https://fonts.googleapis.com/css?family=Raleway:700,900&display=swap');
-//@import "./fonts/stylesheet.css";
-
-// Fonts
-$font-family-sans-serif: "Roboto", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-
-$grid-gutter-width:           20px;
-$card-border-radius:          .625rem;
-//$card-border-width: 0;
-
-$primary: #0B53F9;
-$input-placeholder-color: #CFCFCF;
-$font-size-base: 1rem;
-$body-bg:                   #F8F8F8 !default;
-
-
-$navbar-light-color:                rgba($primary, .5);
-$navbar-light-hover-color:          rgba($primary, .7);
-$navbar-light-active-color:         rgba($primary, .9);
-$navbar-light-disabled-color:       rgba($primary, .3);
-$navbar-light-toggler-border-color: rgba($primary, .1);
-
-$headings-line-height:        1;
-
-$h1-font-size:                $font-size-base * 2;
-$h2-font-size:                $font-size-base * 1.75;
-$h3-font-size:                $font-size-base * 1.5;
-$h4-font-size:                $font-size-base * 1.25;
-$h5-font-size:                $font-size-base * 1.125;
-$h6-font-size:                $font-size-base * .875;
-
-
-$small-font-size:             66.6667%;
-
-$text-muted: #7c7c7c;
-$input-btn-focus-width: 0;
-
+@import 'variables';
 @import '~bootstrap/scss/bootstrap';
 @import "~bootstrap-vue/src/index";
-
-
-
 
 html,
 body {
