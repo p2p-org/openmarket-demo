@@ -146,6 +146,7 @@ export default {
    ** Build configuration
    */
   build: {
+    extractCSS: true,
     transpile: [
       "vee-validate/dist/rules"
     ],
