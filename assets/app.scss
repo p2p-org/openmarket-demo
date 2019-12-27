@@ -17,121 +17,58 @@ body {
 // themes
 
 #__layout {
-  .light {
     min-height: 100%;
     padding-bottom: 5rem;
     //background-color: #F8F8F8;
-    header {
-      background-color: #fff;
-    }
-    p {
-      color: #464A59;
-    }
-    div {
-      &.label {
-        color: #BABCCC;
-      }
-    }
-    h1,h2,h3,h4,h5,h6 {
-      color: #464A59;
-    }
+}
 
-    legend {
-      color: #BABCCC;
-    }
-
-    .card {
-      border-color: transparent !important;
-      &.bg-primary {
-        background-color: #3299F4 !important;
-        color: white;
-      }
-      &.bg-success {
-        background-color: #71E2B5 !important;
-        color: white;
-      }
-      &.bg-danger {
-        background-color: #F87173 !important;
-        color: white;
-      }
-      &.bg-warning {
-        background-color: #FDBB69 !important;
-        color: white;
-      }
-      &.bg-info {
-        background-color: #AC81F2 !important;
-        color: white;
-      }
-      &.bg-secondary {
-        background-color: #EFEFEF !important;
-        //color: white;
-      }
-
-    }
-  }
-
-  .dark {
-    min-height: 100%;
-    padding-bottom: 5rem;
-    color: #AEBEDE;
-    background-color: #0F1622;
-    header {
-      //background-color: #fff;
-    }
-    p {
-      color: #B8C8EA;
-    }
-    div {
-      &.label {
-        color: #B8C8EA;
-      }
-    }
-    h1,h2,h3,h4,h5,h6 {
-      color: white;
-    }
-    .card {
-      background-color: #19212F;
-      border-color: transparent !important;
-
-      &.bg-primary {
-        background-color: #3299F4 !important;
-        color: white;
-      }
-
-      &.bg-success {
-        background-color: #71E2B5 !important;
-        color: white;
-      }
-
-      &.bg-danger {
-        background-color: #F87173 !important;
-        color: white;
-      }
-
-      &.bg-warning {
-        background-color: #FDBB69 !important;
-        color: white;
-      }
-
-      &.bg-info {
-        background-color: #AC81F2 !important;
-        color: white;
-      }
-
-      &.bg-secondary {
-        background-color: #19212F !important;
-        color: white;
-      }
-    }
-    .form-control {
-      background-color: #19212F;
-      border-color: #fff;
-    }
-
+p {
+  color: #464A59;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+div {
+  &.label {
+    color: #BABCCC;
   }
 }
 
+legend {
+  color: #BABCCC;
+}
+
+.card {
+  border-color: transparent !important;
+  &.bg-primary {
+    background-color: #3299F4 !important;
+    color: white;
+  }
+  &.bg-success {
+    background-color: #71E2B5 !important;
+    color: white;
+  }
+  &.bg-danger {
+    background-color: #F87173 !important;
+    color: white;
+  }
+  &.bg-warning {
+    background-color: #FDBB69 !important;
+    color: white;
+  }
+  &.bg-info {
+    background-color: #AC81F2 !important;
+    color: white;
+  }
+  &.bg-secondary {
+    background-color: #EFEFEF !important;
+    //color: white;
+  }
+
+}
+
+
 header {
+  background-color: $white;
   .navbar-brand {
     font-weight: bold;
     text-transform: uppercase;
@@ -147,6 +84,7 @@ header {
 //  transition: all .35s;
 //}
 h1,h2,h3,h4,h5,h6 {
+  color: #464A59;
   &.subtitle {
     font-weight: 600;
   }
@@ -273,9 +211,24 @@ $cards-per-line: (
   }
 }
 
-p {
-  font-size: 0.875rem;
-  line-height: 1.7;
+.navbar.tool-bar  {
+  padding-top: 0;
+  padding-bottom: 0;
+  .show > .nav-link, .active > .nav-link, .nav-link.show, .nav-link.active {
+    color: $black;
+    border-bottom: solid 2px $black;
+  }
+}
+
+.nav-pills {
+  .nav-link {
+    color: $navbar-light-color;
+  }
+
+  .nav-link.active, .show > .nav-link {
+    color: $black;
+    background-color: $white;
+  }
 }
 
 .btn-outline-default {

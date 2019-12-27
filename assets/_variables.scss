@@ -11,13 +11,18 @@ $font-size-base: 1rem;
 $body-bg:                   #F8F8F8 !default;
 
 
-$navbar-light-color:                rgba($primary, .5);
+//$navbar-light-color:                rgba($primary, .5);
 $navbar-light-hover-color:          rgba($primary, .7);
 $navbar-light-active-color:         rgba($primary, .9);
-$navbar-light-disabled-color:       rgba($primary, .3);
-$navbar-light-toggler-border-color: rgba($primary, .1);
+//$navbar-light-disabled-color:       rgba($primary, .3);
+//$navbar-light-toggler-border-color: rgba($primary, .1);
+
+$nav-pills-border-radius:           50rem;
+$nav-pills-link-active-color:       #000;
+$nav-pills-link-active-bg:          #fff;
 
 $headings-line-height:        1;
+$card-border-width: 0;
 
 $h1-font-size:                $font-size-base * 2;
 $h2-font-size:                $font-size-base * 1.75;

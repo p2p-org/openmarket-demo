@@ -39,14 +39,6 @@ export default {
   name: 'FormItemOffersList',
   components: { CoinPriceInline, Jazzicon },
   props: {
-    currencyImage: {
-      type: String,
-      default: null,
-    },
-    owner: {
-      type: Object,
-      default: null,
-    },
     busy: {
       type: Boolean,
       default: false,
@@ -59,23 +51,18 @@ export default {
   data: () => ({
     price: '1',
     fields: [
-      { key: 'price', sortable: false, class: ' ' },
+      { key: 'price', label: 'Offer', sortable: false, class: ' ' },
       { key: 'buyer', sortable: false, class: ' ' },
       { key: 'created_at', label: 'Date', sortable: false, class: ' ' },
-      { key: 'actions', label: '', class: 'offer-actions ' }
+      { key: 'actions', label: '', class: 'offer-actions ' },
     ],
   }),
   computed: {
     ...mapGetters('user', ['currentUser']),
-
-
     buyer() {
       return this.currentUser ? this.currentUser.address : null
     },
 
-    ownerAddress() {
-      return this.owner.address || null
-    },
   },
   methods: {
     isMyOffer(offer) {

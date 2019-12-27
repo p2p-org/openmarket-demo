@@ -25,8 +25,11 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
       commit(MARKET_ALL_NFT, nfts)
     })
 }
+export function queryNftMeta({ rootState }, nft) {
+  return this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))
+}
 
-export function queryNft({ state, commit, rootState }, { force = false, params = {} } = {}) {
+export function queryNft({ state, commit, rootState, dispatch }, { force = false, params = {} } = {}) {
   // const nft = state.nfts.find(n => n.token_id === params.tokenId)
   // if (!nft || (state.nfts.length && !force)) return Promise.resolve()
   if (state.nfts.length && !force) return Promise.resolve()
@@ -34,7 +37,7 @@ export function queryNft({ state, commit, rootState }, { force = false, params =
     this.$marketApi
       .getNfts(params)
       .then(nfts => {
-        return Promise.all(nfts.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then(metas =>
+        return Promise.all(nfts.map(nft => dispatch('queryNftMeta', nft))).then(metas =>
           nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
         )
       })
@@ -59,14 +62,16 @@ export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
   // readonly orderPrice?: SortOrder
   // readonly minPrice?: string
   // readonly maxPrice?: string
-  const { tokenId } = params
+  const { tokenId = null } = params
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNftOffers(params)
       .then(offers => {
         console.debug('nft offers', offers)
-        commit(MARKET_ITEM_OFFERS, { tokenId, offers })
-        resolve()
+        if (tokenId) {
+          commit(MARKET_ITEM_OFFERS, { tokenId, offers })
+        }
+        resolve(offers)
       })
       .catch(reject)
   })
@@ -81,14 +86,16 @@ export function queryBid({ state, commit, rootState }, { params = {} } = {}) {
   // readonly orderPrice?: SortOrder
   // readonly minPrice?: string
   // readonly maxPrice?: string
-  const { tokenId } = params
+  const { tokenId = null } = params
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNftBids(params)
       .then(bids => {
         console.debug('nft bids', bids)
-        commit(MARKET_ITEM_BIDS, { tokenId, bids })
-        resolve()
+        if (tokenId) {
+          commit(MARKET_ITEM_BIDS, { tokenId, bids })
+        }
+        resolve(bids)
       })
       .catch(reject)
   })
