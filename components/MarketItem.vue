@@ -202,7 +202,7 @@
               </b-card>
             </b-col>
           </b-row>
-          <h5 class="subtitle mt-5 mb-3">
+          <h5 v-if="owned" class="subtitle mt-5 mb-3">
             Burn <small class="text-danger">(be careful, it's irreversible)</small>
           </h5>
           <form-item-burn v-if="owned" :busy="busy" @submit="onBurn" />

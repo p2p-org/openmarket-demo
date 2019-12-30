@@ -12,6 +12,8 @@ export const state = () => ({
   baseNftDenom: 'denom_basic',
   baseCoinDenom: 'token',
   baseCoinImage: '/images/currency_atom.png',
+  stakeCoinDenom: 'stake',
+  stakeCoinImage: '/images/currency_stake.png',
   coins: {
     token: {
       name: 'TKN',

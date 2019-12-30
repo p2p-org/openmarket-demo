@@ -1,5 +1,5 @@
 <template>
-  <div :class="theme">
+  <div>
     <page-header v-if="!loading" />
     <nuxt v-if="!loading" />
     <!--    <page-footer />-->
@@ -25,7 +25,6 @@ export default {
   computed: {
     ...mapState({
       loading: state => state.loading,
-      theme: state => state.theme,
     }),
   },
   mounted() {

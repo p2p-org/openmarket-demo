@@ -18,6 +18,9 @@
             <b-nav-item v-if="currentUser" :to="localePath({ name: 'market', query: { owner: currentUser.address } })" :class="{ active: isMarketRoute && isMyNftRoute }" exact>
               My NFT's
             </b-nav-item>
+            <b-nav-item v-if="currentUser" :to="localePath({ name: 'my' })">
+              My Account
+            </b-nav-item>
             <b-nav-item v-if="currentUser" :to="localePath({ name: 'nft' })">
               Mint
             </b-nav-item>
