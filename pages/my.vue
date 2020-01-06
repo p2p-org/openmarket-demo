@@ -65,8 +65,8 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import Jazzicon from '@/components/Jazzicon'
-import Market from '@/components/Market'
+import Jazzicon from '~/components/Jazzicon'
+import Market from '~/components/Market'
 export default {
   name: 'PageMyAccount',
   components: {

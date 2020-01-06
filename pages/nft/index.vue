@@ -6,8 +6,8 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import Nft from '@/components/Nft'
-import Page from '@/components/Page'
+import Nft from '~/components/Nft'
+import Page from '~/components/Page'
 
 export default {
   name: 'PageNft',

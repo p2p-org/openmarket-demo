@@ -3,7 +3,7 @@
     <b-navbar toggleable="lg">
       <b-container>
         <b-navbar-brand to="/" exact>
-          <!--        <b-img src="@/assets/psc_logo_web_2d.png"></b-img>-->
+          <!--        <b-img src="~/assets/psc_logo_web_2d.png"></b-img>-->
           Open Market
         </b-navbar-brand>
         <b-navbar-toggle target="nav_collapse" />

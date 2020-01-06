@@ -22,7 +22,7 @@ import {
   ACTION_SUCCESS,
   ACTION_TOKEN_BURN,
   ACTION_TOKEN_TRNSFER,
-} from '../helpers/action-types'
+} from '~/helpers/action-types'
 
 export default {
   name: 'MarketWrapper',

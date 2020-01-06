@@ -73,7 +73,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { ACTION_AUCTION_CANCEL, ACTION_FIXED_BUY, ACTION_FIXED_CANCEL } from '../helpers/action-types'
+import { ACTION_AUCTION_CANCEL, ACTION_FIXED_BUY, ACTION_FIXED_CANCEL } from '~/helpers/action-types'
 import CoinPriceCompact from './elements/CoinPriceCompact'
 
 export default {

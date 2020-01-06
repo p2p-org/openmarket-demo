@@ -25,9 +25,9 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { ACTION_OFFER_ACCEPT, ACTION_OFFER_CANCEL, ACTION_SUCCESS } from '../../helpers/action-types'
-import { prepOffer } from '@/helpers'
-import FormUserOffersList from '@/components/form/UserOffersList'
+import { ACTION_OFFER_ACCEPT, ACTION_OFFER_CANCEL, ACTION_SUCCESS } from '~/helpers/action-types'
+import { prepOffer } from '~/helpers'
+import FormUserOffersList from '~/components/form/UserOffersList'
 
 export default {
   name: 'TabMyOffers',

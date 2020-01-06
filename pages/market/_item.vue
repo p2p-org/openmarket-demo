@@ -6,8 +6,8 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import Market from '@/components/Market'
-import MarketItem from '@/components/MarketItem'
+import Market from '~/components/Market'
+import MarketItem from '~/components/MarketItem'
 
 export default {
   name: 'PageMarketItem',

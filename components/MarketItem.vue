@@ -219,7 +219,7 @@ import {
   ACTION_TOKEN_BURN,
   ACTION_TOKEN_TRNSFER,
   ACTION_SUCCESS,
-} from '../helpers/action-types'
+} from '~/helpers/action-types'
 import FormItemOffer from './form/ItemOffer'
 import FormItemSell from './form/ItemSell'
 import FormItemOwner from './form/ItemOwner'
