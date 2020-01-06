@@ -1,110 +1,6 @@
 <template>
   <section class="user">
-    <b-card v-if="currentUser" no-body class="py-3 mb-3">
-      <b-container>
-        <b-row>
-          <b-col>
-            <b-row>
-              <b-col>
-                <div class="d-flex flex-row align-items-center">
-                  <client-only>
-                    <jazzicon :address="userAddress" :diameter="70" />
-                  </client-only>
-                  <h3 class="ml-3">
-                    {{ currentUser.name }}
-                    <br >
-                    <small class="text-muted">
-                      {{ currentUser.address }}
-                    </small>
-                  </h3>
-                </div>
-              </b-col>
-              <b-col lg="5" class="d-flex flex-column">
-                <h6 class="text-muted">
-                  Balances
-                </h6>
-                <b-list-group flush>
-                  <b-list-group-item
-                    v-for="(c, k) in currentUser.coins"
-                    :key="k"
-                    class="d-flex justify-content-between align-items-center border-0 px-0"
-                  >
-                    <div class="d-flex align-items-center">
-                      <b-img :src="coinImage(c.denom)" rounded="circle" width="25px" height="25px" />
-                      <h5 class="ml-2 my-0">
-                        {{ c.amount }}
-                        <small>{{ coinName(c.denom) }} <span class="text-muted">({{ c.denom }})</span></small>
-                      </h5>
-                    </div>
-                    <b-btn variant="primary" disabled size="sm">
-                      Add funds
-                    </b-btn>
-                  </b-list-group-item>
-                </b-list-group>
-                <!--                  <div v-for="c in currentUser.coins">-->
-                <!--                    <div class="d-flex justify-content-middle align-items-center">-->
-                <!--                      <b-img :src="coinImage(c.denom)" rounded="circle" width="33px" height="33px" />-->
-                <!--                      <h1 class="ml-2 my-0">-->
-                <!--                        <b>{{ c.amount | priceBig }}</b> {{ coinName(c.denom) }}-->
-                <!--                      </h1>-->
-                <!--                    </div>-->
-                <!--&lt;!&ndash;                    <h4 class="mt-1">&ndash;&gt;-->
-                <!--&lt;!&ndash;                      <small class="text-muted">{{ price.value | priceEth(rate) }}</small>&ndash;&gt;-->
-                <!--&lt;!&ndash;                    </h4>&ndash;&gt;-->
-                <!--                  </div>-->
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-      </b-container>
-    </b-card>
     <b-container>
-      <b-row>
-        <b-col lg="10" xl="8" class="mx-auto">
-          <b-card class="mb-3 p-2 market-action">
-            <ValidationObserver ref="observer" v-slot="{ passes, invalid }">
-              <b-form novalidate @submit.stop.prevent="passes(onCoinTransfer)">
-                <b-row>
-                  <b-col>
-                    <b-text-input-prep
-                      v-model="recipient"
-                      :rules="{ required: true, regex: /^cosmos[a-z0-9]{39}$/i }"
-                      name="Recipient"
-                      type="text"
-                      label="Enter recipient address"
-                      placeholder="address"
-                      :disabled="busyTx"
-                    >
-                      <b-input-group-text>
-                        <fa :icon="['fas', 'address-book']" />
-                      </b-input-group-text>
-                    </b-text-input-prep>
-                  </b-col>
-                  <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
-                    <b-price-user-input
-                      v-model="coin"
-                      name="Coins amount"
-                      type="text"
-                      label="Enter coins amount"
-                      placeholder="amount"
-                      :disabled="busyTx"
-                    />
-                  </b-col>
-                </b-row>
-                <b-row class="mt-2">
-                  <b-col md="6" />
-                  <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
-                    <b-btn variant="primary" size="lg" class="py-2" :disabled="busyTx || invalid" type="submit">
-                      Send coins
-                      <b-spinner v-if="busyTx" type="grow" small />
-                    </b-btn>
-                  </b-col>
-                </b-row>
-              </b-form>
-            </ValidationObserver>
-          </b-card>
-        </b-col>
-      </b-row>
       <b-row class="justify-content-md-center">
         <b-col lg="10" xl="8">
           <h5 v-if="address !== null">
@@ -120,9 +16,9 @@
             <b-form-group id="fieldset-address" label="Address" label-for="input-address">
               <b-form-input id="input-address" v-model="form.address" trim readonly />
             </b-form-group>
-            <b-form-group id="fieldset-address" label="Mnemonic" label-for="input-mnemonic">
+            <b-form-group id="fieldset-mnemonic" label="Mnemonic" label-for="input-mnemonic">
               <!--            <b-input-group>-->
-              <b-form-input id="input-address" v-model="form.mnemonic" trim :readonly="address !== null" />
+              <b-form-input id="input-mnemonic" v-model="form.mnemonic" trim :readonly="address !== null" />
               <!--              <b-input-group-append v-if="id === null">-->
               <!--                <b-button variant="info" @click="genMnemonic">Generate</b-button>-->
               <!--              </b-input-group-append>-->
@@ -180,7 +76,7 @@ export default {
       baseCoinDenom: state => state.config.baseCoinDenom,
 
       users: state => state.user.users,
-      current: state => state.user.current,
+      currentAddress: state => state.user.currentAddress,
     }),
     ...mapGetters('user', ['currentUser', 'userIdByAddress']),
     ...mapGetters('config', ['coinImage', 'coinName']),
@@ -192,7 +88,7 @@ export default {
     },
   },
   watch: {
-    current(address) {
+    currentAddress(address) {
       if (address) {
         //     console.log(this.$route)
         //     console.log(u)
@@ -221,7 +117,6 @@ export default {
   },
   methods: {
     ...mapActions('user', ['addUser', 'updUser', 'setCurrentUser', 'loadCurrentUserInfo']),
-    ...mapActions('market', ['coinTransfer', 'waitMarket']),
     doSetUser() {
       // if (!this.form.address) return
       this.busy = true
@@ -250,7 +145,7 @@ export default {
               this.form = { ...this.form, address }
               this.$bvModal.msgBoxOk('User added', { title: 'Success', okVariant: 'success' }).then(() => {
                 this.setCurrentUser(address)
-                // this.$router.push({ name: 'user-address', params: { address: this.current } })
+                // this.$router.push({ name: 'user-address', params: { address: this.currentAddress } })
               })
             })
             .catch(err => {
@@ -273,39 +168,6 @@ export default {
         // console.log(mnemonic)
         this.form = { name, mnemonic }
       }, 100)
-    },
-    onCoinTransfer() {
-      this.busyTx = true
-      this.$bvModal
-        .msgBoxConfirm('Confirm coin transfer?')
-        .then(confirm => {
-          if (confirm) {
-            return this.coinTransfer({ user: this.currentUser, recipient: this.recipient, coin: this.coin })
-              .then(res => this.waitMarket({ hash: res.result.txhash }))
-              .then(tx => {
-                console.log('tx mined', tx)
-                return this.loadCurrentUserInfo()
-              })
-              .then(() => {
-                this.recipient = null
-                this.coin = {
-                  amount: 0,
-                  denom: this.baseCoinDenom,
-                }
-                this.$refs.observer.reset()
-                return this.$bvModal.msgBoxOk('Coin transfered', { title: 'Great', okVariant: 'success' })
-              })
-              .catch(e => {
-                console.log('transfer fail', e)
-                if (e && e.message) {
-                  this.$bvModal.msgBoxOk(e.message, { title: 'Error', okVariant: 'danger' })
-                }
-              })
-          }
-        })
-        .then(() => {
-          this.busyTx = false
-        })
     },
   },
 }

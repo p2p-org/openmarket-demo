@@ -141,7 +141,12 @@ export default {
     },
     calcHash(text) {
       // return parseInt(text.slice(2, 10), 26)
-      return text ? text.match(/\d/g).reduce((a, n) => a + n) : 0
+      return text
+        ? text
+            .substring(8)
+            .match(/\d/g)
+            .reduce((a, n) => a + n)
+        : 0
       // return text ? text.split('').reduce((a, n) => a + n.charCodeAt(0), 0) : 0
     },
   },

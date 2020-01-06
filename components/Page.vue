@@ -1,6 +1,6 @@
 <template>
   <main class="main">
-    <slot></slot>
+    <slot />
   </main>
 </template>
 
@@ -9,13 +9,6 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'Page',
-  components: {},
-  data() {
-    return {}
-  },
-  computed: {},
-  created() {},
-  mounted() {},
 }
 </script>
 

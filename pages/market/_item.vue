@@ -1,13 +1,13 @@
 <template>
-  <page>
-    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rateETH"></market-item>
-  </page>
+  <market>
+    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rate" />
+  </market>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import Page from '@/components/Page'
-import MarketItem from '@/components/MarketItem'
+import Market from '~/components/Market'
+import MarketItem from '~/components/MarketItem'
 
 export default {
   name: 'PageMarketItem',
@@ -15,7 +15,7 @@ export default {
     // Must be a number
     return /^[\d\w]+$/.test(params.item)
   },
-  components: { MarketItem, Page },
+  components: { MarketItem, Market },
   // props: {
   //   id: {
   //     type: String,
@@ -26,10 +26,9 @@ export default {
   }),
   computed: {
     ...mapState({
-      rateETH: state => state.config.rateETH,
+      rate: state => state.config.rateETH,
+      userAddress: state => state.config.v,
     }),
-
-    ...mapGetters('user', ['currentUser']),
     ...mapGetters('market', ['findNft', 'findOffers', 'findBids']),
     nft() {
       return this.findNft(this.$route.params.item)
@@ -46,7 +45,7 @@ export default {
   watch: {
     nft(nft) {
       if (!nft) {
-        this.$router.push(this.localePath({ name: 'market', query: { owner: this.currentUser.address } }))
+        this.$router.push(this.localePath({ name: 'market', query: { owner: this.userAddress } }))
       }
     },
   },
@@ -61,7 +60,7 @@ export default {
       // .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
   },
   methods: {
-    ...mapActions('market', ['queryNft', 'nftSellFixed', 'nftCancelFixed', 'queryOffer', 'queryBid']),
+    ...mapActions('market', ['queryNft', 'queryOffer', 'queryBid']),
   },
 }
 </script>

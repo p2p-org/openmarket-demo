@@ -11,13 +11,18 @@ $font-size-base: 1rem;
 $body-bg:                   #F8F8F8 !default;
 
 
-$navbar-light-color:                rgba($primary, .5);
+//$navbar-light-color:                rgba($primary, .5);
 $navbar-light-hover-color:          rgba($primary, .7);
 $navbar-light-active-color:         rgba($primary, .9);
-$navbar-light-disabled-color:       rgba($primary, .3);
-$navbar-light-toggler-border-color: rgba($primary, .1);
+//$navbar-light-disabled-color:       rgba($primary, .3);
+//$navbar-light-toggler-border-color: rgba($primary, .1);
+
+$nav-pills-border-radius:           50rem;
+$nav-pills-link-active-color:       #000;
+$nav-pills-link-active-bg:          #fff;
 
 $headings-line-height:        1;
+$card-border-width: 0;
 
 $h1-font-size:                $font-size-base * 2;
 $h2-font-size:                $font-size-base * 1.75;
@@ -31,3 +36,8 @@ $small-font-size:             66.6667%;
 
 $text-muted: #7c7c7c;
 //$input-btn-focus-width: 0;
+
+//sort icons with primary color
+$b-table-sort-icon-bg-not-sorted: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='#0B53F9' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/></svg>");
+$b-table-sort-icon-bg-ascending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='#0B53F9' d='M51 1l25 23 24 22H1l25-22z'/><path fill='#0B53F9' opacity='.3' d='M51 101l25-23 24-22H1l25 22z'/></svg>");
+$b-table-sort-icon-bg-descending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='#0B53F9' opacity='.3' d='M51 1l25 23 24 22H1l25-22z'/><path fill='#0B53F9' d='M51 101l25-23 24-22H1l25 22z'/></svg>");

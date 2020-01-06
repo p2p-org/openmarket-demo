@@ -13,14 +13,23 @@ const round = v => Math.round((v + Number.EPSILON) * 10) / 10
 
 Vue.mixin({
   filters: {
-    mToDate(value, locale = null) {
+    toDate(value, locale = null) {
       if (!value) {
         return ''
       }
       if (locale) {
         value.locale(locale)
       }
-      return value.format('D MMM HH:mm')
+      return value.format('D MMM YYYY')
+    },
+    toTime(value, locale = null) {
+      if (!value) {
+        return ''
+      }
+      if (locale) {
+        value.locale(locale)
+      }
+      return value.format('HH:mm:ss')
     },
     // bnToEther(value) {
     //   return value ? utils.formatEther(value) : ''

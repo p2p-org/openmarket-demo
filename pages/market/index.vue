@@ -1,5 +1,5 @@
 <template>
-  <page>
+  <market>
     <b-container>
       <b-jumbotron class="banner1">
         <h1>BlockRobots</h1>
@@ -13,21 +13,21 @@
     <section class="market">
       <market-list :owner="owner" :search="search" />
     </section>
-  </page>
+  </market>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import MarketList from '@/components/MarketList'
-import Page from '@/components/Page'
+import MarketList from '~/components/MarketList'
+import Market from '~/components/Market'
 
 export default {
   name: 'PageMarket',
-  components: { Page, MarketList },
+  components: { Market, MarketList },
   data: () => ({}),
   computed: {
     ...mapState({
-      current: state => state.user.current,
+      currentAddress: state => state.user.currentAddress,
     }),
     owner() {
       return this.$route.query.owner || null
@@ -41,9 +41,9 @@ export default {
       handler(owner) {
         this.queryNft({ force: true, params: { owner } })
       },
-      immediate: true
+      immediate: true,
     },
-    current(to, from) {
+    currentAddress(to, from) {
       if (to && from) {
         if (this.owner === from) {
           this.$router.push({ name: this.$route.name, query: { ...this.$route.query, owner: to } })

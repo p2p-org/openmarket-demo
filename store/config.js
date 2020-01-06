@@ -1,4 +1,4 @@
-import { CONFIG_URLS } from './mutation-types'
+import { CONFIG_URLS } from '~/helpers/mutation-types'
 
 export const state = () => ({
   lcdUrl: '/_lcd',
@@ -12,6 +12,8 @@ export const state = () => ({
   baseNftDenom: 'denom_basic',
   baseCoinDenom: 'token',
   baseCoinImage: '/images/currency_atom.png',
+  stakeCoinDenom: 'stake',
+  stakeCoinImage: '/images/currency_stake.png',
   coins: {
     token: {
       name: 'TKN',

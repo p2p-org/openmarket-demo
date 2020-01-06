@@ -54,7 +54,7 @@ export default {
     ...mapState({
       coins: state => state.market.coins,
     }),
-    ...mapGetters('user', ['currentUser']),
+    ...mapGetters('user', ['currentUser', 'currentUserCoins']),
     ...mapGetters('config', ['coinImage', 'coinName']),
     innerCoins() {
       // if (this.currentUser && this.currentUser.coins) {
@@ -64,7 +64,7 @@ export default {
       if (this.denoms.length) {
         return this.coins.filter(d => this.denoms.includes(d))
       }
-      return this.currentUser ? this.coins.filter(d => this.currentUser.coins.findIndex(c => c.denom === d) !== -1) : this.coins
+      return this.currentUser ? this.coins.filter(d => this.currentUserCoins.findIndex(c => c.denom === d) !== -1) : this.coins
     },
     maxAmount() {
       if (!this.currentUser) return 0

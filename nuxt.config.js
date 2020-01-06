@@ -45,7 +45,7 @@ export default {
   /*
    ** Global CSS
    */
-  css: ['@/assets/app.scss'],
+  css: ['~/assets/app.scss'],
   /*
    ** Plugins to load before mounting the App
    */
@@ -84,18 +84,18 @@ export default {
         // !!! IMPORTANT !!!
         // don't forget to add locales from vee-validate-i18n plugin
         locales: [
-          {
-            code: 'en',
-            file: 'en-US.js',
-            iso: 'en-US',
-            name: 'English',
-          },
           // {
           //   code: 'ru',
           //   file: 'ru-RU.js',
           //   iso: 'ru-RU',
           //   name: 'Русский',
           // },
+          {
+            code: 'en',  // Make sure that defualt locale is the last one!
+            file: 'en-US.js',
+            iso: 'en-US',
+            name: 'English',
+          },
         ],
         defaultLocale: 'en',
         lazy: true,

@@ -1,12 +1,10 @@
 <template>
-  <div>
-    <div class="d-flex justify-content-middle align-items-center">
-      <b-img :src="img" rounded="circle" width="31px" height="31px" />
-      <h5 class="ml-2 my-0">
-        {{ price.amount | priceBig }} <small>{{ name }} <span
-        class="text-muted">({{ denom }})</span></small>
-      </h5>
-    </div>
+  <div class="d-flex justify-content-middle align-items-center">
+    <b-img :src="img" rounded="circle" width="31px" height="31px" />
+    <h5 class="ml-2 my-0">
+      {{ price.amount | priceBig }} <small>{{ name }} <span
+      class="text-muted d-none d-lg-inline">({{ denom }})</span></small>
+    </h5>
   </div>
 </template>
 
