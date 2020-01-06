@@ -85,9 +85,9 @@
             <b-nav-item-dropdown right toggle-class="d-flex flex-row align-items-center">
               <template slot="button-content">
 <!--                <fa :icon="['fas', 'user']" /> {{ userName | truncate(5) }}-->
-                <template v-if="current">
+                <template v-if="currentAddress">
                   <client-only>
-                    <jazzicon :address="userAddress" :diameter="24" />
+                    <jazzicon :address="currentAddress" :diameter="24" />
                   </client-only>
                   <h6 class="my-0">{{ userName | truncate(10) }} <small>{{ userBalance }} {{ coinName(baseCoinDenom) }}</small></h6>
                 </template>
@@ -144,9 +144,9 @@
               <b-dropdown-item :to="localePath({ name: 'user-address' })" exact variant="success">
                 <fa :icon="['fas', 'sign-in-alt']" /> login
               </b-dropdown-item>
-              <template v-if="current">
+              <template v-if="currentAddress">
                 <b-dropdown-divider />
-                <b-dropdown-item :to="localePath({ name: 'user-address', params: { address: current } })" exact variant="warning">
+                <b-dropdown-item :to="localePath({ name: 'user-address', params: { address: currentAddress } })" exact variant="warning">
                   <fa :icon="['fas', 'edit']" /> details
                 </b-dropdown-item>
                 <b-dropdown-item variant="danger" @click="delCurrentUser">
@@ -182,19 +182,15 @@ export default {
   },
   computed: {
     ...mapState({
-      users: state => state.user.users,
       mockUsers: state => state.config.mockUsers,
       baseCoinDenom: state => state.config.baseCoinDenom,
-      current: state => state.user.current,
+      currentAddress: state => state.user.currentAddress,
     }),
     // ...mapGetters(['getTheme']),
     ...mapGetters('user', ['currentUser', 'usersList']),
     ...mapGetters('config', ['coinImage', 'coinName']),
     userName() {
       return this.currentUser ? this.currentUser.name : ''
-    },
-    userAddress() {
-      return this.currentUser ? this.currentUser.address.substring(8) : ''
     },
     userBalance() {
       let val = 0
@@ -204,15 +200,11 @@ export default {
       }
       return val
     },
-    // loggedUsers() {
-    //   console.log(this.users)
-    //   return Object.keys(this.users).map(u => ({ ...u, active: u.address === this.current }))
-    // },
     isMyNftRoute() {
-      return  this.currentUser && this.$route.query.owner && this.$route.query.owner === this.currentUser.address
+      return this.currentAddress && this.$route.query.owner && this.$route.query.owner === this.currentAddress
     },
     isMarketRoute() {
-      return this.$route.name === 'market' || this.$route.name === 'market-item'
+      return this.getRouteBaseName() === 'market' || this.getRouteBaseName() === 'market-item'
     },
   },
   // created() {
@@ -220,7 +212,7 @@ export default {
   //
   // },
   watch: {
-    current(address) {
+    currentAddress(address) {
       if (address) {
         this.loadUserInfo({ address })
       }

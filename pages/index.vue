@@ -9,22 +9,15 @@
 </template>
 
 <script>
-import Page from '../components/Page'
+import Page from '@/components/Page'
 
 export default {
   name: 'PageIndex',
   components: { Page },
-  data: () => ({
-  }),
   created() {
     // if (this.$route.name === 'index') {
       this.$router.push(this.localePath({ name: 'market' }))
     // }
-  },
-  mounted() {
-
-  },
-  methods: {
   },
 }
 </script>

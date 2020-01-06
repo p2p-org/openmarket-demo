@@ -1,4 +1,4 @@
-import { CONFIG_URLS } from './mutation-types'
+import { CONFIG_URLS } from '~/helpers/mutation-types'
 
 export const state = () => ({
   lcdUrl: '/_lcd',

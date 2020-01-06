@@ -1,5 +1,4 @@
 <template>
-  <section v-if="currentUser" class="user">
     <b-container>
       <b-row>
         <b-col>
@@ -72,7 +71,6 @@
       </b-row>
 
     </b-container>
-  </section>
 </template>
 
 <script>
@@ -82,7 +80,7 @@ import BTextInputPrep from '../../components/form/inputs/BTextInputPrep'
 import BPriceUserInput from '../../components/form/inputs/BPriceUserInput'
 
 export default {
-  name: 'UserLogin',
+  name: 'TabMyBalances',
   components: {
     BPriceUserInput,
     BTextInputPrep,
@@ -104,18 +102,10 @@ export default {
   computed: {
     ...mapState({
       baseCoinDenom: state => state.config.baseCoinDenom,
-
-      users: state => state.user.users,
-      current: state => state.user.current,
+      currentAddress: state => state.user.currentAddress,
     }),
     ...mapGetters('user', ['currentUser', 'userIdByAddress', 'currentUserCoins']),
     ...mapGetters('config', ['coinImage', 'coinName']),
-    address() {
-      return this.$route.params.address !== null && typeof this.$route.params.address !== 'undefined' ? this.$route.params.address : null
-    },
-    userAddress() {
-      return this.currentUser ? this.currentUser.address.substring(8) : ''
-    },
     userBalance() {
       let val = 0
       if (this.currentUser && this.currentUser.coins && this.currentUser.coins.length) {
@@ -126,32 +116,10 @@ export default {
     },
 
   },
-  watch: {
-    current(address) {
-      if (address) {
-        //     console.log(this.$route)
-        //     console.log(u)
-        //     const id = this.userIdByAddress(u.address)
-        //     if (id !== -1) {
-        this.$router.push({ name: this.$route.name, params: { address } })
-        //     }
-        this.form = { ...this.currentUser }
-      }
-    },
-  },
   created() {
     this.coin = {
       amount: 0,
       denom: this.baseCoinDenom,
-    }
-  },
-  mounted() {
-    if (this.address && this.users[this.address]) {
-      // this.setCurrentUser(this.address).then(() => {
-      this.form = { ...this.currentUser }
-      // })
-    } else {
-      this.$router.push({ name: this.$route.name })
     }
   },
   methods: {

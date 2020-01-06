@@ -5,7 +5,7 @@ import {
   MARKET_ITEM_BIDS,
   MARKET_ITEM_OFFERS,
   MARKET_COINS,
-} from '../mutation-types'
+} from '~/helpers/mutation-types'
 import { prepToken, prepOffer, prepBid, prepNft } from '~/helpers'
 
 export default {
@@ -13,15 +13,27 @@ export default {
     nfts.forEach(nft => {
       let idx = state.offers.findIndex(n => n.token_id === nft.token_id)
       if (idx !== -1) {
-        state.offers.splice(idx, 1, { token_id: nft.token_id, offers: nft.offers.map(o => prepOffer({...o, nft: {owner_address: nft.owner.address}})) })
+        state.offers.splice(idx, 1, {
+          token_id: nft.token_id,
+          offers: nft.offers.map(o => prepOffer({ ...o, nft: { token_id: nft.token_id, owner_address: nft.owner.address } })),
+        })
       } else {
-        state.offers.push({ token_id: nft.token_id, offers: nft.offers.map(o => prepOffer({...o, nft: {owner_address: nft.owner.address}})) })
+        state.offers.push({
+          token_id: nft.token_id,
+          offers: nft.offers.map(o => prepOffer({ ...o, nft: { token_id: nft.token_id, owner_address: nft.owner.address } })),
+        })
       }
       idx = state.bids.findIndex(n => n.token_id === nft.token_id)
       if (idx !== -1) {
-        state.bids.splice(idx, 1, { token_id: nft.token_id, bids: nft.bids.map(b => prepBid({...b, nft: {owner_address: nft.owner.address}})) })
+        state.bids.splice(idx, 1, {
+          token_id: nft.token_id,
+          bids: nft.bids.map(b => prepBid({ ...b, nft: { token_id: nft.token_id, owner_address: nft.owner.address } })),
+        })
       } else {
-        state.bids.push({ token_id: nft.token_id, bids: nft.bids.map(b => prepBid({...b, nft: {owner_address: nft.owner.address}})) })
+        state.bids.push({
+          token_id: nft.token_id,
+          bids: nft.bids.map(b => prepBid({ ...b, nft: { token_id: nft.token_id, owner_address: nft.owner.address } })),
+        })
       }
       nft.offer = undefined
       nft.bids = undefined

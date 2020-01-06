@@ -32,7 +32,7 @@ export function setCurrentUser({ commit, dispatch }, address) {
 }
 
 export function delCurrentUser({ state, dispatch }) {
-  return dispatch('delUser', state.current)
+  return dispatch('delUser', state.currentAddress)
 }
 
 export function delUser({ commit, dispatch }, address) {
@@ -41,7 +41,7 @@ export function delUser({ commit, dispatch }, address) {
 }
 
 export function updCurrentUser({ state, dispatch }, { params = {} }) {
-  return dispatch('updUser', { address: state.current, params })
+  return dispatch('updUser', { address: state.currentAddress, params })
 }
 
 export function updUser({ commit, dispatch }, { address, params = {} }) {
@@ -50,7 +50,7 @@ export function updUser({ commit, dispatch }, { address, params = {} }) {
 }
 
 export function loadCurrentUserInfo({ state, dispatch }) {
-  return dispatch('loadUserInfo', { address: state.current })
+  return dispatch('loadUserInfo', { address: state.currentAddress })
 }
 
 export function loadUserInfo({ commit, state, getters, rootState }, { address }) {

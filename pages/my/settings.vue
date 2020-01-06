@@ -2,14 +2,9 @@
   <section v-if="currentUser" class="user">
     <b-container>
       <b-row>
-        <b-col lg="10" xl="8" class="mx-auto">
-          <b-card class="mb-3 p-2">
-            <h6 class="text-muted">
-              Settings
-            </h6>
-            <div class="text-center  my-2">
-              <strong>under construction...</strong>
-            </div>
+        <b-col>
+          <b-card body-class="text-center">
+            <strong>under construction...</strong>
           </b-card>
         </b-col>
       </b-row>
@@ -21,7 +16,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
-  name: 'PageMySettings',
+  name: 'TabMySettings',
   components: {},
   data: () => ({
     form: {},

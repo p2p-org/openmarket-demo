@@ -1,4 +1,4 @@
-import { CONFIG_URLS, FINISH_LOADER, START_LOADER } from './mutation-types'
+import { CONFIG_URLS, FINISH_LOADER, START_LOADER } from '~/helpers/mutation-types'
 
 export const state = () => ({
   loading: true,

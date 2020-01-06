@@ -6,13 +6,13 @@ export default {
     } else {
       state.users = { ...state.users, [address]: { name, address, mnemonic, ecpairPriv, ...params } }
     }
-    // state.current = address
+    // state.currentAddress = address
   },
   setCurrentUser(state, address) {
     if (state.users[address]) {
-      state.current = address
+      state.currentAddress = address
     } else {
-      state.current = Object.keys(state.users)[0] || null
+      state.currentAddress = Object.keys(state.users)[0] || null
     }
   },
   delUser(state, address) {
@@ -25,8 +25,8 @@ export default {
     // if (state.users[address]) {
     //   delete state.users[address]
     // }
-    if (state.current === address) {
-      state.current = Object.keys(state.users)[0] || null
+    if (state.currentAddress === address) {
+      state.currentAddress = Object.keys(state.users)[0] || null
     }
   },
 
@@ -43,7 +43,7 @@ export default {
       const current = JSON.parse(localStorage.getItem('current'))
       if (users && Object.keys(users).length) {
         state.users = users
-        state.current = users[current] ? current : Object.keys(users)[0]
+        state.currentAddress = users[current] ? current : Object.keys(users)[0]
       }
     }
   },
@@ -51,7 +51,7 @@ export default {
   saveLocalUsers(state) {
     if (typeof Storage !== 'undefined') {
       localStorage.setItem('users', JSON.stringify(state.users))
-      localStorage.setItem('current', JSON.stringify(state.current))
+      localStorage.setItem('current', JSON.stringify(state.currentAddress))
     }
   },
   setServiceUser(state, { address = null, ecpairPriv = null, params = {} }) {

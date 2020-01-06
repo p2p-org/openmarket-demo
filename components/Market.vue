@@ -1,12 +1,31 @@
 <template>
-  <div><slot /></div>
+  <main class="market">
+    <slot />
+  </main>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
+import {
+  ACTION_AUCTION_BID,
+  ACTION_AUCTION_BUYOUT,
+  ACTION_AUCTION_CANCEL,
+  ACTION_AUCTION_FINISH,
+  ACTION_AUCTION_START,
+  ACTION_FAIL,
+  ACTION_FIXED_BUY,
+  ACTION_FIXED_CANCEL,
+  ACTION_FIXED_SELL,
+  ACTION_OFFER_ACCEPT,
+  ACTION_OFFER_CANCEL,
+  ACTION_OFFER_MAKE,
+  ACTION_SUCCESS,
+  ACTION_TOKEN_BURN,
+  ACTION_TOKEN_TRNSFER,
+} from '../helpers/action-types'
 
 export default {
-  name: 'Market',
+  name: 'MarketWrapper',
   data() {
     return {
       txWait: 2000, // approx. time needed to mine and index tx
@@ -19,19 +38,19 @@ export default {
     // },
   },
   mounted() {
-    this.$root.$on('marketSellFixed', this.doSellFixed)
-    this.$root.$on('marketBuyFixed', this.doBuyFixed)
-    this.$root.$on('marketCancelFixed', this.doCancelFixed)
-    this.$root.$on('marketMakeOffer', this.doMakeOffer)
-    this.$root.$on('marketAcceptOffer', this.doAcceptOffer)
-    this.$root.$on('marketCancelOffer', this.doCancelOffer)
-    this.$root.$on('marketPlaceBid', this.doPlaceBid)
-    this.$root.$on('marketBuyout', this.doBuyout)
-    this.$root.$on('marketStartAuction', this.doStartAuction)
-    this.$root.$on('marketFinishAuction', this.doFinishAuction)
-    this.$root.$on('marketCancelAuction', this.doCancelAuction)
-    this.$root.$on('marketTransfer', this.doTransfer)
-    this.$root.$on('marketBurn', this.doBurn)
+    this.$root.$on(ACTION_FIXED_SELL, this.doSellFixed)
+    this.$root.$on(ACTION_FIXED_BUY, this.doBuyFixed)
+    this.$root.$on(ACTION_FIXED_CANCEL, this.doCancelFixed)
+    this.$root.$on(ACTION_OFFER_MAKE, this.doMakeOffer)
+    this.$root.$on(ACTION_OFFER_ACCEPT, this.doAcceptOffer)
+    this.$root.$on(ACTION_OFFER_CANCEL, this.doCancelOffer)
+    this.$root.$on(ACTION_AUCTION_BID, this.doPlaceBid)
+    this.$root.$on(ACTION_AUCTION_BUYOUT, this.doBuyout)
+    this.$root.$on(ACTION_AUCTION_START, this.doStartAuction)
+    this.$root.$on(ACTION_AUCTION_FINISH, this.doFinishAuction)
+    this.$root.$on(ACTION_AUCTION_CANCEL, this.doCancelAuction)
+    this.$root.$on(ACTION_TOKEN_TRNSFER, this.doTransfer)
+    this.$root.$on(ACTION_TOKEN_BURN, this.doBurn)
   },
   methods: {
     ...mapActions('market', [
@@ -66,7 +85,7 @@ export default {
     },
     doSellFixed({ price, id, user }) {
       this.userAction(
-        'sellFixed',
+        ACTION_FIXED_SELL,
         id,
         'Confirm sell?',
         'NFT listed for Fixed Price',
@@ -83,7 +102,7 @@ export default {
     },
     doBuyFixed({ id, user }) {
       this.userAction(
-        'buyFixed',
+        ACTION_FIXED_BUY,
         id,
         'Confirm buy?',
         'Yep, you bought it!',
@@ -99,7 +118,7 @@ export default {
     },
     doCancelFixed({ id, user }) {
       this.userAction(
-        'cancelFixed',
+        ACTION_FIXED_CANCEL,
         id,
         'Confirm cancel sell?',
         'NFT unlisted',
@@ -115,7 +134,7 @@ export default {
     },
     doMakeOffer({ id, price, user }) {
       this.userAction(
-        'makeOffer',
+        ACTION_OFFER_MAKE,
         id,
         'Confirm make offer?',
         'Offer committed!',
@@ -132,7 +151,7 @@ export default {
     },
     doAcceptOffer({ id, offerId, user }) {
       this.userAction(
-        'acceptOffer',
+        ACTION_OFFER_ACCEPT,
         id,
         'Confirm accept offer?',
         'You accepted the offer, item sold!',
@@ -149,7 +168,7 @@ export default {
     },
     doCancelOffer({ id, offerId, user }) {
       this.userAction(
-        'cancelOffer',
+        ACTION_OFFER_CANCEL,
         id,
         'Confirm cancel offer?',
         'Offer removed!',
@@ -166,7 +185,7 @@ export default {
     },
     doStartAuction({ id, price, user, buyout, ends }) {
       this.userAction(
-        'startAuction',
+        ACTION_AUCTION_START,
         id,
         'Confirm start auction?',
         'Auction for item started!',
@@ -185,7 +204,7 @@ export default {
     },
     doPlaceBid({ id, price, user }) {
       this.userAction(
-        'placeBid',
+        ACTION_AUCTION_BID,
         id,
         'Confirm bid placing?',
         'Your bid placed',
@@ -202,7 +221,7 @@ export default {
     },
     doBuyout({ id, user }) {
       this.userAction(
-        'buyout',
+        ACTION_AUCTION_BUYOUT,
         id,
         'Confirm item buyout?',
         'Yep, you bought it!',
@@ -218,7 +237,7 @@ export default {
     },
     doCancelAuction({ id, user }) {
       this.userAction(
-        'cancelAuction',
+        ACTION_AUCTION_CANCEL,
         id,
         'Confirm cancel auction?',
         'NFT unlisted from auction',
@@ -234,7 +253,7 @@ export default {
     },
     doFinishAuction({ id, user }) {
       this.userAction(
-        'finishAuction',
+        ACTION_AUCTION_FINISH,
         id,
         'Confirm auction finishing?',
         'Auction finished!',
@@ -250,7 +269,7 @@ export default {
     },
     doTransfer({ id, recipient, user }) {
       this.userAction(
-        'transfer',
+        ACTION_TOKEN_TRNSFER,
         id,
         'Confirm transfer?',
         'NFT Transfered',
@@ -282,7 +301,7 @@ export default {
     },
     doBurn({ id, user }) {
       this.userAction(
-        'burn',
+        ACTION_TOKEN_BURN,
         id,
         'Confirm NFT burning?',
         'NFT eliminated!',
@@ -296,16 +315,17 @@ export default {
         () => this.clearNft(id)
       )
     },
-    handleOk(tokenId, msg, r) {
+    handleOk(action, tokenId, msg, r) {
+      console.log('action ok', action, tokenId, r)
       this.$bvModal.msgBoxOk(msg, { title: 'Great', okVariant: 'success' })
-      this.$root.$emit('userActionOk', { tokenId })
+      this.$root.$emit(ACTION_SUCCESS, { action, tokenId })
     },
-    handleErr(tokenId, e) {
-      console.log('action fail', tokenId, e)
+    handleErr(action, tokenId, e) {
+      console.log('action fail', action, tokenId, e)
       if (e && e.message) {
         this.$bvModal.msgBoxOk(e.message, { title: 'Error', okVariant: 'danger' })
       }
-      this.$root.$emit('userActionFail', { tokenId })
+      this.$root.$emit(ACTION_FAIL, { action, tokenId })
     },
     checkUser() {
       if (!this.currentUser) {
@@ -327,8 +347,8 @@ export default {
                 console.log('tx mined', tx)
                 return fSuccess()
               })
-              .then(() => this.handleOk(id, msgSuccess))
-              .catch(err => this.handleErr(id, err))
+              .then(() => this.handleOk(action, id, msgSuccess))
+              .catch(err => this.handleErr(action, id, err))
               .then(() => this.nftBusyUnlock({ tokenId: id }))
           } else {
             return this.nftBusyUnlock({ tokenId: id })

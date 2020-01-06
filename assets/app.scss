@@ -184,11 +184,14 @@ $cards-per-line: (
       font-size: 0.875rem;
       color: $text-muted;
       padding-bottom: 0;
+      padding-top: 0;
     }
     tr {
       //width: 100%;
       td {
-        //padding-bottom: 0.5rem;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        vertical-align: middle;
         background-color: $card-bg;
         background-clip: border-box;
         //border-top: $card-border-width solid $card-border-color;
@@ -327,6 +330,19 @@ span.value {
   font-weight: bold;
   text-transform: uppercase;
 }
+
+.el-datetime {
+  line-height: 1rem;
+  .date {
+    font-size: 0.875rem;
+  }
+  .time {
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+}
+
+
 /* transition */
 
 .page-enter-active, .page-leave-active {

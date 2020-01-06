@@ -72,7 +72,8 @@
 </template>
 
 <script>
-import {  mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import { ACTION_AUCTION_CANCEL, ACTION_FIXED_BUY, ACTION_FIXED_CANCEL } from '../helpers/action-types'
 import CoinPriceCompact from './elements/CoinPriceCompact'
 
 export default {
@@ -158,13 +159,13 @@ export default {
       this.$router.push(this.localePath({ name: 'market-item', params: { item: this.tokenId } }))
     },
     onCancelFixed() {
-      this.$root.$emit('marketCancelFixed', { id: this.nft.token_id, user: this.currentUser })
+      this.$root.$emit(ACTION_FIXED_CANCEL, { id: this.nft.token_id, user: this.currentUser })
     },
     onBuyFixed() {
-      this.$root.$emit('marketBuyFixed', { id: this.nft.token_id, user: this.currentUser })
+      this.$root.$emit(ACTION_FIXED_BUY, { id: this.nft.token_id, user: this.currentUser })
     },
     onCancelAuction() {
-      this.$root.$emit('marketCancelAuction', { id: this.nft.token_id, user: this.currentUser })
+      this.$root.$emit(ACTION_AUCTION_CANCEL, { id: this.nft.token_id, user: this.currentUser })
     },
   },
 }

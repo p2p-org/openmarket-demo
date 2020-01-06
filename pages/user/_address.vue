@@ -48,7 +48,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { ValidationObserver } from 'vee-validate'
 import BTextInputPrep from '../../components/form/inputs/BTextInputPrep'
 import BPriceUserInput from '../../components/form/inputs/BPriceUserInput'
-import Jazzicon from '~/components/Jazzicon'
+import Jazzicon from '@/components/Jazzicon'
 
 export default {
   name: 'UserLogin',
@@ -76,7 +76,7 @@ export default {
       baseCoinDenom: state => state.config.baseCoinDenom,
 
       users: state => state.user.users,
-      current: state => state.user.current,
+      currentAddress: state => state.user.currentAddress,
     }),
     ...mapGetters('user', ['currentUser', 'userIdByAddress']),
     ...mapGetters('config', ['coinImage', 'coinName']),
@@ -88,7 +88,7 @@ export default {
     },
   },
   watch: {
-    current(address) {
+    currentAddress(address) {
       if (address) {
         //     console.log(this.$route)
         //     console.log(u)
@@ -145,7 +145,7 @@ export default {
               this.form = { ...this.form, address }
               this.$bvModal.msgBoxOk('User added', { title: 'Success', okVariant: 'success' }).then(() => {
                 this.setCurrentUser(address)
-                // this.$router.push({ name: 'user-address', params: { address: this.current } })
+                // this.$router.push({ name: 'user-address', params: { address: this.currentAddress } })
               })
             })
             .catch(err => {

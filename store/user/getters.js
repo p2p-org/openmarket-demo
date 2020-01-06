@@ -1,11 +1,11 @@
 export function currentUser(state) {
-  return state.users[state.current] || null
-  // return state.users[state.current] ? { ...state.users[state.current] } : null
+  return state.users[state.currentAddress] || null
+  // return state.users[state.currentAddress] ? { ...state.users[state.currentAddress] } : null
 }
 
 // export function currentUserCoins(state, getters, rootState) {
-//   if (state.users[state.current]) {
-//     return rootState.config.coins.filter(c => state.users[state.current].coins.findIndex(x => x.denom === c.denom) !== -1)
+//   if (state.users[state.currentAddress]) {
+//     return rootState.config.coins.filter(c => state.users[state.currentAddress].coins.findIndex(x => x.denom === c.denom) !== -1)
 //   }
 //   return []
 // }
@@ -39,5 +39,5 @@ export function userIdByAddress(state) {
 }
 
 export function usersList(state) {
-  return Object.keys(state.users).map(k => ({ ...state.users[k], active: k === state.current }))
+  return Object.keys(state.users).map(k => ({ ...state.users[k], active: k === state.currentAddress }))
 }

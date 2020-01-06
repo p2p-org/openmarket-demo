@@ -12,8 +12,5 @@ import Page from '@/components/Page'
 export default {
   name: 'PageNft',
   components: { Page, Nft },
-  data: () => ({}),
-  mounted() {},
-  methods: {},
 }
 </script>
