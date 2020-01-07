@@ -1,26 +1,24 @@
 <template>
-  <section v-if="currentUser" class="user">
-    <b-container>
-      <b-row>
-        <b-col>
-          <b-tabs v-model="tabIndex" pills content-class="mt-3">
-            <b-tab title="Income offers" @click="loadIncomeOffers">
-              <form-user-offers-list v-if="incomeOffers.length" :items="incomeOffers" :busy="incomeOffersBusy" @cancel="onCancelOffer" @accept="onAcceptOffer"/>
-              <b-card v-else body-class="text-center">
-                <strong>No offers yet...</strong>
-              </b-card>
-            </b-tab>
-            <b-tab title="My offers" @click="loadMyOffers">
-              <form-user-offers-list v-if="myOffers.length" :items="myOffers" :busy="myOffersBusy" @cancel="onCancelOffer" @accept="onAcceptOffer"/>
-              <b-card v-else body-class="text-center">
-                <strong>No offers yet...</strong>
-              </b-card>
-            </b-tab>
-          </b-tabs>
-        </b-col>
-      </b-row>
-    </b-container>
-  </section>
+  <b-container>
+    <b-row>
+      <b-col>
+        <b-tabs v-model="tabIndex" pills content-class="mt-3">
+          <b-tab title="Income offers" @click="loadIncomeOffers">
+            <form-user-offers-list v-if="incomeOffers.length" :items="incomeOffers" :busy="incomeOffersBusy" @cancel="onCancelOffer" @accept="onAcceptOffer"/>
+            <b-card v-else body-class="text-center">
+              <strong>There are no income offers yet...</strong>
+            </b-card>
+          </b-tab>
+          <b-tab title="My offers" @click="loadMyOffers">
+            <form-user-offers-list v-if="myOffers.length" :items="myOffers" :busy="myOffersBusy" @cancel="onCancelOffer" @accept="onAcceptOffer"/>
+            <b-card v-else body-class="text-center">
+              <strong>There are no your offers yet...</strong>
+            </b-card>
+          </b-tab>
+        </b-tabs>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
@@ -33,16 +31,6 @@ export default {
   name: 'TabMyOffers',
   components: {
     FormUserOffersList,
-  },
-  props: {
-    roomId: {
-      type: String,
-      default: null,
-    },
-    messages: {
-      type: Array,
-      default: () => [],
-    },
   },
   data: () => ({
     tabIndex: 0,
@@ -83,7 +71,7 @@ export default {
     this.$root.$off(ACTION_SUCCESS)
   },
   methods: {
-    ...mapActions('market', ['queryOffer', 'queryNftMeta', 'queryNft']),
+    ...mapActions('market', ['queryOffer', 'queryNft']),
     onActionCompleted({ action, tokenId }) {
       console.log(action, tokenId)
       switch (action) {
@@ -99,7 +87,7 @@ export default {
     loadMyOffers() {
       if (this.myOffersBusy) return
       this.myOffersBusy = true
-      this.queryOffer({ params: { buyer: this.currentUser.address } }).then(offers => {
+      this.queryOffer({ params: { buyer: this.currentAddress } }).then(offers => {
         this.myOffers = offers.map(prepOffer)
         this.myOffersBusy = false
       })
@@ -107,7 +95,7 @@ export default {
     loadIncomeOffers() {
       if (this.incomeOffersBusy) return
       this.incomeOffersBusy = true
-      this.queryOffer({ params: { owner: this.currentUser.address } }).then(offers => {
+      this.queryOffer({ params: { owner: this.currentAddress } }).then(offers => {
         this.incomeOffers = offers.map(prepOffer)
         this.incomeOffersBusy = false
       })

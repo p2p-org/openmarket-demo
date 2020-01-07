@@ -141,8 +141,36 @@ $cards-per-line: (
   vertical-align: baseline;
 }
 .market {
-  .navbar {
-    padding: 0 0 1rem 0;
+  .navbar#sorters {
+    padding-left: 0;
+    padding-right: 0;
+
+
+    .form-inline .form-group {
+      display: -webkit-box;
+      display: flex;
+      -webkit-box-flex: 0;
+      flex: 0 0 auto;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      flex-flow: row wrap;
+      -webkit-box-align: center;
+      align-items: center;
+      margin-bottom: 0;
+      & > label {
+        color: $text-muted;
+        font-size: 0.875rem;
+
+        display: -webkit-box;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        margin-bottom: 0;
+      }
+    }
+
   }
   .card {
     .nft-image {
@@ -189,8 +217,6 @@ $cards-per-line: (
     tr {
       //width: 100%;
       td {
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
         vertical-align: middle;
         background-color: $card-bg;
         background-clip: border-box;
