@@ -1,7 +1,7 @@
 <template>
   <ValidationProvider v-slot="{ validated, dirty, errors }" :vid="vid" :name="$attrs.name" :rules="rules">
 <!--    :invalid-feedback="errors[0]"-->
-    <b-form-group class="my-0" v-bind="$attrs" :state="validateState(validated, dirty, errors)">
+    <b-form-group class="my-0" v-bind="$attrs" :label-for="id" :state="validateState(validated, dirty, errors)">
       <b-input-group size="lg">
         <template v-slot:prepend>
           <b-dropdown :variant="classDropdown(validated, dirty, errors)">
@@ -13,7 +13,7 @@
             </b-dropdown-item>
           </b-dropdown>
         </template>
-        <b-form-input v-model="innerValue.amount" v-bind="$attrs" :state="validateState(validated, dirty, errors)" />
+        <b-form-input v-model="innerValue.amount" v-bind="$attrs" :id="id" :state="validateState(validated, dirty, errors)" />
       </b-input-group>
     </b-form-group>
   </ValidationProvider>
@@ -51,11 +51,13 @@ export default {
       coins: state => state.market.coins,
     }),
     ...mapGetters('config', ['coinImage', 'coinName']),
+    id() {
+      return `input-${this.cuid}`
+    },
     innerRules() {
       return { required: true, numeric: true, min_value: 1, ...this.rules }
     },
   },
-
   watch: {
     // Handles internal model changes.
     innerValue: {
@@ -71,7 +73,6 @@ export default {
       },
       deep: true,
     },
-
   },
   created() {
     if (this.value) {

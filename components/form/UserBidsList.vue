@@ -6,32 +6,13 @@
     <template v-slot:cell(price)="data">
       <coin-price-inline :price="data.item.price" />
     </template>
-    <template v-slot:cell(buyer)="data">
+    <template v-slot:cell(bidder)="data">
       <owner-address :address="data.value" />
     </template>
     <template v-slot:cell(created_at)="data">
       <date-time :value="data.value" />
     </template>
-    <template v-slot:cell(actions)="data">
-      <b-btn
-        v-if="isMyOffer(data.item)"
-        variant="outline-secondary"
-        size="sm"
-        :disabled="isBusyNft(data.item.nft.token_id)"
-        @click.stop="cancel(data.item)"
-        >Cancel
-<!--        <b-spinner v-if="isBusyNft(data.item.nft.token_id)" type="grow" small />-->
-      </b-btn>
-      <b-btn
-        v-else-if="isMyNft(data.item)"
-        variant="outline-primary"
-        size="sm"
-        :disabled="isBusyNft(data.item.nft.token_id)"
-        @click.stop="accept(data.item)"
-        >Accept
-<!--        <b-spinner v-if="isBusyNft(data.item.nft.token_id)" type="grow" small />-->
-      </b-btn>
-    </template>
+
   </b-table>
 </template>
 
@@ -44,7 +25,7 @@ import TokenSmall from '../elements/TokenSmall'
 import OwnerAddress from '../elements/OwnerAddress'
 
 export default {
-  name: 'FormUserOffersList',
+  name: 'FormUserBidsList',
   components: { OwnerAddress, TokenSmall, DateTime, CoinPriceInline },
   props: {
     busy: {
@@ -68,10 +49,10 @@ export default {
         sortByFormatted: true,
         // filterByFormatted: true,
       },
-      { key: 'price', label: 'Offer', sortable: true },
-      { key: 'buyer', sortable: true },
+      { key: 'price', label: 'Bid', sortable: true },
+      { key: 'bidder', sortable: true },
       { key: 'created_at', label: 'Date', sortable: true },
-      { key: 'actions', label: '', class: 'offer-actions ' },
+      { key: 'actions', label: '', class: 'bids-actions ' },
     ],
   }),
   computed: {
@@ -82,18 +63,7 @@ export default {
     },
   },
   methods: {
-    isMyOffer(offer) {
-      return offer.buyer && offer.buyer === this.buyer
-    },
-    isMyNft(offer) {
-      return offer.nft && offer.nft.owner_address === this.buyer
-    },
-    accept(offer) {
-      this.$emit('accept', { tokenId: offer.nft.token_id, offerId: offer.offer_id })
-    },
-    cancel(offer) {
-      this.$emit('cancel', { tokenId: offer.nft.token_id, offerId: offer.offer_id })
-    },
+
   },
 }
 </script>

@@ -1,8 +1,8 @@
 <template>
   <ValidationProvider v-slot="{ validated, dirty, errors }" :vid="vid" :name="$attrs.name" :rules="rules">
 <!--    :invalid-feedback="errors[0]"-->
-    <b-form-group class="my-0" v-bind="$attrs" :state="validateState(validated, dirty, errors)">
-      <b-form-input v-model="innerValue" v-bind="$attrs" :state="validateState(validated, dirty, errors)" size="lg" />
+    <b-form-group class="my-0" v-bind="$attrs" :label-for="id" :state="validateState(validated, dirty, errors)">
+      <b-form-input v-model="innerValue" v-bind="$attrs" :id="id" :state="validateState(validated, dirty, errors)" size="lg" />
     </b-form-group>
   </ValidationProvider>
 </template>
@@ -30,6 +30,11 @@ export default {
   data: () => ({
     innerValue: '',
   }),
+  computed: {
+    id() {
+      return `input-${this.cuid}`
+    },
+  },
   watch: {
     // Handles internal model changes.
     innerValue(newVal) {

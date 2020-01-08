@@ -3,44 +3,48 @@
     <b-row class="">
       <b-col md="3">
         <b-card>
-          <template v-if="nfts.length">
-            <b-form-group
-              v-for="p in nfts[0].meta.properties.filter(x => x.display === null)"
-              :key="p.trait"
-              :label="p.trait.toUpperCase()"
-            >
-              <b-form-checkbox-group v-model="selected[p.trait]" :options="nfts[0].meta.definitions[p.trait]" stacked />
-            </b-form-group>
-          </template>
+        <b-navbar id="filters" toggleable="md" class="flex-md-column align-items-md-start">
+          <div class="d-flex align-items-center">Filters <b-btn v-if="isSelected" size="xs" variant="outline-secondary" class="ml-2" @click.stop.prevent="clearFilters">clear all ×</b-btn></div>
+
+          <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+          <b-collapse id="nav-collapse" is-nav>
+            <b-navbar-nav v-if="nfts.length" fill align="start"  class="flex-md-column">
+            <b-nav-text v-for="p in nfts[0].meta.properties.filter(x => x.display === null)" :key="p.trait">
+              <label>{{ p.trait.toUpperCase() }}</label>
+                <b-form-checkbox-group v-model="selected[p.trait]" :options="nfts[0].meta.definitions[p.trait]" stacked />
+            </b-nav-text>
+            </b-navbar-nav>
+          </b-collapse>
+        </b-navbar>
+<!--        <b-card>-->
+<!--          <template v-if="nfts.length">-->
+<!--            <b-form-group-->
+<!--              v-for="p in nfts[0].meta.properties.filter(x => x.display === null)"-->
+<!--              :key="p.trait"-->
+<!--              :label="p.trait.toUpperCase()"-->
+<!--            >-->
+<!--              <b-form-checkbox-group v-model="selected[p.trait]" :options="nfts[0].meta.definitions[p.trait]" stacked />-->
+<!--            </b-form-group>-->
+<!--          </template>-->
         </b-card>
       </b-col>
       <b-col>
-        <b-navbar>
+        <b-navbar id="sorters">
           <b-navbar-nav>
             <b-nav-form>
-              <b-form-group class="mr-2">
-                <b-form-radio-group
-                  v-model="filter.market.current"
-                  :options="filter.market.options"
-                  buttons
-                  button-variant="outline-secondary"
-                  name="radio-btn-outline"
-                  size="sm"
-                />
-              </b-form-group>
-
-              <sort-dropdown :value="sort.time.current" :options="sort.time.options" @change="changeSortTime" />
-              <sort-dropdown :value="sort.price.current" :options="sort.price.options" @change="changeSortPrice" />
-
-              <!--              <b-dropdown size="sm" variant="outline-secondary">-->
-              <!--                <b-dropdown-item-button v-for="opt in sortOptsTime" :key="opt.value" @click.prevent="setSortOptTime(opt.value)">{{ opt.text }}</b-dropdown-item-button>-->
-              <!--                <template v-slot:button-content>-->
-              <!--                  {{ currentSortOptTime.text }}-->
-              <!--                </template>-->
-              <!--              </b-dropdown>-->
+              <b-selector-input v-model="filter.market.current" :options="filter.market.options" />
             </b-nav-form>
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
+            <b-nav-form>
+              <b-sort-input :value="sort.time.current" :label="sort.time.label" @input="changeSortTime" class="ml-2"/>
+              <b-sort-input :value="sort.price.current" :label="sort.price.label" @input="changeSortPrice" class="ml-2"/>
+<!--              <sort-dropdown :value="sort.time.current" :options="sort.time.options" @change="changeSortTime" />-->
+<!--              <sort-dropdown :value="sort.price.current" :options="sort.price.options" @change="changeSortPrice" />-->
+            </b-nav-form>
+          </b-navbar-nav>
+          <b-navbar-nav class="ml-auto d-none d-lg-block">
             <b-nav-form @submit.prevent="doSearch">
               <b-input-group>
                 <b-form-input id="input-nft-list" v-model="innerSearch" list="input-list" size="sm" placeholder="Search" />
@@ -82,10 +86,12 @@ import { mapState, mapActions, mapGetters } from 'vuex'
 
 import SortDropdown from './form/SortDropdown'
 import MarketCard from './MarketCard'
+import BSortInput from './form/inputs/BSortInput'
+import BSelectorInput from './form/inputs/BSelectorInput'
 
 export default {
   name: 'MarketList',
-  components: { MarketCard, SortDropdown },
+  components: { BSelectorInput, BSortInput, MarketCard, SortDropdown },
   props: {
     // buyer: {
     //   type: String,
@@ -110,6 +116,50 @@ export default {
       selected: {},
       options: ['All', 'Fixed price', 'Auction'],
 
+      filterOptions: {
+        my: {
+          type: 'check',
+          param: 'where[owner][like]',
+          label: 'My',
+          // options: [
+          //   {value: true, text: 'Only My'},
+          //   {value: false, text: 'All'},
+          // ],
+        },
+        id: {
+          type: 'sort',
+          param: 'order_by[id]',
+          label: 'Newest',
+          // options: [
+          //   // {value: null, text: 'Sort by newness...'},
+          //   {value: 'asc', text: 'Oldest first'},
+          //   {value: 'desc', text: 'Newest last'},
+          // ],
+        },
+        price: {
+          type: 'sort',
+          selected: null,
+          param: 'order_by[price]',
+          label: 'Price',
+          // options: [
+          //   {value: null, text: 'Sort by price...'},
+          //   {value: 'asc', text: 'Cheapest first'},
+          //   {value: 'desc', text: 'Cheapest last'},
+          // ],
+        },
+        level: {
+          type: 'sort',
+          selected: null,
+          param: 'order_by[level]',
+          label: 'Level',
+          // options: [
+          //   {value: null, text: 'Sort by level...'},
+          //   {value: 'desc', text: 'High to low'},
+          //   {value: 'asc', text: 'Low to high'},
+          // ],
+        },
+      },
+
       // asc - true, desc - false
       sort: {
         _current: {
@@ -117,6 +167,7 @@ export default {
           value: 'asc',
         },
         price: {
+          label: 'Price',
           current: null,
           sortFunc: this.sortPrice,
           options: [
@@ -135,6 +186,7 @@ export default {
           ],
         },
         time: {
+          label: 'Novelty',
           current: null,
           sortFunc: this.sortTime,
           options: [
@@ -187,11 +239,16 @@ export default {
     // sortFunc() {
     //   return this.sort[this.sort._current.parameter].cmpFunc
     // },
+    isSelected() {
+      const traits = Object.keys(this.selected)
+      console.log(traits)
+      if (!traits.length) return false
+      return traits.reduce((s, t) => s || !!(this.selected[t] && this.selected[t].length), false)
+    },
     nftsFiltered() {
       const tmpNfts = this.nfts
         .filter(n => {
-          const traits = Object.keys(this.selected)
-          if (!traits.length) return true
+          if (!Object.keys(this.selected).length) return true
           return n.meta.properties.reduce((s, p) => s & (this.selected[p.trait] && this.selected[p.trait].length ? this.selected[p.trait].includes(p.value) : true), true)
         })
         .filter(
@@ -264,6 +321,7 @@ export default {
       this.updSort('time', value)
     },
     changeSortPrice(value) {
+      console.log(value)
       this.updSort('price', value)
     },
     updSort(parameter, value) {
@@ -272,6 +330,16 @@ export default {
       // }
       this.sort._current = { parameter, value }
       this.sort[parameter].current = value
+    },
+    clearFilters() {
+      const traits = Object.keys(this.selected)
+      console.log(traits)
+      if (traits.length) {
+        this.selected = traits.reduce((s, t) => {
+          s[t] = []
+          return s
+        }, {})
+      }
     },
   },
 }

@@ -27,15 +27,12 @@ p {
   font-size: 0.875rem;
   line-height: 1.7;
 }
-div {
-  &.label {
-    color: #BABCCC;
-  }
-}
+//div {
+//  &.label {
+//    color: #BABCCC;
+//  }
+//}
 
-legend {
-  color: #BABCCC;
-}
 
 .card {
   border-color: transparent !important;
@@ -140,9 +137,48 @@ $cards-per-line: (
 .spinner-grow {
   vertical-align: baseline;
 }
+.btn-xs, .btn-group-xs > .btn {
+  padding: 0.1rem 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  border-radius: 0.2rem;
+}
 .market {
-  .navbar {
-    padding: 0 0 1rem 0;
+  legend, label {
+    color: $text-muted;
+    margin-bottom: 0.125rem;
+  }
+
+  .navbar#sorters {
+    padding-left: 0;
+    padding-right: 0;
+
+
+    .form-inline .form-group {
+      display: -webkit-box;
+      display: flex;
+      -webkit-box-flex: 0;
+      flex: 0 0 auto;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      flex-flow: row wrap;
+      -webkit-box-align: center;
+      align-items: center;
+      margin-bottom: 0;
+      & > label {
+        color: $text-muted;
+        font-size: 0.875rem;
+
+        display: -webkit-box;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        margin-bottom: 0;
+      }
+    }
+
   }
   .card {
     .nft-image {
@@ -189,8 +225,6 @@ $cards-per-line: (
     tr {
       //width: 100%;
       td {
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
         vertical-align: middle;
         background-color: $card-bg;
         background-clip: border-box;

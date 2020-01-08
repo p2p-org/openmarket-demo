@@ -1,6 +1,7 @@
 <template>
   <div class="d-flex justify-content-start el-token-small">
-    <b-img v-bind="imgProps" rounded="circle" :src="image" :alt="title" class="ml-1"/>
+    <b-img v-if="image" v-bind="imgProps" rounded="circle" :src="image" :alt="title" class="ml-1" />
+    <b-spinner v-else />
     <div class="d-flex flex-column justify-content-center">
       <h6 class="ml-2 mb-1">{{ title | truncate(35) }}</h6>
       <small><b-link :to="localePath({ name: 'market-item', params: { item: tokenId } })" class="ml-2">

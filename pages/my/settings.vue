@@ -1,15 +1,13 @@
 <template>
-  <section v-if="currentUser" class="user">
-    <b-container>
-      <b-row>
-        <b-col>
-          <b-card body-class="text-center">
-            <strong>under construction...</strong>
-          </b-card>
-        </b-col>
-      </b-row>
-    </b-container>
-  </section>
+  <b-container>
+    <b-row>
+      <b-col>
+        <b-card body-class="text-center">
+          <strong>under construction...</strong>
+        </b-card>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
