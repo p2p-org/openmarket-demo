@@ -1,6 +1,6 @@
 <template>
   <market>
-    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rate" />
+    <market-item :nft="nft" :offers="offers" :bids="bids" :rate="rate" :busy="nftLoading"/>
   </market>
 </template>
 
@@ -23,6 +23,7 @@ export default {
   //   },
   // },
   data: () => ({
+    nftLoading: false,
   }),
   computed: {
     ...mapState({
@@ -50,17 +51,25 @@ export default {
     },
   },
   created() {
-    this.queryNft({ force: true, params: { tokenId: this.$route.params.item } })
-    .then(() => {
+    this.loadNft(this.$route.params.item).then(() => {
       if (!this.nft) {
         this.$router.push(this.localePath({ name: 'market' }))
       }
     })
-      // .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
-      // .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
+    // .then(() => this.queryOffer({ params: { tokenId: this.$route.params.item } }))
+    // .then(() => this.queryBid({ params: { tokenId: this.$route.params.item } }))
   },
   methods: {
     ...mapActions('market', ['queryNft', 'queryOffer', 'queryBid']),
+    loadNft(tokenId) {
+      if (this.nftLoading) return
+      this.nftLoading = true
+      return this.queryNft({ force: true, params: { tokenId } })
+        .catch(this.alertError)
+        .then(() => {
+          this.nftLoading = false
+        })
+    },
   },
 }
 </script>

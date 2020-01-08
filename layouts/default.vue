@@ -22,7 +22,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import PreLoader from '../components/PreLoader'
+import PreLoader from '~/components/PreLoader'
 import PageHeader from '~/components/Header'
 // import PageFooter from '~/components/Footer'
 

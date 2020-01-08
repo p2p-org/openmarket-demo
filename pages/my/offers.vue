@@ -4,14 +4,16 @@
       <b-col>
         <b-tabs v-model="tabIndex" pills content-class="mt-3">
           <b-tab title="Income offers" @click="loadIncomeOffers">
+            <loading-box :busy="incomeOffersBusy" />
             <form-user-offers-list v-if="incomeOffers.length" :items="incomeOffers" :busy="incomeOffersBusy" @cancel="onCancelOffer" @accept="onAcceptOffer"/>
-            <b-card v-else body-class="text-center">
+            <b-card v-else-if="!incomeOffersBusy" body-class="text-center">
               <strong>There are no income offers yet...</strong>
             </b-card>
           </b-tab>
           <b-tab title="My offers" @click="loadMyOffers">
+            <loading-box :busy="myOffersBusy" />
             <form-user-offers-list v-if="myOffers.length" :items="myOffers" :busy="myOffersBusy" @cancel="onCancelOffer" @accept="onAcceptOffer"/>
-            <b-card v-else body-class="text-center">
+            <b-card v-else-if="!myOffersBusy" body-class="text-center">
               <strong>There are no your offers yet...</strong>
             </b-card>
           </b-tab>
@@ -26,10 +28,12 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { ACTION_OFFER_ACCEPT, ACTION_OFFER_CANCEL, ACTION_SUCCESS } from '~/helpers/action-types'
 import { prepOffer } from '~/helpers'
 import FormUserOffersList from '~/components/form/UserOffersList'
+import LoadingBox from '~/components/elements/LoadingBox'
 
 export default {
   name: 'TabMyOffers',
   components: {
+    LoadingBox,
     FormUserOffersList,
   },
   data: () => ({

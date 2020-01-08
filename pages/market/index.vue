@@ -11,7 +11,7 @@
       </b-jumbotron>
     </b-container>
     <section class="market">
-      <market-list :owner="owner" :search="search" />
+      <market-list :owner="owner" :search="search" :busy="nftsLoading" />
     </section>
   </market>
 </template>
@@ -24,7 +24,9 @@ import Market from '~/components/Market'
 export default {
   name: 'PageMarket',
   components: { Market, MarketList },
-  data: () => ({}),
+  data: () => ({
+    nftsLoading: false,
+  }),
   computed: {
     ...mapState({
       currentAddress: state => state.user.currentAddress,
@@ -39,7 +41,7 @@ export default {
   watch: {
     owner: {
       handler(owner) {
-        this.queryNft({ force: true, params: { owner } }).catch(this.alertError)
+        this.loadNfts(owner)
       },
       immediate: true,
     },
@@ -62,6 +64,15 @@ export default {
   },
   methods: {
     ...mapActions('market', ['queryNft']),
+    loadNfts(owner) {
+      if (this.nftsLoading) return
+      this.nftsLoading = true
+      return this.queryNft({ force: true, params: { owner } })
+        .catch(this.alertError)
+        .then(() => {
+          this.nftsLoading = false
+        })
+    },
   },
 }
 </script>

@@ -152,7 +152,6 @@ export default {
   },
   methods: {
     submit() {
-      console.log(this.price)
       this.$emit('submit', { price: this.price })
     },
     reset() {
