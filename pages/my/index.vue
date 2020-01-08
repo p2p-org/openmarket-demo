@@ -76,8 +76,8 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { ValidationObserver } from 'vee-validate'
-import BTextInputPrep from '../../components/form/inputs/BTextInputPrep'
-import BPriceUserInput from '../../components/form/inputs/BPriceUserInput'
+import BTextInputPrep from '~/components/form/inputs/BTextInputPrep'
+import BPriceUserInput from '~/components/form/inputs/BPriceUserInput'
 
 export default {
   name: 'TabMyBalances',

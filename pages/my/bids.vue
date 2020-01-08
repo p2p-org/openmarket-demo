@@ -4,8 +4,9 @@
       <b-col>
         <b-tabs v-model="tabIndex" pills content-class="mt-3">
           <b-tab title="My bids" @click="loadMyBids">
+            <loading-box :busy="myBidsBusy" />
             <form-user-bids-list v-if="myBids.length" :items="myBids" :busy="myBidsBusy" />
-            <b-card v-else body-class="text-center">
+            <b-card v-else-if="!myBidsBusy" body-class="text-center">
               <strong>There are no your bids yet...</strong>
             </b-card>
           </b-tab>
@@ -19,10 +20,12 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { prepBid } from '~/helpers'
 import FormUserBidsList from '~/components/form/UserBidsList'
+import LoadingBox from '~/components/elements/LoadingBox'
 
 export default {
   name: 'TabMyBids',
   components: {
+    LoadingBox,
     FormUserBidsList,
   },
   data: () => ({

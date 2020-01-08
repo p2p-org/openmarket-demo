@@ -38,8 +38,8 @@
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
             <b-nav-form>
-              <b-sort-input :value="sort.time.current" :label="sort.time.label" @input="changeSortTime" class="ml-2"/>
-              <b-sort-input :value="sort.price.current" :label="sort.price.label" @input="changeSortPrice" class="ml-2"/>
+<!--              @input="updSort(k, $event)"-->
+              <b-sort-input v-for="(s, k) in sort" :key="k" v-model="s.current" :label="s.label" :titles="s.titles" class="ml-2" />
 <!--              <sort-dropdown :value="sort.time.current" :options="sort.time.options" @change="changeSortTime" />-->
 <!--              <sort-dropdown :value="sort.price.current" :options="sort.price.options" @change="changeSortPrice" />-->
             </b-nav-form>
@@ -66,10 +66,12 @@
           <!--              :image="nft.meta.image"-->
           <!--              :price="nft.price"-->
           <!--              :id="nft.id"-->
-          <transition-group v-if="nftsPaged.length" name="flip-list" tag="div" class="card-deck">
+        <loading-box :busy="busy" />
+
+        <transition-group v-if="nftsPaged.length" name="flip-list" tag="div" class="card-deck">
             <market-card v-for="nft in nftsPaged" :key="nft.token_id" :nft="nft" :rate="rateETH" />
           </transition-group>
-          <b-card v-else class="mb-3" body-class="text-center">
+          <b-card v-else-if="!busy" class="mb-3" body-class="text-center">
             <strong>No items yet...</strong>
           </b-card>
           <!--            {{ nfts }}-->
@@ -84,14 +86,21 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
 
-import SortDropdown from './form/SortDropdown'
+// import SortDropdown from './form/SortDropdown'
 import MarketCard from './MarketCard'
 import BSortInput from './form/inputs/BSortInput'
 import BSelectorInput from './form/inputs/BSelectorInput'
+import LoadingBox from './elements/LoadingBox'
 
 export default {
   name: 'MarketList',
-  components: { BSelectorInput, BSortInput, MarketCard, SortDropdown },
+  components: {
+    LoadingBox,
+    BSelectorInput,
+    BSortInput,
+    MarketCard,
+    // SortDropdown,
+  },
   props: {
     // buyer: {
     //   type: String,
@@ -105,6 +114,10 @@ export default {
       type: String,
       default: null,
     },
+    busy: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -116,93 +129,105 @@ export default {
       selected: {},
       options: ['All', 'Fixed price', 'Auction'],
 
-      filterOptions: {
-        my: {
-          type: 'check',
-          param: 'where[owner][like]',
-          label: 'My',
-          // options: [
-          //   {value: true, text: 'Only My'},
-          //   {value: false, text: 'All'},
-          // ],
-        },
-        id: {
-          type: 'sort',
-          param: 'order_by[id]',
-          label: 'Newest',
-          // options: [
-          //   // {value: null, text: 'Sort by newness...'},
-          //   {value: 'asc', text: 'Oldest first'},
-          //   {value: 'desc', text: 'Newest last'},
-          // ],
-        },
-        price: {
-          type: 'sort',
-          selected: null,
-          param: 'order_by[price]',
-          label: 'Price',
-          // options: [
-          //   {value: null, text: 'Sort by price...'},
-          //   {value: 'asc', text: 'Cheapest first'},
-          //   {value: 'desc', text: 'Cheapest last'},
-          // ],
-        },
-        level: {
-          type: 'sort',
-          selected: null,
-          param: 'order_by[level]',
-          label: 'Level',
-          // options: [
-          //   {value: null, text: 'Sort by level...'},
-          //   {value: 'desc', text: 'High to low'},
-          //   {value: 'asc', text: 'Low to high'},
-          // ],
-        },
-      },
+      // filterOptions: {
+      //   my: {
+      //     type: 'check',
+      //     param: 'where[owner][like]',
+      //     label: 'My',
+      //     // options: [
+      //     //   {value: true, text: 'Only My'},
+      //     //   {value: false, text: 'All'},
+      //     // ],
+      //   },
+      //   id: {
+      //     type: 'sort',
+      //     param: 'order_by[id]',
+      //     label: 'Newest',
+      //     // options: [
+      //     //   // {value: null, text: 'Sort by newness...'},
+      //     //   {value: 'asc', text: 'Oldest first'},
+      //     //   {value: 'desc', text: 'Newest last'},
+      //     // ],
+      //   },
+      //   price: {
+      //     type: 'sort',
+      //     selected: null,
+      //     param: 'order_by[price]',
+      //     label: 'Price',
+      //     // options: [
+      //     //   {value: null, text: 'Sort by price...'},
+      //     //   {value: 'asc', text: 'Cheapest first'},
+      //     //   {value: 'desc', text: 'Cheapest last'},
+      //     // ],
+      //   },
+      //   level: {
+      //     type: 'sort',
+      //     selected: null,
+      //     param: 'order_by[level]',
+      //     label: 'Level',
+      //     // options: [
+      //     //   {value: null, text: 'Sort by level...'},
+      //     //   {value: 'desc', text: 'High to low'},
+      //     //   {value: 'asc', text: 'Low to high'},
+      //     // ],
+      //   },
+      // },
 
       // asc - true, desc - false
+      sortCurrent: {
+        parameter: 'price',
+        value: 'asc',
+      },
       sort: {
-        _current: {
-          parameter: 'price',
-          value: 'asc',
-        },
+        // _current: {
+        //   parameter: 'price',
+        //   value: 'asc',
+        // },
         price: {
           label: 'Price',
-          current: null,
+          current: 'asc',
           sortFunc: this.sortPrice,
-          options: [
-            {
-              value: null,
-              text: '- sort by price -',
-            },
-            {
-              value: 'asc',
-              text: 'Price low to high',
-            },
-            {
-              value: 'desc',
-              text: 'Price high to low',
-            },
-          ],
+          titles: {
+            asc: 'Cheapest first',
+            desc: 'Expensive first',
+          },
+          // options: [
+          //   {
+          //     value: null,
+          //     text: '- sort by price -',
+          //   },
+          //   {
+          //     value: 'asc',
+          //     text: 'Price low to high',
+          //   },
+          //   {
+          //     value: 'desc',
+          //     text: 'Price high to low',
+          //   },
+          // ],
         },
         time: {
           label: 'Novelty',
           current: null,
           sortFunc: this.sortTime,
-          options: [
-            {
-              value: null,
-              text: '- sort by novelty -',
-            },
-            {
-              value: 'asc',
-              text: 'Newest first',
-            },
-            {
-              value: 'desc',
-              text: 'Oldest first',
-            },
-          ],
+          titles: {
+            asc: 'Newest first',
+            desc: 'Oldest first',
+          },
+          // options: [
+          //   {
+          //     value: null,
+          //     text: '- sort by novelty -',
+          //   },
+          //   {
+          //     value: 'asc',
+          //     text: 'Newest first',
+          //   },
+          //   {
+          //     value: 'desc',
+          //     text: 'Oldest first',
+          //   },
+          // ],
         },
       },
       filter: {
@@ -237,11 +262,10 @@ export default {
     }),
     ...mapGetters('user', ['currentUser']),
     // sortFunc() {
-    //   return this.sort[this.sort._current.parameter].cmpFunc
+    //   return this.sort[this.sortCurrent.parameter].cmpFunc
     // },
     isSelected() {
       const traits = Object.keys(this.selected)
-      console.log(traits)
       if (!traits.length) return false
       return traits.reduce((s, t) => s || !!(this.selected[t] && this.selected[t].length), false)
     },
@@ -265,7 +289,7 @@ export default {
               : true)
         )
         .filter(n => !this.filter.market.current || n.status === this.filter.market.current)
-      return this.sort[this.sort._current.parameter].sortFunc(tmpNfts, this.sort._current.value === 'asc')
+      return this.sort[this.sortCurrent.parameter].sortFunc(tmpNfts, this.sortCurrent.value === 'asc')
     },
     nftsPaged() {
       const curPage = this.currentPage || 1
@@ -286,6 +310,22 @@ export default {
     // currentPage(p) {
     //   this.reloadNftPage(p)
     // }
+    'sort.price.current': {
+      handler(val) {
+        if (val) {
+          this.updSort('price', val)
+        }
+      },
+      deep: true,
+    },
+    'sort.time.current': {
+      handler(val) {
+        if (val) {
+          this.updSort('time', val)
+        }
+      },
+      deep: true,
+    },
     numberOfPages(n) {
       this.currentPage = null
     },
@@ -317,23 +357,21 @@ export default {
     doSearch() {
       this.$router.push(this.localePath({ name: 'market', query: { q: this.innerSearch } }))
     },
-    changeSortTime(value) {
-      this.updSort('time', value)
-    },
-    changeSortPrice(value) {
-      console.log(value)
-      this.updSort('price', value)
-    },
     updSort(parameter, value) {
-      // if (this.sort._current.parameter && this.sort[this.sort._current.parameter]) {
-      this.sort[this.sort._current.parameter].current = null
+      // if (this.sortCurrent.parameter && this.sort[this.sortCurrent.parameter]) {
+      // this.sort[this.sortCurrent.parameter].current = null
       // }
-      this.sort._current = { parameter, value }
-      this.sort[parameter].current = value
+      const params = Object.keys(this.sort)
+      params.forEach(p => {
+        if (p !== parameter) {
+          this.sort[p].current = null
+        }
+      })
+      this.sortCurrent = { parameter, value }
+      // this.sort[parameter].current = value
     },
     clearFilters() {
       const traits = Object.keys(this.selected)
-      console.log(traits)
       if (traits.length) {
         this.selected = traits.reduce((s, t) => {
           s[t] = []

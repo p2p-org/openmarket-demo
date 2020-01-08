@@ -53,7 +53,7 @@ export default {
         if (!nft || !nft.meta) {
           this.nftBusyLock({ tokenId: this.tokenId }).then(() => {
             this.queryNft({ force: true, params: { tokenId: this.tokenId } })
-              .catch(console.log)
+              .catch(this.alertError)
               .then(() => this.nftBusyUnlock({ tokenId: this.tokenId }))
           })
         }
