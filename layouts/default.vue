@@ -1,6 +1,15 @@
 <template>
   <div>
     <page-header v-if="!loading" />
+    <b-alert :show="!!errors.length" variant="danger" dismissible @dismissed="hideError">
+      Something went wrong! Check your internet connection ant try to reload the page.
+
+      <ul>
+        <li v-for="(e, i) in errors" :key="i">
+          <small>{{ e }}</small>
+        </li>
+      </ul>
+    </b-alert>
     <nuxt v-if="!loading" />
     <!--    <page-footer />-->
     <pre-loader />
@@ -25,21 +34,33 @@ export default {
     // PageFooter,
   },
 
-  data: () => ({}),
+  data: () => ({
+    errors: [],
+  }),
   computed: {
     ...mapState({
       loading: state => state.loading,
     }),
   },
+  created() {
+    this.$root.$on('error', this.showError)
+  },
   mounted() {
     this.queryCoins()
-    // this.initUsers().then(() => {
-      this.stopLoader()
-    // })
+      .catch(this.alertError)
+      .then(() => {
+        this.stopLoader()
+      })
   },
   methods: {
     ...mapActions(['initUsers', 'stopLoader']),
     ...mapActions('market', ['queryCoins']),
+    showError(e) {
+      this.errors.push(e.message)
+    },
+    hideError() {
+      this.errors = []
+    },
   },
 }
 </script>

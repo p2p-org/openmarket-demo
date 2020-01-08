@@ -63,5 +63,9 @@ Vue.mixin({
         return 0
       })
     },
+    alertError(e) {
+      console.log(e)
+      this.$root.$emit('error', e)
+    },
   },
 })

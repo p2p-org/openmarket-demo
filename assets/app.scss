@@ -27,15 +27,12 @@ p {
   font-size: 0.875rem;
   line-height: 1.7;
 }
-div {
-  &.label {
-    color: #BABCCC;
-  }
-}
+//div {
+//  &.label {
+//    color: #BABCCC;
+//  }
+//}
 
-legend {
-  color: #BABCCC;
-}
 
 .card {
   border-color: transparent !important;
@@ -140,7 +137,18 @@ $cards-per-line: (
 .spinner-grow {
   vertical-align: baseline;
 }
+.btn-xs, .btn-group-xs > .btn {
+  padding: 0.1rem 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  border-radius: 0.2rem;
+}
 .market {
+  legend, label {
+    color: $text-muted;
+    margin-bottom: 0.125rem;
+  }
+
   .navbar#sorters {
     padding-left: 0;
     padding-right: 0;

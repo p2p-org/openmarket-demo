@@ -214,7 +214,7 @@ export default {
   watch: {
     currentAddress(address) {
       if (address) {
-        this.loadUserInfo({ address })
+        this.loadUserInfo({ address }).catch(this.alertError)
       }
     },
   },

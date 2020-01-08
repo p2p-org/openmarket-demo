@@ -39,7 +39,7 @@ export default {
   watch: {
     owner: {
       handler(owner) {
-        this.queryNft({ force: true, params: { owner } })
+        this.queryNft({ force: true, params: { owner } }).catch(this.alertError)
       },
       immediate: true,
     },

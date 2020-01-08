@@ -1,7 +1,7 @@
 <template>
   <ValidationProvider v-slot="{ validated, dirty, errors }" :vid="vid" :name="$attrs.name" :rules="innerRules">
 <!--    :invalid-feedback="errors[0]"-->
-    <b-form-group class="my-0" v-bind="$attrs" :state="validateState(validated, dirty, errors)">
+    <b-form-group class="my-0" v-bind="$attrs" :label-for="id" :state="validateState(validated, dirty, errors)">
       <b-input-group size="lg">
         <template v-slot:prepend>
           <b-dropdown :variant="classDropdown(validated, dirty, errors)">
@@ -13,7 +13,7 @@
             </b-dropdown-item>
           </b-dropdown>
         </template>
-        <b-form-input v-model="innerValue.amount" v-bind="$attrs" :state="validateState(validated, dirty, errors)" />
+        <b-form-input v-model="innerValue.amount" v-bind="$attrs" :id="id" :state="validateState(validated, dirty, errors)" />
       </b-input-group>
     </b-form-group>
   </ValidationProvider>
@@ -22,7 +22,9 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { ValidationProvider } from 'vee-validate'
-
+/*
+ *  Limit price input to current user amounts
+ */
 export default {
   components: {
     ValidationProvider,
@@ -56,6 +58,9 @@ export default {
     }),
     ...mapGetters('user', ['currentUser', 'currentUserCoins']),
     ...mapGetters('config', ['coinImage', 'coinName']),
+    id() {
+      return `input-${this.cuid}`
+    },
     innerCoins() {
       // if (this.currentUser && this.currentUser.coins) {
       //   return this.coins.filter(c => this.currentUser.coins.findIndex(x => x.denom === c) !== -1)
