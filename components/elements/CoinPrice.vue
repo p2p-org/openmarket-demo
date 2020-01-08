@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-middle align-items-center">
       <b-img :src="img" rounded="circle" width="33px" height="33px" />
       <h1 class="ml-2 my-0">
-        {{ price.amount | priceBig }} <small>{{ name }} <span class="text-muted">({{ denom }})</span></small>
+        {{ price.amount | priceBig }} <small>{{ name }} <span class="text-muted d-none d-lg-inline">({{ denom }})</span></small>
       </h1>
     </div>
     <h4 class="mt-1">

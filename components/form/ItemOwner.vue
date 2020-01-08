@@ -1,22 +1,21 @@
 <template>
   <b-row v-if="owner" class="mt-2">
-    <b-col md="6" class="d-flex flex-column pr-4">
+    <b-col class="d-flex flex-column pr-4">
       <b-form-group label="Owner" :label-for="id" class="my-0">
-        <owner-address :address="ownerAddress" />
+<!--        <owner-address :address="ownerAddress" />-->
 <!--        <client-only>-->
 <!--          <jazzicon :address="ownerAddress" :diameter="20" />-->
 <!--        </client-only>-->
 <!--        <b-link :id="id" :to="localePath({ name: 'market', query: { owner: ownerAddress } })">-->
 <!--          {{ ownerAddress | collapse(10, 5) }}-->
 <!--        </b-link>-->
-<!--&lt;!&ndash;        <owner-address :address="ownerAddress">&ndash;&gt;-->
-<!--          <span class="text-muted"> items on sale {{ ownerItemsOnSaleCount }} / {{ ownerItemsCount }}</span>-->
-<!--&lt;!&ndash;        </owner-address>&ndash;&gt;-->
+        <owner-address :address="ownerAddress">
+          <span class="text-muted ml-2"> items on sale <b>{{ ownerItemsOnSaleCount }}</b> of <b>{{ ownerItemsCount }}</b> total</span>
+        </owner-address>
       </b-form-group>
-      <owner-address :address="ownerAddress" />
     </b-col>
-    <b-col md="6" class="d-flex flex-column p-2">
-    </b-col>
+<!--    <b-col md="6" class="d-flex flex-column p-2">-->
+<!--    </b-col>-->
   </b-row>
 </template>
 
