@@ -72,7 +72,7 @@ export default {
       return this.currentUser ? this.coins.filter(d => this.currentUserCoins.findIndex(c => c.denom === d) !== -1) : this.coins
     },
     maxAmount() {
-      if (!this.currentUser) return 0
+      if (!this.currentUser || !this.currentUser.coins) return 0
       const c = this.currentUser.coins.find(x => x.denom === this.innerValue.denom)
       return c ? c.amount : 0
     },

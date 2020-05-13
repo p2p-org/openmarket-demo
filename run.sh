@@ -47,7 +47,7 @@ while test $# -gt 0; do
       exit 0
       ;;
     up-proxy)
-      docker network create app-network
+      docker network create dwh-network
       docker-compose -f docker-compose-proxy.yml up -d
       exit 0
       ;;
