@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 export default {
   mode: 'universal',
   /*
@@ -136,6 +138,11 @@ export default {
       target: process.env.REST_URL || 'http://localhost:1317',
       ws: false,
     },
+    '/_dst': {
+      pathRewrite: { '^/_dst': '' },
+      target: process.env.REST_URL2 || 'http://localhost:1318',
+      ws: false,
+    },
     '/_gql': {
       pathRewrite: { '^/_gql': '' },
       target: process.env.GQL_URL || 'http://localhost:8080/v1/graphql',
@@ -148,11 +155,15 @@ export default {
   build: {
     extractCSS: true,
     transpile: [
-      "vee-validate/dist/rules"
+      'vee-validate/dist/rules',
     ],
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {},
+    extend(config, ctx) {
+      config.node = {
+        fs: 'empty',
+      }
+    },
   },
 }

@@ -29,7 +29,7 @@
             <ValidationObserver ref="observer" v-slot="{ passes, invalid }">
               <b-form novalidate @submit.stop.prevent="passes(onCoinTransfer)">
                 <b-row>
-                  <b-col>
+                  <b-col md="4" class="d-flex flex-column pl-2 justify-content-end">
                     <b-text-input-prep
                       v-model="recipient"
                       :rules="{ required: true, regex: /^cosmos[a-z0-9]{39}$/i }"
@@ -44,7 +44,18 @@
                       </b-input-group-text>
                     </b-text-input-prep>
                   </b-col>
-                  <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
+
+                  <b-col md="4" class="d-flex flex-column pl-2 justify-content-end">
+                    <b-select-input
+                      v-model="path"
+                      name="Network"
+                      label="Choose destination network"
+                      placeholder="network"
+                      :options="options"
+                      :disabled="busyTx"
+                    />
+                  </b-col>
+                  <b-col md="4" class="d-flex flex-column pl-2 justify-content-end">
                     <b-price-user-input
                       v-model="coin"
                       name="Coins amount"
@@ -78,10 +89,12 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { ValidationObserver } from 'vee-validate'
 import BTextInputPrep from '~/components/form/inputs/BTextInputPrep'
 import BPriceUserInput from '~/components/form/inputs/BPriceUserInput'
+import BSelectInput from '../../components/form/inputs/BSelectInput'
 
 export default {
   name: 'TabMyBalances',
   components: {
+    BSelectInput,
     BPriceUserInput,
     BTextInputPrep,
     ValidationObserver,
@@ -94,6 +107,7 @@ export default {
     recipient: null,
     busyTx: false,
     busy: false,
+    path: null,
   }),
   // validate({ params }) {
   //   // Must be a number
@@ -101,6 +115,7 @@ export default {
   // },
   computed: {
     ...mapState({
+      ibc: state => state.config.ibc,
       baseCoinDenom: state => state.config.baseCoinDenom,
       currentAddress: state => state.user.currentAddress,
     }),
@@ -114,7 +129,12 @@ export default {
       }
       return val
     },
-
+    options() {
+      return [
+        { value: null, text: `Home (${this.ibc.src.chainId})` },
+        { value: this.ibc.dst.channelTx, text: `Target (${this.ibc.dst.chainId})` },
+      ]
+    }
   },
   created() {
     this.coin = {
@@ -132,7 +152,7 @@ export default {
         .msgBoxConfirm('Confirm coin transfer?')
         .then(confirm => {
           if (confirm) {
-            return this.coinTransfer({ user: this.currentUser, recipient: this.recipient, coin: this.coin })
+            return this.coinTransfer({ user: this.currentUser, recipient: this.recipient, coin: this.coin, path: this.path })
               .then(res => this.waitMarket({ hash: res.result.txhash }))
               .then(tx => {
                 console.log('tx mined', tx)

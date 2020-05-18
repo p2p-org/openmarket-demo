@@ -62,3 +62,21 @@ export function prepNft(n) {
     busy: false,
   }
 }
+
+export function parseDenom(denom) {
+  const regex = /^([a-z]+)\/([a-z]+)\/([a-z]+)$/g
+  if (regex.test(denom)) {
+    const found = denom.split('/')
+    return {
+      port: found[0],
+      channel: found[1],
+      denom: found[2]
+    }
+  } else {
+    return {
+      port: null,
+      channel: null,
+      denom
+    }
+  }
+}

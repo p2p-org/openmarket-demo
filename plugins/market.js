@@ -45,4 +45,14 @@ export default ({ store, req }, inject) => {
     })
   )
   inject('txMsgs', OpenMarketTxMsgs)
+
+
+  inject(
+    'txApiDst',
+    new OpenMarketTxAPI({
+      lcdUrl: buildPath(`${proto}//${host}`, store.state.config.ibc.dst.lcdUrl),
+      chainId: store.state.config.ibc.dst.chainId,
+    })
+  )
+
 }

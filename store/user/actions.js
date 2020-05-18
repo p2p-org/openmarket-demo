@@ -1,23 +1,20 @@
-export function addUser({ state, commit, dispatch }, { name = null, mnemonic = null, address = null, ecpairPriv = null }) {
+export function addUser({ state, commit, dispatch }, { name = null, mnemonic }) {
+  let wallet
   try {
-    if (mnemonic && (!address || !ecpairPriv)) {
-      address = this.$txApi.getAddress(mnemonic)
-      ecpairPriv = this.$txApi.getECPairPriv(mnemonic)
-    }
-    commit('setUser', { name, mnemonic, address, ecpairPriv })
+    wallet = this.$txApi.getWallet(mnemonic)
+    commit('setUser', { address: wallet.address, name, wallet, mnemonic })
   } catch (e) {
     console.error('addUser', e)
     return Promise.reject(e)
   }
   commit('saveLocalUsers')
-  return Promise.resolve(address)
+  return Promise.resolve(wallet.address)
 }
 
 export function initServiceUser({ commit, rootState }) {
   try {
-    const address = this.$txApi.getAddress(rootState.config.serviceUser.mnemonic)
-    const ecpairPriv = this.$txApi.getECPairPriv(rootState.config.serviceUser.mnemonic)
-    commit('setServiceUser', { address, ecpairPriv })
+    const wallet = this.$txApi.getWallet(rootState.config.serviceUser.mnemonic)
+    commit('setServiceUser', wallet)
   } catch (e) {
     console.error('initService', e)
     return Promise.reject(e)
@@ -53,12 +50,14 @@ export function loadCurrentUserInfo({ state, dispatch }) {
   return dispatch('loadUserInfo', { address: state.currentAddress })
 }
 
-export function loadUserInfo({ commit, state, getters, rootState }, { address }) {
-  return this.$txApi.getAccounts(address).then(data => {
-    console.log('load user from bc', data)
-    commit('setUser', { address, params: { ...data.result.value, address } })
-    commit('saveLocalUsers')
-  })
+export async function loadUserInfo({ commit, state, getters, rootState }, { address }) {
+  const resp = await Promise.all([
+    this.$txApi.getAccounts(address),
+    this.$txApi.getBalances(address)
+  ])
+  console.log('load user from bc', resp)
+  commit('setUser', { address, params: { ...resp[0].result.value, coins: resp[1].result } })
+  commit('saveLocalUsers')
 }
 
 export function loadLocalUsers({ commit }) {

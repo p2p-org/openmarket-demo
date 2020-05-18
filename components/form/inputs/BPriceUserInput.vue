@@ -6,7 +6,7 @@
         <template v-slot:prepend>
           <b-dropdown :variant="classDropdown(validated, dirty, errors)">
             <template v-slot:button-content>
-              <b-img :src="coinImage(innerValue.denom)" rounded="circle" width="30px" height="30px" />
+              <b-img :src="coinImage(fullDenom.denom)" rounded="circle" width="30px" height="30px" /> <small>{{ fullDenom.channel }}</small>
             </template>
             <b-dropdown-item v-for="denom in innerCoins" :key="denom" @click="setCoin(denom)">
               <b-img :src="coinImage(denom)" rounded="circle" width="30px" height="30px" /> {{ coinName(denom) }} <small class="text-muted">({{ denom }})</small>
@@ -22,6 +22,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { ValidationProvider } from 'vee-validate'
+import { parseDenom } from '../../../helpers'
 /*
  *  Limit price input to current user amounts
  */
@@ -65,11 +66,11 @@ export default {
       // if (this.currentUser && this.currentUser.coins) {
       //   return this.coins.filter(c => this.currentUser.coins.findIndex(x => x.denom === c) !== -1)
       // }
-      // return this.currentUser ? this.currentUser.coins.map(c => c.denom) : this.coins
-      if (this.denoms.length) {
-        return this.coins.filter(d => this.denoms.includes(d))
-      }
-      return this.currentUser ? this.coins.filter(d => this.currentUserCoins.findIndex(c => c.denom === d) !== -1) : this.coins
+      return (this.currentUser ? this.currentUserCoins.map(c => c.denom) : this.coins)
+      // if (this.denoms.length) {
+      //   return this.coins.filter(d => this.denoms.includes(d))
+      // }
+      // return this.currentUser ? this.coins.filter(d => this.currentUserCoins.findIndex(c => c.denom === d) !== -1) : this.coins
     },
     maxAmount() {
       if (!this.currentUser || !this.currentUser.coins) return 0
@@ -79,6 +80,9 @@ export default {
     innerRules() {
       return { required: true, numeric: true, min_value: 1, max_value: this.maxAmount, ...this.rules }
     },
+    fullDenom() {
+      return parseDenom(this.innerValue.denom)
+    }
   },
 
   watch: {

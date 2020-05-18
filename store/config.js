@@ -1,10 +1,11 @@
 import { CONFIG_URLS } from '~/helpers/mutation-types'
+import { parseDenom } from '../helpers'
 
 export const state = () => ({
   lcdUrl: '/_lcd',
   gqlUrl: '/_gql',
-  moniker: 'node0',
-  chainId: 'mpchain',
+  // moniker: 'node0',
+  chainId: 'ibc0',
   nodeId: 'e65a518a5bb43acbdfd537234f5dcab48d7a7ba7',
   tokenBaseUrl: '/api/token/',
   hasuraAccessKey: 'q5WNqC6MP6123123',
@@ -14,6 +15,22 @@ export const state = () => ({
   baseCoinImage: '/images/currency_atom.png',
   stakeCoinDenom: 'stake',
   stakeCoinImage: '/images/currency_stake.png',
+  ibc: {
+    src: {
+      lcdUrl: '/_src',
+      chainId: 'ibc0',
+      channelTx: 'ibczerochannel',
+      portTx: 'transfer',
+      portTxNFT: 'transfernft',
+    },
+    dst: {
+      lcdUrl: '/_dst',
+      chainId: 'ibc1',
+      channelTx: 'ibconechannel',
+      portTx: 'transfer',
+      portTxNFT: 'transfernft',
+    }
+  },
   coins: {
     token: {
       name: 'TKN',
@@ -71,30 +88,10 @@ export const state = () => ({
         'matter learn fall finish reunion result obtain fiscal picture afford arrange dignity air banana ketchup glad option cricket embrace infant album wagon wage razor',
     },
     {
-      name: 'dgaming',
+      name: 'user3',
       mnemonic:
-        'unfold whale pear cage stand rescue grape sentence fence document fan begin traffic across property sense list dose sock license drink poverty romance bid',
+        'bachelor crew business silver apology input next price around check banner maximum palace pumpkin select nice oil luggage breeze electric arrange pass example pause',
     },
-    // {
-    //   name: 'validator1',
-    //   mnemonic:
-    //     'base figure planet hazard sail easily honey advance tuition grab across unveil random kiss fence connect disagree evil recall latin cause brisk soft lunch',
-    // },
-    // {
-    //   name: 'alice',
-    //   mnemonic:
-    //     'actor barely wait patrol moral amateur hole clerk misery truly salad wonder artefact orchard grit check abandon drip avoid shaft dirt thought melody drip',
-    // },
-    // {
-    //   name: 'bob',
-    //   mnemonic:
-    //     'force tone wrist rice ramp inform access idea lend purse verify dial beef right spread forget novel sentence rail script pretty east exchange canoe',
-    // },
-    // {
-    //   name: 'jack',
-    //   mnemonic:
-    //     'rich decide letter cannon wet sword ill cruise lyrics churn valid shift unknown steel drum gasp ginger fury modify ship vast puppy mountain embark',
-    // },
   ],
   urls: {
     // gql: 'http://localhost:3000/_gql',
@@ -117,6 +114,7 @@ export const getters = {
 
   coinImage(state) {
     return denom => {
+
       return state.coins[denom] ? state.coins[denom].image : state.baseCoinImage
     }
   },
