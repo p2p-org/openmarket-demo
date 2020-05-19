@@ -1,0 +1,59 @@
+version: '3'
+services:
+  om-ibc0:
+    build:
+      context: .
+    container_name: om-bc0
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - nft-db0:/app/db
+      - nft-img0:/app/static/images/output
+    environment:
+      - NODE_ENV=development
+      - GQL_URL=http://graphql_ibc0:8080/v1/graphql
+      - REST_URL=http://marketplace_api_ibc0:1317
+      - REST_URL_DST=http://marketplace_api_ibc1:1317
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=demo-ibc0.openmarket.one
+      - LETSENCRYPT_HOST=demo-ibc0.openmarket.one
+#      - DEBUG="true"
+    networks:
+      - dwh-tier
+
+  om-ibc1:
+    build:
+      context: .
+    container_name: om-ibc1
+    restart: unless-stopped
+    ports:
+      - 3001:3000
+    volumes:
+      - nft-db1:/app/db
+      - nft-img1:/app/static/images/output
+    environment:
+      - NODE_ENV=development
+      - GQL_URL=http://graphql_ibc1:8080/v1/graphql
+      - REST_URL=http://marketplace_api_ibc1:1317
+      - REST_URL_DST=http://marketplace_api_ibc0:1317
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=demo-ibc1.openmarket.one
+      - LETSENCRYPT_HOST=demo-ibc1.openmarket.one
+    #      - DEBUG="true"
+    networks:
+      - dwh-tier
+
+
+networks:
+  dwh-tier:
+    external:
+      name: dwh-network
+
+volumes:
+  nft-db0:
+  nft-img0:
+  nft-db1:
+  nft-img1:
+
+
