@@ -140,7 +140,7 @@ export default {
     },
     '/_dst': {
       pathRewrite: { '^/_dst': '' },
-      target: process.env.REST_URL2 || 'http://localhost:1318',
+      target: process.env.REST_URL_DST || 'http://localhost:1318',
       ws: false,
     },
     '/_gql': {
