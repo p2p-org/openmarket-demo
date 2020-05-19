@@ -34,7 +34,7 @@
     "nuxt": "^2.12.2",
     "nuxt-fontawesome": "^0.4.0",
     "nuxt-i18n": "^6.11.1",
-    "openmarket-sdk": "0.0.20",
+    "openmarket-sdk": "0.0.21",
     "sharp": "^0.25.3",
     "vee-validate": "^3.3.0",
     "vue-api-query": "^1.5.2",
