@@ -4,20 +4,23 @@ export function txCheck(tx, msg) {
   return new Promise((resolve, reject) => {
     console.log('tx send', tx, msg)
     let log = {}
-    if (tx && tx.result && tx.result.raw_log) {
-      log = JSON.parse(tx.result.raw_log)
+
+    if (tx && tx.raw_log && !tx.code) {
+      log = JSON.parse(tx.raw_log)
+      console.log('tx log1', log)
       if (Array.isArray(log)) {
+        if (!log.length) {
+          return resolve(tx)
+        }
         log = log.pop()
       }
       console.log('tx log', log)
       if (log.success) {
-        resolve(tx)
-        return
+        return resolve(tx)
       }
-    } else if (tx && tx.error) {
-      log.message = tx.error
     }
-    reject(new Error(log && log.message ? log.message : 'unknown tx error'))
+    console.log('tx log1', log)
+    reject(new Error(tx.raw_log || `unknown tx error: ${tx.code}`))
   })
 }
 

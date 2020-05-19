@@ -132,6 +132,9 @@
         <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">
           <form-item-gift :busy="nftBusy" @submit="onTransfer" />
         </b-card>
+        <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">
+          <form-item-tranfer :busy="nftBusy" @submit="onTransfer" />
+        </b-card>
         <template v-if="offers.length">
           <h5 class="subtitle mt-3">
             Offers
@@ -177,7 +180,7 @@
             <b-card no-body>
               <b-table striped hover :items="items" :busy="true">
                 <template v-slot:table-busy>
-                  <div class="text-center  my-2">
+                  <div class="text-center my-2">
                     <!--                      <b-spinner class="align-middle"></b-spinner>-->
                     <strong>under construction...</strong>
                   </div>
@@ -202,6 +205,7 @@ import FormItemCancelSell from './form/ItemCancelSell'
 import FormItemBuy from './form/ItemBuy'
 import FormItemCancelAuction from './form/ItemCancelAuction'
 import FormItemGift from './form/ItemGift'
+import FormItemTransfer from './form/ItemTransfer'
 import FormItemOffersList from './form/ItemOffersList'
 import FormItemBid from './form/ItemBid'
 import FormItemAuction from './form/ItemAuction'
@@ -241,6 +245,7 @@ export default {
     FormItemOwner,
     FormItemSell,
     FormItemOffer,
+    FormItemTransfer
   },
 
   props: {
@@ -462,8 +467,8 @@ export default {
     onBurn() {
       this.$root.$emit(ACTION_TOKEN_BURN, { id: this.nft.token_id, user: this.currentUser })
     },
-    onTransfer({ recipient }) {
-      this.$root.$emit(ACTION_TOKEN_TRNSFER, { id: this.nft.token_id, recipient, user: this.currentUser })
+    onTransfer({ recipient, path = null }) {
+      this.$root.$emit(ACTION_TOKEN_TRNSFER, { id: this.nft.token_id, recipient, user: this.currentUser, path })
     },
   },
 }

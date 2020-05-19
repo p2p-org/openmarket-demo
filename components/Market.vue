@@ -267,7 +267,7 @@ export default {
         () => this.loadCurrentUserInfo().then(() => this.loadNft(id))
       )
     },
-    doTransfer({ id, recipient, user }) {
+    doTransfer({ id, recipient, user, path = null }) {
       this.userAction(
         ACTION_TOKEN_TRNSFER,
         id,
@@ -277,6 +277,7 @@ export default {
           this.nftTransfer({
             user,
             recipient,
+            path,
             token: {
               id,
             },

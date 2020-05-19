@@ -19,14 +19,14 @@ export const state = () => ({
     src: {
       lcdUrl: '/_src',
       chainId: 'ibc0',
-      channelTx: 'ibczerochannel',
+      channelTx: 'ibconechannel',
       portTx: 'transfer',
       portTxNFT: 'transfernft',
     },
     dst: {
       lcdUrl: '/_dst',
       chainId: 'ibc1',
-      channelTx: 'ibconechannel',
+      channelTx: 'ibczerochannel',
       portTx: 'transfer',
       portTxNFT: 'transfernft',
     }

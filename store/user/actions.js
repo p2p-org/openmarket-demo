@@ -1,20 +1,23 @@
-export function addUser({ state, commit, dispatch }, { name = null, mnemonic }) {
-  let wallet
+export function addUser({ state, commit, dispatch }, { name = null, mnemonic = null, address = null, ecpairPriv = null }) {
   try {
-    wallet = this.$txApi.getWallet(mnemonic)
-    commit('setUser', { address: wallet.address, name, wallet, mnemonic })
+    if (mnemonic && (!address || !ecpairPriv)) {
+      address = this.$txApi.getAddress(mnemonic)
+      ecpairPriv = this.$txApi.getECPairPriv(mnemonic)
+    }
+    commit('setUser', { name, mnemonic, address, ecpairPriv })
   } catch (e) {
     console.error('addUser', e)
     return Promise.reject(e)
   }
   commit('saveLocalUsers')
-  return Promise.resolve(wallet.address)
+  return Promise.resolve(address)
 }
 
 export function initServiceUser({ commit, rootState }) {
   try {
-    const wallet = this.$txApi.getWallet(rootState.config.serviceUser.mnemonic)
-    commit('setServiceUser', wallet)
+    const address = this.$txApi.getAddress(rootState.config.serviceUser.mnemonic)
+    const ecpairPriv = this.$txApi.getECPairPriv(rootState.config.serviceUser.mnemonic)
+    commit('setServiceUser', { address, ecpairPriv })
   } catch (e) {
     console.error('initService', e)
     return Promise.reject(e)

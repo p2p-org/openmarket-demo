@@ -1,21 +1,28 @@
 import dayjs from 'dayjs'
-import { MARKET_ALL_NFT, MARKET_BUSY_NFT, MARKET_DEL_NFT, MARKET_ITEM_BIDS, MARKET_ITEM_OFFERS, MARKET_COINS } from '~/helpers/mutation-types'
-import { txCheck } from '~/helpers'
-import { parseDenom } from '../../helpers'
 import { marshalPubKey } from '@tendermint/amino-js'
 import { bytesToBase64 } from '@tendermint/belt'
 
+// import {
+//   BroadcastMode,
+//   createAddress,
+//   createBroadcastTx,
+//   createWalletFromMnemonic,
+//   SignMeta,
+//   signTx,
+//   StdTx,
+//   Tx,
+//   Wallet,
+// } from '@tendermint/sig'
+import { parseDenom } from '../../helpers'
 import {
-  BroadcastMode,
-  createAddress,
-  createBroadcastTx,
-  createWalletFromMnemonic,
-  SignMeta,
-  signTx,
-  StdTx,
-  Tx,
-  Wallet,
-} from '@tendermint/sig'
+  MARKET_ALL_NFT,
+  MARKET_BUSY_NFT,
+  MARKET_DEL_NFT,
+  MARKET_ITEM_BIDS,
+  MARKET_ITEM_OFFERS,
+  MARKET_COINS,
+} from '~/helpers/mutation-types'
+import { txCheck } from '~/helpers'
 function tokenId(tokenId) {
   return parseInt(tokenId.substring(6))
 }
@@ -30,12 +37,12 @@ function tokenId(tokenId) {
 export function getAllNft({ state, commit, rootState }, { force = false } = {}) {
   return this.$marketApi
     .getAllNft()
-    .then(nfts => {
-      return Promise.all(nfts.map(nft => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then(metas =>
+    .then((nfts) => {
+      return Promise.all(nfts.map((nft) => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then((metas) =>
         nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
       )
     })
-    .then(nfts => {
+    .then((nfts) => {
       commit(MARKET_ALL_NFT, nfts)
     })
 }
@@ -50,12 +57,12 @@ export function queryNft({ state, commit, rootState, dispatch }, { force = false
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNfts(params)
-      .then(nfts => {
-        return Promise.all(nfts.map(nft => dispatch('queryNftMeta', nft))).then(metas =>
+      .then((nfts) => {
+        return Promise.all(nfts.map((nft) => dispatch('queryNftMeta', nft))).then((metas) =>
           nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
         )
       })
-      .then(nfts => {
+      .then((nfts) => {
         console.debug('nfts', nfts)
         commit(MARKET_ALL_NFT, nfts)
         resolve()
@@ -80,7 +87,7 @@ export function queryOffer({ state, commit, rootState }, { params = {} } = {}) {
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNftOffers(params)
-      .then(offers => {
+      .then((offers) => {
         console.debug('nft offers', offers)
         if (tokenId) {
           commit(MARKET_ITEM_OFFERS, { tokenId, offers })
@@ -104,7 +111,7 @@ export function queryBid({ state, commit, rootState }, { params = {} } = {}) {
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getNftBids(params)
-      .then(bids => {
+      .then((bids) => {
         console.debug('nft bids', bids)
         if (tokenId) {
           commit(MARKET_ITEM_BIDS, { tokenId, bids })
@@ -119,7 +126,7 @@ export function queryUser({ commit, state, getters }, { address }) {
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getUser({ address })
-      .then(users => {
+      .then((users) => {
         if (users.length) {
           resolve(users.pop())
         }
@@ -133,7 +140,7 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
   return new Promise((resolve, reject) => {
     this.$marketApi
       .getOneNft(id)
-      .then(r => {
+      .then((r) => {
         // commit(MARKET_ALL_NFT, r)
         resolve(r)
       })
@@ -143,7 +150,7 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
 
 export function nftMint({ state, commit, rootGetters, rootState }, { user, token } = {}) {
   const svcUser = rootGetters['user/serviceUser']
-  return this.$txApi.getAccounts(svcUser.address).then(data => {
+  return this.$txApi.getAccounts(svcUser.address).then((data) => {
     // console.log(this.$txApi.getECPairPriv(user.mnemonic))
     const signMsg = this.$txMsgs.NewMessageMintNFT({
       sender: svcUser.address,
@@ -161,13 +168,13 @@ export function nftMint({ state, commit, rootGetters, rootState }, { user, token
       sequence: data.result.value.sequence,
     })
     // console.log('sign msg', signMsg)
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(svcUser.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(svcUser.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftSellFixed({ state, commit, rootState }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     console.log('user', data)
     const signMsg = this.$txMsgs.NewMessagePutNFTOnMarket({
       owner: user.address,
@@ -186,13 +193,13 @@ export function nftSellFixed({ state, commit, rootState }, { user, token } = {})
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftMakeOffer({ state, commit, rootState }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     console.log('user', data)
     const signMsg = this.$txMsgs.NewMsgMakeOffer({
       buyer: user.address,
@@ -213,13 +220,13 @@ export function nftMakeOffer({ state, commit, rootState }, { user, token } = {})
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftAcceptOffer({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     console.log('user', data)
     const signMsg = this.$txMsgs.NewMsgAcceptOffer({
       seller: user.address,
@@ -237,13 +244,13 @@ export function nftAcceptOffer({ state, commit, rootState, rootGetters }, { user
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftCancelOffer({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     console.log('user', data)
     const signMsg = this.$txMsgs.NewMsgRemoveOffer({
       buyer: user.address,
@@ -258,13 +265,13 @@ export function nftCancelOffer({ state, commit, rootState, rootGetters }, { user
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgBuyNFT({
       token_id: token.id,
       buyer: user.address,
@@ -279,13 +286,13 @@ export function nftBuyFixed({ state, commit, rootState, rootGetters }, { user, t
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgRemoveNFTFromMarket({
       owner: user.address,
       token_id: token.id,
@@ -298,14 +305,14 @@ export function nftCancelFixed({ state, commit, rootState, rootGetters }, { user
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftStartAuction({ state, commit, rootState }, { user, token } = {}) {
   console.log(token)
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgPutNFTOnAuction({
       owner: user.address,
       beneficiary: rootState.config.beneficiary.seller.address,
@@ -328,13 +335,13 @@ export function nftStartAuction({ state, commit, rootState }, { user, token } = 
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftCancelAuction({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgRemoveNFTFromAuction({
       owner: user.address,
       token_id: token.id,
@@ -347,13 +354,13 @@ export function nftCancelAuction({ state, commit, rootState, rootGetters }, { us
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftFinishAuction({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgFinishAuction({
       owner: user.address,
       token_id: token.id,
@@ -366,13 +373,13 @@ export function nftFinishAuction({ state, commit, rootState, rootGetters }, { us
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgMakeBidOnAuction({
       price: {
         denom: token.price.denom,
@@ -391,13 +398,13 @@ export function nftPlaceBid({ state, commit, rootState, rootGetters }, { user, t
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
 export function nftBuyout({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMsgBuyoutOnAuction({
       buyer: user.address,
       beneficiary: rootState.config.beneficiary.buyer.address,
@@ -412,94 +419,117 @@ export function nftBuyout({ state, commit, rootState, rootGetters }, { user, tok
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
-export function nftTransfer({ state, commit, rootState, rootGetters }, { user, token, recipient } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
-    const signMsg = this.$txMsgs.NewMsgTransferNFT({
-      sender: user.address,
-      token_id: token.id,
-      recipient,
-      denom: rootState.config.baseNftDenom,
-
-      // this part is necessary
-      fee: 0,
-      gas: '200000',
-      memo: '',
-      chain_id: rootState.config.chainId,
-      account_number: data.result.value.account_number,
-      sequence: data.result.value.sequence,
-    })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
-  })
-}
-
-export async function coinTransfer({ state, commit, rootState, rootGetters }, { user, coin, recipient, path } = {}) {
-  let signMsg
-  const resp = await Promise.all([
-    this.$txApi.getAccounts(user.wallet.address),
-    this.$txApiDst.getAccounts(user.wallet.address)
-  ])
-
-  const signMeta = {
-    account_number: resp[0].result.value.account_number,
-    chain_id: rootState.config.ibc.src.chainId,
-    // chain_id: rootState.config.chainId,
-    sequence: resp[0].result.value.sequence || '0',
-  }
+export async function nftTransfer({ state, commit, rootState, rootGetters }, { user, token, recipient, path } = {}) {
+  const resp = await Promise.all([this.$txApi.getAccounts(user.address), this.$txApiDst.getAccounts(user.address)])
   const destHeight = resp[1].height
-  // ibc
-  if (path !== null) {
-    console.log(path)
-    const fullDenom = parseDenom(coin.denom)
-    console.log(fullDenom)
 
-    signMsg = this.$txMsgs.NewMsgIBCTransferFungibleTokens({
-      sender: user.wallet.address,
-      receiver: recipient,
-      denom: fullDenom.channel
-        ? `${rootState.config.ibc.src.portTx}/${rootState.config.ibc.src.channelTx}/${fullDenom.denom}`
-        : `${rootState.config.ibc.dst.portTx}/${rootState.config.ibc.dst.channelTx}/${fullDenom.denom}`,
-      // denom: coin.denom,
-      amount: coin.amount,
-      sourceChannel: fullDenom.channel || rootState.config.ibc.src.channelTx,
-      destHeight,
+  const fullDenom = parseDenom(token.denom)
+  // return this.$txApi.getAccounts(user.address).then((data) => {
+  const signMsg =
+    path !== null
+      ? this.$txMsgs.NewMsgIBCTransferNFT({
+          account_number: resp[0].result.value.account_number,
+          chain_id: rootState.config.ibc.src.chainId,
+          // chain_id: rootState.config.chainId,
+          sequence: resp[0].result.value.sequence || '0',
 
-      // this part is necessary
-      fee: 0,
-      gas: '200000',
-      memo: '',
-    })
+          sender: user.address,
+          receiver: recipient,
 
-  } else {
-    signMsg = this.$txMsgs.NewMsgTransferFungibleTokens({
-      owner: user.address,
-      recipient,
-      denom: coin.denom,
-      amount: coin.amount,
+          denom: fullDenom.channel
+            ? `${rootState.config.ibc.src.portTx}/${rootState.config.ibc.src.channelTx}/${fullDenom.denom}`
+            : `${rootState.config.ibc.dst.portTx}/${rootState.config.ibc.dst.channelTx}/${fullDenom.denom}`,
+          // denom: coin.denom,
+          id: token.id,
+          sourceChannel: fullDenom.channel || rootState.config.ibc.src.channelTx,
+          destHeight,
 
-      // this part is necessary
-      fee: 0,
-      gas: '200000',
-      memo: '',
-    })
-  }
-  console.log(
-    signMsg,
-    user.wallet, signMeta
-  )
-  const signedTx = sign(signMsg, user.wallet, signMeta)
-  console.log(signedTx)
-  // return await this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+          // this part is necessary
+          fee: 0,
+          gas: '200000',
+          memo: '',
+        })
+      : this.$txMsgs.NewMsgTransferNFT({
+          sender: user.address,
+          token_id: token.id,
+          recipient,
+          denom: fullDenom.denom,
+
+          // this part is necessary
+          fee: 0,
+          gas: '200000',
+          memo: '',
+          account_number: resp[0].result.value.account_number,
+          chain_id: rootState.config.ibc.src.chainId,
+          // chain_id: rootState.config.chainId,
+          sequence: resp[0].result.value.sequence || '0',
+        })
+  const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+  // console.log(signedTx)
+  const tx = await this.$txApi.broadcast(signedTx)
+  return await txCheck(tx, signedTx)
   // })
 }
 
+export async function coinTransfer({ state, commit, rootState, rootGetters }, { user, coin, recipient, path } = {}) {
+  const resp = await Promise.all([this.$txApi.getAccounts(user.address), this.$txApiDst.getAccounts(user.address)])
+  const destHeight = resp[1].height
+  // ibc
+  const fullDenom = parseDenom(coin.denom)
+  // console.log(fullDenom)
+
+  const signMsg =
+    path !== null
+      ? this.$txMsgs.NewMsgIBCTransferFungibleTokens({
+          account_number: resp[0].result.value.account_number,
+          chain_id: rootState.config.ibc.src.chainId,
+          // chain_id: rootState.config.chainId,
+          sequence: resp[0].result.value.sequence || '0',
+          sender: user.address,
+          receiver: recipient,
+          denom: fullDenom.channel
+            ? `${rootState.config.ibc.src.portTx}/${rootState.config.ibc.src.channelTx}/${fullDenom.denom}`
+            : `${rootState.config.ibc.dst.portTx}/${rootState.config.ibc.dst.channelTx}/${fullDenom.denom}`,
+          // denom: coin.denom,
+          amount: coin.amount,
+          sourceChannel: fullDenom.channel || rootState.config.ibc.src.channelTx,
+          destHeight,
+
+          // this part is necessary
+          fee: 0,
+          gas: '200000',
+          memo: '',
+        })
+      : this.$txMsgs.NewMsgTransferFungibleTokens({
+          account_number: resp[0].result.value.account_number,
+          chain_id: rootState.config.ibc.src.chainId,
+          // chain_id: rootState.config.chainId,
+          sequence: resp[0].result.value.sequence || '0',
+
+          owner: user.address,
+          recipient,
+          denom: coin.denom,
+          amount: coin.amount,
+
+          // this part is necessary
+          fee: 0,
+          gas: '200000',
+          memo: '',
+        })
+  // console.log(signMsg)
+  const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+  // console.log(signedTx)
+  const tx = await this.$txApi.broadcast(signedTx)
+  return await txCheck(tx, signedTx)
+}
+
 export function nftBurn({ state, commit, rootState, rootGetters }, { user, token } = {}) {
-  return this.$txApi.getAccounts(user.address).then(data => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     const signMsg = this.$txMsgs.NewMessageBurnNFT({
       sender: user.address,
       token_id: token.id,
@@ -513,8 +543,8 @@ export function nftBurn({ state, commit, rootState, rootGetters }, { user, token
       account_number: data.result.value.account_number,
       sequence: data.result.value.sequence,
     })
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.privKey))
-    return this.$txApi.broadcast(signedTx).then(tx => txCheck(tx, signedTx))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
+    return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }
 
@@ -549,7 +579,7 @@ export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
     const getTx = () => {
       this.$marketApi
         .getTxMsgs({ hash })
-        .then(tx => {
+        .then((tx) => {
           if (!tx) {
             if (retryCnt > retryLimit) {
               reject(new Error('tx wait timeout: probably the transaction was failing for some reason'))
@@ -575,7 +605,7 @@ export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
 export function queryCoins({ rootState, commit }) {
   commit(MARKET_COINS, [rootState.config.baseCoinDenom])
   // console.log('get coins')
-  return this.$marketApi.getTokens().then(coins => {
+  return this.$marketApi.getTokens().then((coins) => {
     console.log('get coins', coins)
     if (coins && coins.length) {
       commit(MARKET_COINS, coins)
@@ -583,15 +613,14 @@ export function queryCoins({ rootState, commit }) {
   })
 }
 
-
-function sign(tx, wallet, meta) {
-  const signedTx = signTx(tx, meta, wallet)
-  console.log('123',signedTx)
-  // @ts-ignore
-  // tslint:disable-next-line: no-object-mutation
-  signedTx.signatures = signedTx.signatures.map(s => ({
-    pub_key: bytesToBase64(marshalPubKey(s.pub_key, false)),
-    signature: s.signature
-  }))
-  return signedTx
-}
+// function sign(tx, wallet, meta) {
+//   const signedTx = signTx(tx, meta, wallet)
+//   console.log('123', signedTx)
+//   // @ts-ignore
+//   // tslint:disable-next-line: no-object-mutation
+//   signedTx.signatures = signedTx.signatures.map((s) => ({
+//     pub_key: bytesToBase64(marshalPubKey(s.pub_key, false)),
+//     signature: s.signature,
+//   }))
+//   return signedTx
+// }

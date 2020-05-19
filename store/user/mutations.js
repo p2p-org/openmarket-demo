@@ -1,12 +1,10 @@
 export default {
-  setUser(state, { mnemonic = null, address = null, name = null, wallet = {}, params = {} }) {
+  setUser(state, { mnemonic = null, name = null, address = null, ecpairPriv = null, params = {} }) {
     if (state.users[address]) {
-      // console.log('upd user', address, state.users[address], params)
+      console.log('upd user', address, state.users[address], params)
       state.users = { ...state.users, [address]: { ...state.users[address], ...params } }
     } else {
-      // console.log('new user', address, params)
-      state.users = { ...state.users, [address]: { name, address, mnemonic, wallet, ...params } }
-      // console.log('new user', address, state.users[address])
+      state.users = { ...state.users, [address]: { name, address, mnemonic, ecpairPriv, ...params } }
     }
     // state.currentAddress = address
   },
@@ -56,11 +54,11 @@ export default {
       localStorage.setItem('current', JSON.stringify(state.currentAddress))
     }
   },
-  setServiceUser(state, { address = null, wallet = {}, params = {} }) {
+  setServiceUser(state, { address = null, ecpairPriv = null, params = {} }) {
     if (state.service) {
       state.service = { ...state.service, ...params }
     } else {
-      state.service = { address, wallet, ...params }
+      state.service = { address, ecpairPriv, ...params }
     }
   },
 }

@@ -67,8 +67,8 @@
                   </b-col>
                 </b-row>
                 <b-row class="mt-2">
-                  <b-col md="6" />
-                  <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
+                  <b-col md="8" />
+                  <b-col md="4" class="d-flex flex-column pl-2 justify-content-end">
                     <b-btn variant="primary" size="lg" class="py-2" :disabled="busyTx || invalid" type="submit">
                       Send coins
                       <b-spinner v-if="busyTx" type="grow" small />
@@ -153,7 +153,7 @@ export default {
         .then(confirm => {
           if (confirm) {
             return this.coinTransfer({ user: this.currentUser, recipient: this.recipient, coin: this.coin, path: this.path })
-              .then(res => this.waitMarket({ hash: res.result.txhash }))
+              .then(tx => this.waitMarket({ hash: tx.txhash }))
               .then(tx => {
                 console.log('tx mined', tx)
                 return this.loadCurrentUserInfo()
