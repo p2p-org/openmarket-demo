@@ -1,10 +1,13 @@
 import { CONFIG_URLS } from '~/helpers/mutation-types'
 
+const IBC_SRC = process.env.IBC_SRC || 'ibc0'
+const IBC_DST = process.env.IBC_DST || 'ibc1'
+
 export const state = () => ({
   lcdUrl: '/_lcd',
   gqlUrl: '/_gql',
   // moniker: 'node0',
-  chainId: process.env.IBC_SRC,
+  chainId: IBC_SRC,
   nodeId: 'e65a518a5bb43acbdfd537234f5dcab48d7a7ba7',
   tokenBaseUrl: '/api/token/',
   hasuraAccessKey: 'q5WNqC6MP6123123',

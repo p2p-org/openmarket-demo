@@ -20,6 +20,8 @@ COPY . .
 RUN \
   export GQL_URL='%%GQL_URL%%' && \
   export REST_URL='%%REST_URL%%' && \
+  export IBC_SRC='%%IBC_SRC%%' && \
+  export IBC_DST='%%IBC_DST%%' && \
   npm run --silent build
 RUN npm prune --production
 
