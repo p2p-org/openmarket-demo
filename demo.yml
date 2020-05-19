@@ -1,8 +1,7 @@
 version: '3'
 services:
   om-ibc0:
-    build:
-      context: .
+    image: "om:latest"
     container_name: om-bc0
     restart: unless-stopped
     ports:
@@ -23,8 +22,7 @@ services:
       - dwh-tier
 
   om-ibc1:
-    build:
-      context: .
+    image: "om:latest"
     container_name: om-ibc1
     restart: unless-stopped
     ports:
