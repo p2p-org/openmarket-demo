@@ -2,7 +2,7 @@ version: '3'
 services:
   om-ibc0:
     image: "om:latest"
-    container_name: om-bc0
+    container_name: om-ibc0
     restart: unless-stopped
     ports:
       - 3000:3000
