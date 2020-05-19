@@ -14,6 +14,8 @@ services:
       - GQL_URL=http://graphql_ibc0:8080/v1/graphql
       - REST_URL=http://marketplace_api_ibc0:1317
       - REST_URL_DST=http://marketplace_api_ibc1:1317
+      - IBC_SRC=ibc0
+      - IBC_DST=ibc1
       - VIRTUAL_PORT=3000
       - VIRTUAL_HOST=demo-ibc0.openmarket.one
       - LETSENCRYPT_HOST=demo-ibc0.openmarket.one
@@ -35,10 +37,12 @@ services:
       - GQL_URL=http://graphql_ibc1:8080/v1/graphql
       - REST_URL=http://marketplace_api_ibc1:1317
       - REST_URL_DST=http://marketplace_api_ibc0:1317
+      - IBC_SRC=ibc1
+      - IBC_DST=ibc0
       - VIRTUAL_PORT=3000
       - VIRTUAL_HOST=demo-ibc1.openmarket.one
       - LETSENCRYPT_HOST=demo-ibc1.openmarket.one
-    #      - DEBUG="true"
+#      - DEBUG="true"
     networks:
       - dwh-tier
 
