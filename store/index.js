@@ -23,8 +23,6 @@ export const actions = {
   async nuxtServerInit({ state, commit, dispatch }, { req, app }) {
     // await dispatch('market/queryCoins')
 
-    await dispatch('user/initServiceUser')
-
     // if (process.env.GQL_WS_URL) {
     //   commit(`config/${CONFIG_URLS}`, {
     //     gqlWsUrl: process.env.GQL_WS_URL,

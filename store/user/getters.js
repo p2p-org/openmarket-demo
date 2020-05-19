@@ -26,10 +26,6 @@ export function currentUserBalance(state, getters) {
   }
 }
 
-export function serviceUser(state) {
-  return state.service || null
-}
-
 export function findUserByName(state) {
   return name => state.users.find(x => x.name === name)
 }

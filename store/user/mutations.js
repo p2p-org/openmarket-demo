@@ -54,11 +54,4 @@ export default {
       localStorage.setItem('current', JSON.stringify(state.currentAddress))
     }
   },
-  setServiceUser(state, { address = null, ecpairPriv = null, params = {} }) {
-    if (state.service) {
-      state.service = { ...state.service, ...params }
-    } else {
-      state.service = { address, ecpairPriv, ...params }
-    }
-  },
 }

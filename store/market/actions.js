@@ -149,11 +149,10 @@ export function getOneNft({ state, commit, rootState }, { force = false, id = nu
 }
 
 export function nftMint({ state, commit, rootGetters, rootState }, { user, token } = {}) {
-  const svcUser = rootGetters['user/serviceUser']
-  return this.$txApi.getAccounts(svcUser.address).then((data) => {
+  return this.$txApi.getAccounts(user.address).then((data) => {
     // console.log(this.$txApi.getECPairPriv(user.mnemonic))
     const signMsg = this.$txMsgs.NewMessageMintNFT({
-      sender: svcUser.address,
+      sender: user.address,
       recipient: user.address,
       token_id: token.id,
       denom: rootState.config.baseNftDenom,
@@ -168,7 +167,7 @@ export function nftMint({ state, commit, rootGetters, rootState }, { user, token
       sequence: data.result.value.sequence,
     })
     // console.log('sign msg', signMsg)
-    const signedTx = this.$txApi.sign(signMsg, Buffer.from(svcUser.ecpairPriv))
+    const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
     return this.$txApi.broadcast(signedTx).then((tx) => txCheck(tx, signedTx))
   })
 }

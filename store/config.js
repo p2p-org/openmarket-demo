@@ -71,11 +71,6 @@ export const state = () => ({
         'onion axis add badge give decline behave cry aim have drop wheat cat annual nerve mobile elite test effort race rebel dragon forget pony',
     },
   },
-  serviceUser: {
-    address: '',
-    mnemonic:
-      'unfold whale pear cage stand rescue grape sentence fence document fan begin traffic across property sense list dose sock license drink poverty romance bid',
-  },
   mockUsers: [
     {
       name: 'user1',
