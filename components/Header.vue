@@ -5,6 +5,7 @@
         <b-navbar-brand to="/" exact>
           <!--        <b-img src="~/assets/psc_logo_web_2d.png"></b-img>-->
           Open Market
+          <small class="text-danger">{{ chainId.toUpperCase() }}</small>
         </b-navbar-brand>
         <b-navbar-toggle target="nav_collapse" />
         <b-collapse id="nav_collapse" is-nav>
@@ -182,6 +183,7 @@ export default {
   },
   computed: {
     ...mapState({
+      chainId: state => state.config.chainId,
       mockUsers: state => state.config.mockUsers,
       baseCoinDenom: state => state.config.baseCoinDenom,
       currentAddress: state => state.user.currentAddress,

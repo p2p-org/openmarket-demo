@@ -15,19 +15,21 @@
             <b-input-group-text><fa :icon="['fas', 'address-book']"/></b-input-group-text>
           </b-text-input-prep>
         </b-col>
-        <b-col md="6" class="d-flex flex-column pr-2">
+        <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
           <b-select-input
             v-model="path"
             name="Network"
             label="Choose destination network"
             placeholder="network"
             :options="options"
-            :disabled="busyTx"
+            :disabled="busy"
           />
         </b-col>
-        <b-col md="6" class="d-flex flex-column pl-2 justify-content-end">
+      </b-row>
+      <b-row class="mt-2">
+        <b-col cols="8" class="d-flex flex-column pl-2 justify-content-end mx-auto">
           <b-btn variant="warning" size="lg" class="py-2" :disabled="busy || invalid" type="submit">
-            Gift token
+            Transfer/Gift token
             <b-spinner v-if="busy" type="grow" small />
           </b-btn>
         </b-col>
@@ -37,13 +39,15 @@
 </template>
 
 <script>
-import {  mapState } from 'vuex'
+import {  mapGetters, mapState } from 'vuex'
 import { ValidationObserver } from 'vee-validate'
 import BTextInputPrep from './inputs/BTextInputPrep'
+import BSelectInput from './inputs/BSelectInput'
 
 export default {
-  name: 'FormItemGift',
+  name: 'FormItemTransfer',
   components: {
+    BSelectInput,
     BTextInputPrep,
     ValidationObserver
   },
@@ -62,13 +66,11 @@ export default {
     path: null,
   }),
   computed: {
-    ...mapState({
-      ibc: state => state.config.ibc,
-    }),
+    ...mapGetters('config', ['ibcPath']),
     options() {
       return [
-        { value: null, text: `Home (${this.ibc.src.chainId})` },
-        { value: this.ibc.dst.channelTx, text: `Target (${this.ibc.dst.chainId})` },
+        { value: null, text: `Home (${this.ibcPath.src.chainId})` },
+        { value: this.ibcPath.dst.channelTx, text: `Target (${this.ibcPath.dst.chainId})` },
       ]
     }
   },

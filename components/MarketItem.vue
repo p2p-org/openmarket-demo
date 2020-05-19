@@ -129,11 +129,11 @@
           </template>
           <!--            </b-row>-->
         </b-card>
+<!--        <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">-->
+<!--          <form-item-gift :busy="nftBusy" @submit="onTransfer" />-->
+<!--        </b-card>-->
         <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">
-          <form-item-gift :busy="nftBusy" @submit="onTransfer" />
-        </b-card>
-        <b-card v-if="owned && status === 0" class="mb-3 p-2 market-action">
-          <form-item-tranfer :busy="nftBusy" @submit="onTransfer" />
+          <form-item-transfer :busy="nftBusy" @submit="onTransfer" />
         </b-card>
         <template v-if="offers.length">
           <h5 class="subtitle mt-3">
@@ -468,7 +468,7 @@ export default {
       this.$root.$emit(ACTION_TOKEN_BURN, { id: this.nft.token_id, user: this.currentUser })
     },
     onTransfer({ recipient, path = null }) {
-      this.$root.$emit(ACTION_TOKEN_TRNSFER, { id: this.nft.token_id, recipient, user: this.currentUser, path })
+      this.$root.$emit(ACTION_TOKEN_TRNSFER, { nft: this.nft, recipient, user: this.currentUser, path })
     },
   },
 }

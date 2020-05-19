@@ -1,11 +1,10 @@
 import { CONFIG_URLS } from '~/helpers/mutation-types'
-import { parseDenom } from '../helpers'
 
 export const state = () => ({
   lcdUrl: '/_lcd',
   gqlUrl: '/_gql',
   // moniker: 'node0',
-  chainId: 'ibc0',
+  chainId: process.env.IBC_SRC,
   nodeId: 'e65a518a5bb43acbdfd537234f5dcab48d7a7ba7',
   tokenBaseUrl: '/api/token/',
   hasuraAccessKey: 'q5WNqC6MP6123123',
@@ -16,20 +15,42 @@ export const state = () => ({
   stakeCoinDenom: 'stake',
   stakeCoinImage: '/images/currency_stake.png',
   ibc: {
-    src: {
-      lcdUrl: '/_src',
-      chainId: 'ibc0',
-      channelTx: 'ibconechannel',
-      portTx: 'transfer',
-      portTxNFT: 'transfernft',
+    ibc0: {
+      src: {
+        lcdUrl: '/_src',
+        chainId: 'ibc0',
+        channelTx: 'ibconechannel',
+        channelTxNFT: 'ibconechannelnft',
+        portTx: 'transfer',
+        portTxNFT: 'transfernft',
+      },
+      dst: {
+        lcdUrl: '/_dst',
+        chainId: 'ibc1',
+        channelTx: 'ibczerochannel',
+        channelTxNFT: 'ibczerochannelnft',
+        portTx: 'transfer',
+        portTxNFT: 'transfernft',
+      },
     },
-    dst: {
-      lcdUrl: '/_dst',
-      chainId: 'ibc1',
-      channelTx: 'ibczerochannel',
-      portTx: 'transfer',
-      portTxNFT: 'transfernft',
-    }
+    ibc1: {
+      src: {
+        lcdUrl: '/_src',
+        chainId: 'ibc1',
+        channelTx: 'ibczerochannel',
+        channelTxNFT: 'ibczerochannelnft',
+        portTx: 'transfer',
+        portTxNFT: 'transfernft',
+      },
+      dst: {
+        lcdUrl: '/_dst',
+        chainId: 'ibc0',
+        channelTx: 'ibconechannel',
+        channelTxNFT: 'ibconechannelnft',
+        portTx: 'transfer',
+        portTxNFT: 'transfernft',
+      },
+    },
   },
   coins: {
     token: {
@@ -104,23 +125,25 @@ export const mutations = {
 
 export const getters = {
   getMockUser(state) {
-    return name => state.mockUsers.find(x => x.name === name)
+    return (name) => state.mockUsers.find((x) => x.name === name)
   },
 
   coinImage(state) {
-    return denom => {
-
+    return (denom) => {
       return state.coins[denom] ? state.coins[denom].image : state.baseCoinImage
     }
   },
   coinName(state) {
-    return denom => {
+    return (denom) => {
       return state.coins[denom] ? state.coins[denom].name : denom
     }
   },
   coinRate(state) {
-    return denom => {
+    return (denom) => {
       return state.coins[denom] ? state.coins[denom].rate : 0
     }
   },
+  ibcPath(state) {
+    return state.ibc[state.chainId]
+  }
 }

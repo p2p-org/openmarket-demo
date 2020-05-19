@@ -2,6 +2,10 @@ require('dotenv').config()
 
 export default {
   mode: 'universal',
+  env: {
+    IBC_SRC: process.env.IBC_SRC || 'ibc0',
+    IBC_DST: process.env.IBC_DST || 'ibc1',
+  },
   /*
    ** Headers of the page
    */

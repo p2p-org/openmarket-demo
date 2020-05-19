@@ -423,17 +423,18 @@ export function nftBuyout({ state, commit, rootState, rootGetters }, { user, tok
   })
 }
 
-export async function nftTransfer({ state, commit, rootState, rootGetters }, { user, token, recipient, path } = {}) {
+export async function nftTransfer({ state, commit, rootState, rootGetters }, { user, nft, recipient, path } = {}) {
   const resp = await Promise.all([this.$txApi.getAccounts(user.address), this.$txApiDst.getAccounts(user.address)])
   const destHeight = resp[1].height
-
-  const fullDenom = parseDenom(token.denom)
+  const ibcPath = rootGetters[`config/ibcPath`]
+  console.log('!!!', nft)
+  const fullDenom = parseDenom(nft.denom)
   // return this.$txApi.getAccounts(user.address).then((data) => {
   const signMsg =
     path !== null
       ? this.$txMsgs.NewMsgIBCTransferNFT({
           account_number: resp[0].result.value.account_number,
-          chain_id: rootState.config.ibc.src.chainId,
+          chain_id: ibcPath.src.chainId,
           // chain_id: rootState.config.chainId,
           sequence: resp[0].result.value.sequence || '0',
 
@@ -441,11 +442,11 @@ export async function nftTransfer({ state, commit, rootState, rootGetters }, { u
           receiver: recipient,
 
           denom: fullDenom.channel
-            ? `${rootState.config.ibc.src.portTx}/${rootState.config.ibc.src.channelTx}/${fullDenom.denom}`
-            : `${rootState.config.ibc.dst.portTx}/${rootState.config.ibc.dst.channelTx}/${fullDenom.denom}`,
+            ? `${ibcPath.src.portTxNFT}/${ibcPath.src.channelTxNFT}/${fullDenom.denom}`
+            : `${ibcPath.dst.portTxNFT}/${ibcPath.dst.channelTxNFT}/${fullDenom.denom}`,
           // denom: coin.denom,
-          id: token.id,
-          sourceChannel: fullDenom.channel || rootState.config.ibc.src.channelTx,
+          id: nft.token_id,
+          sourceChannel: fullDenom.channel || ibcPath.src.channelTxNFT,
           destHeight,
 
           // this part is necessary
@@ -455,7 +456,7 @@ export async function nftTransfer({ state, commit, rootState, rootGetters }, { u
         })
       : this.$txMsgs.NewMsgTransferNFT({
           sender: user.address,
-          token_id: token.id,
+          token_id: nft.token_id,
           recipient,
           denom: fullDenom.denom,
 
@@ -464,7 +465,7 @@ export async function nftTransfer({ state, commit, rootState, rootGetters }, { u
           gas: '200000',
           memo: '',
           account_number: resp[0].result.value.account_number,
-          chain_id: rootState.config.ibc.src.chainId,
+          chain_id: ibcPath.src.chainId,
           // chain_id: rootState.config.chainId,
           sequence: resp[0].result.value.sequence || '0',
         })
@@ -478,25 +479,28 @@ export async function nftTransfer({ state, commit, rootState, rootGetters }, { u
 export async function coinTransfer({ state, commit, rootState, rootGetters }, { user, coin, recipient, path } = {}) {
   const resp = await Promise.all([this.$txApi.getAccounts(user.address), this.$txApiDst.getAccounts(user.address)])
   const destHeight = resp[1].height
-  // ibc
+  const ibcPath = rootGetters[`config/ibcPath`]
   const fullDenom = parseDenom(coin.denom)
   // console.log(fullDenom)
 
+  console.log(ibcPath)
+
+  console.log(path, fullDenom.channel, ibcPath.src.channelTx)
   const signMsg =
     path !== null
       ? this.$txMsgs.NewMsgIBCTransferFungibleTokens({
           account_number: resp[0].result.value.account_number,
-          chain_id: rootState.config.ibc.src.chainId,
+          chain_id: ibcPath.src.chainId,
           // chain_id: rootState.config.chainId,
           sequence: resp[0].result.value.sequence || '0',
           sender: user.address,
           receiver: recipient,
           denom: fullDenom.channel
-            ? `${rootState.config.ibc.src.portTx}/${rootState.config.ibc.src.channelTx}/${fullDenom.denom}`
-            : `${rootState.config.ibc.dst.portTx}/${rootState.config.ibc.dst.channelTx}/${fullDenom.denom}`,
+            ? `${ibcPath.src.portTx}/${ibcPath.src.channelTx}/${fullDenom.denom}`
+            : `${ibcPath.dst.portTx}/${ibcPath.dst.channelTx}/${fullDenom.denom}`,
           // denom: coin.denom,
           amount: coin.amount,
-          sourceChannel: fullDenom.channel || rootState.config.ibc.src.channelTx,
+          sourceChannel: fullDenom.channel || ibcPath.src.channelTx,
           destHeight,
 
           // this part is necessary
@@ -506,7 +510,7 @@ export async function coinTransfer({ state, commit, rootState, rootGetters }, { 
         })
       : this.$txMsgs.NewMsgTransferFungibleTokens({
           account_number: resp[0].result.value.account_number,
-          chain_id: rootState.config.ibc.src.chainId,
+          chain_id: ibcPath.src.chainId,
           // chain_id: rootState.config.chainId,
           sequence: resp[0].result.value.sequence || '0',
 
@@ -520,9 +524,9 @@ export async function coinTransfer({ state, commit, rootState, rootGetters }, { 
           gas: '200000',
           memo: '',
         })
-  // console.log(signMsg)
+  console.log('signMsg',signMsg)
   const signedTx = this.$txApi.sign(signMsg, Buffer.from(user.ecpairPriv))
-  // console.log(signedTx)
+  console.log('signedTx',signedTx)
   const tx = await this.$txApi.broadcast(signedTx)
   return await txCheck(tx, signedTx)
 }
@@ -570,7 +574,7 @@ export function nftBusyUnlock({ state, commit }, { tokenId } = {}) {
 }
 
 export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
-  const retryLimit = 5
+  const retryLimit = 10
   const timeOut = 500
   let retryCnt = 0
 
@@ -581,7 +585,7 @@ export function waitMarket({ state, commit, rootState }, { hash = null } = {}) {
         .then((tx) => {
           if (!tx) {
             if (retryCnt > retryLimit) {
-              reject(new Error('tx wait timeout: probably the transaction was failing for some reason'))
+              reject(new Error('tx wait timeout: probably the transaction was failing for some reason, please refresh the page to check'))
             } else {
               retryCnt++
               setTimeout(() => {

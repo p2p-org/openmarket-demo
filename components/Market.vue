@@ -267,10 +267,10 @@ export default {
         () => this.loadCurrentUserInfo().then(() => this.loadNft(id))
       )
     },
-    doTransfer({ id, recipient, user, path = null }) {
+    doTransfer({ nft, recipient, user, path = null }) {
       this.userAction(
         ACTION_TOKEN_TRNSFER,
-        id,
+        nft.token_id,
         'Confirm transfer?',
         'NFT Transfered',
         () =>
@@ -278,11 +278,9 @@ export default {
             user,
             recipient,
             path,
-            token: {
-              id,
-            },
+            nft,
           }),
-        () => this.loadNft(id)
+        () => this.loadNft(nft.token_id)
       )
     },
     doCoinTransfer({ coin, recipient, user }) {
@@ -343,7 +341,7 @@ export default {
           if (confirm) {
             console.log('action', action, id)
             return fAction()
-              .then(res => this.waitMarket({ hash: res.result.txhash }))
+              .then(res => this.waitMarket({ hash: res.txhash }))
               .then(tx => {
                 console.log('tx mined', tx)
                 return fSuccess()

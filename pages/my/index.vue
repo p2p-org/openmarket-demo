@@ -120,7 +120,7 @@ export default {
       currentAddress: state => state.user.currentAddress,
     }),
     ...mapGetters('user', ['currentUser', 'userIdByAddress', 'currentUserCoins']),
-    ...mapGetters('config', ['coinImage', 'coinName']),
+    ...mapGetters('config', ['coinImage', 'coinName', 'ibcPath']),
     userBalance() {
       let val = 0
       if (this.currentUser && this.currentUser.coins && this.currentUser.coins.length) {
@@ -131,8 +131,8 @@ export default {
     },
     options() {
       return [
-        { value: null, text: `Home (${this.ibc.src.chainId})` },
-        { value: this.ibc.dst.channelTx, text: `Target (${this.ibc.dst.chainId})` },
+        { value: null, text: `Home (${this.ibcPath.src.chainId})` },
+        { value: this.ibcPath.dst.channelTx, text: `Target (${this.ibcPath.dst.chainId})` },
       ]
     }
   },
