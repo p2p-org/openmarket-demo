@@ -20,6 +20,7 @@ COPY . .
 RUN \
   export GQL_URL='%%GQL_URL%%' && \
   export REST_URL='%%REST_URL%%' && \
+  export TOKEN_PREFIX='%%TOKEN_PREFIX%%' && \
   export IBC_SRC='%%IBC_SRC%%' && \
   export IBC_DST='%%IBC_DST%%' && \
   npm run --silent build

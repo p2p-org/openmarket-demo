@@ -61,11 +61,11 @@ export default {
       form: {},
       show: true,
       busy: false,
-      prefix: 'TOKEN_',
     }
   },
   computed: {
     ...mapState({
+      prefix: state => state.config.tokenPrefix,
       nfts: state => state.market.nfts,
     }),
     ...mapGetters('user', ['currentUser']),

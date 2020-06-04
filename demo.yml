@@ -16,6 +16,7 @@ services:
       - REST_URL_DST=http://marketplace_api_ibc1:1317
       - IBC_SRC=ibc0
       - IBC_DST=ibc1
+      - TOKEN_PREFIX=TOKEN_IBC0_
       - VIRTUAL_PORT=3000
       - VIRTUAL_HOST=demo-ibc0.openmarket.one
       - LETSENCRYPT_HOST=demo-ibc0.openmarket.one
@@ -39,6 +40,7 @@ services:
       - REST_URL_DST=http://marketplace_api_ibc0:1317
       - IBC_SRC=ibc1
       - IBC_DST=ibc0
+      - TOKEN_PREFIX=TOKEN_IBC1_
       - VIRTUAL_PORT=3000
       - VIRTUAL_HOST=demo-ibc1.openmarket.one
       - LETSENCRYPT_HOST=demo-ibc1.openmarket.one

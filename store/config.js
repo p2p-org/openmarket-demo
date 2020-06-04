@@ -2,8 +2,10 @@ import { CONFIG_URLS } from '~/helpers/mutation-types'
 
 const IBC_SRC = process.env.IBC_SRC || 'ibc0'
 const IBC_DST = process.env.IBC_DST || 'ibc1'
+const TOKEN_PREFIX = process.env.TOKEN_PREFIX || 'TOKEN_'
 
 export const state = () => ({
+  tokenPrefix: TOKEN_PREFIX,
   lcdUrl: '/_lcd',
   gqlUrl: '/_gql',
   // moniker: 'node0',
