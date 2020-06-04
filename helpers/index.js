@@ -67,7 +67,7 @@ export function prepNft(n) {
 }
 
 export function parseDenom(denom) {
-  const regex = /^([a-z]+)\/([a-z]+)\/([a-z]+)$/g
+  const regex = /^([a-z]+)\/([a-z]+)\/([a-z\_]+)$/g
   if (regex.test(denom)) {
     const found = denom.split('/')
     return {
