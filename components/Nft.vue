@@ -71,7 +71,7 @@ export default {
     ...mapGetters('user', ['currentUser']),
     nextId() {
       const id = this.nfts.reduce((a, n) => {
-        const i = parseInt(n.token_id.replace(/\D/g, ''))
+        const i = parseInt(n.token_id.substring(this.prefix.length))
         return i > a ? i : a
       }, 0)
       return id + 1

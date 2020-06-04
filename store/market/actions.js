@@ -14,6 +14,7 @@ import { bytesToBase64 } from '@tendermint/belt'
 //   Wallet,
 // } from '@tendermint/sig'
 import { parseDenom } from '../../helpers'
+import { TOKEN_PREFIX } from '../config'
 import {
   MARKET_ALL_NFT,
   MARKET_BUSY_NFT,
@@ -24,7 +25,7 @@ import {
 } from '~/helpers/mutation-types'
 import { txCheck } from '~/helpers'
 function tokenId(tokenId) {
-  return parseInt(tokenId.substring(6))
+  return parseInt(tokenId.substring(TOKEN_PREFIX.length))
 }
 
 // function metaProp(meta, trait) {
