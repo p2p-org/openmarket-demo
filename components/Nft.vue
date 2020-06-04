@@ -45,6 +45,7 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { parseTokenId } from '../helpers'
 import { Nft } from '~/models'
 
 export default {
@@ -71,7 +72,7 @@ export default {
     ...mapGetters('user', ['currentUser']),
     nextId() {
       const id = this.nfts.reduce((a, n) => {
-        const i = parseInt(n.token_id.substring(this.prefix.length))
+        const i = parseTokenId(n.token_id)
         return i > a ? i : a
       }, 0)
       return id + 1

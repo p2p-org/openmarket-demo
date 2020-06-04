@@ -83,3 +83,8 @@ export function parseDenom(denom) {
     }
   }
 }
+
+export function parseTokenId(tokenId) {
+  const match = tokenId.match(/^.+_(\d+)$/)
+  return parseInt(match[1] || '0')
+}

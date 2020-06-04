@@ -1,20 +1,7 @@
-import dayjs from 'dayjs'
-import { marshalPubKey } from '@tendermint/amino-js'
-import { bytesToBase64 } from '@tendermint/belt'
+// import dayjs from 'dayjs'
 
-// import {
-//   BroadcastMode,
-//   createAddress,
-//   createBroadcastTx,
-//   createWalletFromMnemonic,
-//   SignMeta,
-//   signTx,
-//   StdTx,
-//   Tx,
-//   Wallet,
-// } from '@tendermint/sig'
-import { parseDenom } from '../../helpers'
-import { TOKEN_PREFIX } from '../config'
+import { parseDenom, parseTokenId } from '../../helpers'
+
 import {
   MARKET_ALL_NFT,
   MARKET_BUSY_NFT,
@@ -24,9 +11,6 @@ import {
   MARKET_COINS,
 } from '~/helpers/mutation-types'
 import { txCheck } from '~/helpers'
-function tokenId(tokenId) {
-  return parseInt(tokenId.substring(TOKEN_PREFIX.length))
-}
 
 // function metaProp(meta, trait) {
 //   return {
@@ -39,7 +23,7 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
   return this.$marketApi
     .getAllNft()
     .then((nfts) => {
-      return Promise.all(nfts.map((nft) => this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id)))).then((metas) =>
+      return Promise.all(nfts.map((nft) => this.$axios.$get(rootState.config.tokenBaseUrl + parseTokenId(nft.token_id)))).then((metas) =>
         nfts.map((nft, idx) => ({ ...nft, meta: metas[idx] }))
       )
     })
@@ -48,7 +32,7 @@ export function getAllNft({ state, commit, rootState }, { force = false } = {}) 
     })
 }
 export function queryNftMeta({ rootState }, nft) {
-  return this.$axios.$get(rootState.config.tokenBaseUrl + tokenId(nft.token_id))
+  return this.$axios.$get(rootState.config.tokenBaseUrl + parseTokenId(nft.token_id))
 }
 
 export function queryNft({ state, commit, rootState, dispatch }, { force = false, params = {} } = {}) {
