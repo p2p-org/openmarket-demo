@@ -7,13 +7,13 @@ on:
 
 jobs:
   sast:
-    uses: p2p-org/security-workflows/.github/workflows/sast.yaml@main
+    uses: p2p-org/security-workflows/.github/workflows/sast.yaml@e726caf9621e3f06560265a1678e8af43ee1903d # main
     secrets: inherit
   sca:
-    uses: p2p-org/security-workflows/.github/workflows/sca.yaml@main
+    uses: p2p-org/security-workflows/.github/workflows/sca.yaml@e726caf9621e3f06560265a1678e8af43ee1903d # main
     secrets: inherit
   docker-scan:
-    uses: p2p-org/security-workflows/.github/workflows/docker-scan.yaml@main
+    uses: p2p-org/security-workflows/.github/workflows/docker-scan.yaml@e726caf9621e3f06560265a1678e8af43ee1903d # main
     secrets: inherit
     with:
       image_name: ${{ github.repository }}
